@@ -22,6 +22,10 @@ public class GameCanvas extends JComponent {
         g2d.setRenderingHints(rh);
 
         gameMap.drawMap(g2d);
+        gameMap.generateRooms();
+        for (Room r : gameMap.getRooms() ) {
+            r.drawRoom(g2d);
+        }
     }
 
 }
