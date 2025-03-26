@@ -3,6 +3,8 @@ import javax.swing.*;
 
 public class GameCanvas extends JComponent {
     private int width, height;
+    private Map gameMap = new Map();
+
 
     public GameCanvas(int width, int height){
         this.width = width;
@@ -18,6 +20,8 @@ public class GameCanvas extends JComponent {
             RenderingHints.KEY_ANTIALIASING,
             RenderingHints.VALUE_ANTIALIAS_ON);
         g2d.setRenderingHints(rh);
+
+        gameMap.drawMap(g2d);
     }
 
 }
