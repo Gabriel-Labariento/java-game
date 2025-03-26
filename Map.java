@@ -3,8 +3,9 @@ import java.awt.*;
 public class Map {
     
     private Tile[][] tiles;
-    private final int TILECOUNTX = 32;
-    private final int TILECOUNTY = 24;
+    private final int TILESIZE = 24; // Must be a common factor of 720 and 540.  
+    private final int TILECOUNTX = (int) (720.0 / TILESIZE);
+    private final int TILECOUNTY = (int) (540.0 / TILESIZE);
     private final int TILEHEIGHT = (int) (540.0 / TILECOUNTY);
     private final int TILEWIDTH = (int) (720.0 / TILECOUNTX);
 
