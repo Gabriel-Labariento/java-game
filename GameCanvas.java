@@ -3,13 +3,14 @@ import javax.swing.*;
 
 public class GameCanvas extends JComponent {
     private int width, height;
-    private Map gameMap = new Map();
+    private Map gameMap;
 
 
-    public GameCanvas(int width, int height){
-        this.width = width;
-        this.height = height;
-        setPreferredSize(new Dimension(width, height));
+    public GameCanvas(int w, int h){
+        this.width = w;
+        this.height = h;
+        gameMap = new Map();
+        setPreferredSize(new Dimension(w, h));
     }
 
     @Override
@@ -21,7 +22,8 @@ public class GameCanvas extends JComponent {
             RenderingHints.VALUE_ANTIALIAS_ON);
         g2d.setRenderingHints(rh);
 
-        gameMap.drawMap(g2d);
+        gameMap.generateRooms(7);
+        gameMap.draw(g2d);
     }
 
 }
