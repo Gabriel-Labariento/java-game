@@ -1,9 +1,11 @@
 import java.awt.*;
+import java.util.*;
 import javax.swing.*;
 
 public class GameCanvas extends JComponent {
     private int width, height;
     private Map gameMap;
+    private ArrayList<MovableCharacter> players;
 
 
     public GameCanvas(int w, int h){
@@ -11,6 +13,9 @@ public class GameCanvas extends JComponent {
         this.height = h;
         gameMap = new Map();
         setPreferredSize(new Dimension(w, h));
+        gameMap.generateRooms(7);
+        players = new ArrayList<>();
+        players.add(new Player(0, 0, 5));
     }
 
     @Override
@@ -22,8 +27,15 @@ public class GameCanvas extends JComponent {
             RenderingHints.VALUE_ANTIALIAS_ON);
         g2d.setRenderingHints(rh);
 
-        gameMap.generateRooms(7);
         gameMap.draw(g2d);
+
+        for (MovableCharacter movableCharacter : players) {
+            movableCharacter.draw(g2d);
+        }
+    }
+
+    public ArrayList<MovableCharacter> getPlayers(){
+        return players;
     }
 
 }
