@@ -3,16 +3,15 @@ import java.util.*;
 
 public class Map {
     private ArrayList<Room> rooms;
- 
-    public Map(){        
+    private Room startRoom, endRoom;
+
+    public Map() {
         rooms = new ArrayList<>();
     }
 
-    public void generateRooms(int numRooms){
-        final int MAXTRIES = 100;
-        int tries = 0;
-           
-        while (tries < MAXTRIES) { 
+    public void generateRooms(int numRooms) {
+
+        while (true) {
             rooms.clear();
             createRoomsNoConnections(numRooms);
             System.out.println("Rooms created");
@@ -20,53 +19,57 @@ public class Map {
             for (Room room : rooms) {
                 // In the current room, generate 2 doors at random directions
                 int maxDoors = 2;
-                while (room.getDoors().size() < maxDoors){
+                while (room.getDoors().size() < maxDoors) {
                     room.addDoor();
                 }
-                
+
                 HashMap<String, Room> doors = room.getDoors();
 
                 // For each door in the current room
-                for (HashMap.Entry<String, Room> door : doors.entrySet()){
-                    
+                for (HashMap.Entry<String, Room> door : doors.entrySet()) {
+
                     String direction = door.getKey();
 
                     // Skip the door if a room is already conected to it
-                    if (door.getValue() != null) continue;
-                    
+                    if (door.getValue() != null)
+                        continue;
+
                     final int MAXATTEMPTS = 100;
                     int attempts = 0;
                     Room randomRoom;
 
-                    // Try to add a room at the specified direction of the room 
-                    while (attempts < MAXATTEMPTS){
+                    // Try to add a room at the specified direction of the room
+                    while (attempts < MAXATTEMPTS) {
                         randomRoom = chooseRandomRoom();
                         if (room.isConnectable(direction, randomRoom) && (randomRoom.canAddMoreDoors())) {
                             room.connectRooms(direction, randomRoom);
-                            System.out.println("Successfully connected Room " + room.getRoomId() + " to Room " + randomRoom.getRoomId() );
+                            System.out.println("Successfully connected Room " + room.getRoomId() + " to Room "
+                                    + randomRoom.getRoomId());
                             break;
-                        } else attempts++;
+                        } else
+                            attempts++;
                     }
-                    
+
                     // If all rooms have been connected, stop.
                     if (areAllRoomsConnected()) {
                         System.out.println("All rooms connected.");
+                        pickStartAndEndRooms();
                         return;
                     } else {
                         System.out.println("Failed to connect all rooms. Retyring...");
-                        tries++;
                     }
                 }
             }
         }
-        System.out.println("Failed to connect all rooms after " + MAXTRIES + " attempts. Please restart the game.");    
     }
 
     /**
-     * Uses a BFS algorithm to check if all the rooms of the map can be traversed to from any other room.
+     * Uses a BFS algorithm to check if all the rooms of the map can be traversed to
+     * from any other room.
+     * 
      * @return a boolean corresponding that says if all the rooms are traversable
      */
-    private boolean areAllRoomsConnected(){
+    private boolean areAllRoomsConnected() {
 
         Queue<Room> queue = new LinkedList<>();
         Set<Room> visited = new HashSet<>();
@@ -75,37 +78,41 @@ public class Map {
         queue.add(startingRoom);
         visited.add(startingRoom);
 
-        while (!queue.isEmpty()){
+        while (!queue.isEmpty()) {
             // Get (also removes) the first element of the queue
             Room currentRoom = queue.poll();
-            
+
             for (Room neighbor : currentRoom.getConnections()) {
                 // Check if all the rooms connected to this room have been visited
-                if (!visited.contains(neighbor)){
+                if (!visited.contains(neighbor)) {
                     visited.add(neighbor);
-                    // If this is the first time visiting the neighbor, that means we haven't dealt with ITS neighbors so we add to the queue
+                    // If this is the first time visiting the neighbor, that means we haven't dealt
+                    // with ITS neighbors so we add to the queue
                     queue.add(neighbor);
                 }
             }
         }
 
-        // If the number of visited rooms == the number of rooms there are, then all rooms are reachable.
+        // If the number of visited rooms == the number of rooms there are, then all
+        // rooms are reachable.
         return visited.size() == rooms.size();
     }
 
     /**
      * Returns a random room from the rooms ArrayList.
+     * 
      * @return the random room chosen
      */
-    private Room chooseRandomRoom(){
-        return rooms.get((int)(Math.random() * rooms.size()));
+    private Room chooseRandomRoom() {
+        return rooms.get((int) (Math.random() * rooms.size()));
     }
 
     /**
      * Creates a number of rooms separated by at least 100px and at most 400px.
+     * 
      * @param numRooms the number of rooms to be made
      */
-    private void createRoomsNoConnections(int numRooms){
+    private void createRoomsNoConnections(int numRooms) {
         int x = 0;
         int y = 0;
         int distance = 100; // Rooms will never collide unless roomSize > 100
@@ -122,10 +129,67 @@ public class Map {
         }
     }
 
-    
-    public void draw(Graphics2D g2d){
+    public void draw(Graphics2D g2d) {
         for (Room room : rooms) {
             room.draw(g2d);
         }
+    }
+
+    private void pickStartAndEndRooms() {
+        // If called before all the rooms are connected, return.
+        if (!areAllRoomsConnected()) {
+            System.out.println("Failed to pick start and end rooms. Not all rooms are connected yet.");
+            return;
+        }
+
+        // Pick a room from the rooms
+        Room a = chooseRandomRoom();
+
+        // Determine the farthest point from that room, call that b
+        Room b = getFurthestRoom(a);
+
+        // Determine the farthest point from b, call that c
+        Room c = getFurthestRoom(b);
+
+        // b and c are the diameter end nodes of the graph.
+        startRoom = b;
+        endRoom = c;
+
+        startRoom.setIsStartRoom(true);
+        endRoom.setIsEndRoom(true);
+
+        System.out.println("Start Room is Room " + startRoom.getRoomId());
+        System.out.println("End Room is Room " + endRoom.getRoomId());
+    }
+
+    private Room getFurthestRoom(Room start) {
+
+        Queue<Room> queue = new LinkedList<>();
+        Set<Room> visited = new HashSet<>();
+        HashMap<Room, Integer> distance = new HashMap<>();
+
+        Room startingRoom = start;
+        queue.add(startingRoom);
+        visited.add(startingRoom);
+        distance.put(start, 0);
+
+        Room furthest = start;
+
+        while (!queue.isEmpty()) {
+            Room currentRoom = queue.poll();
+
+            for (Room neighbor : currentRoom.getConnections()) {
+                if (!visited.contains(neighbor)) {
+                    visited.add(neighbor);
+                    queue.add(neighbor);
+                    distance.put(neighbor, distance.get(currentRoom) + 1);
+
+                    if (distance.get(neighbor) > distance.get(furthest)) {
+                        furthest = neighbor;
+                    }
+                }
+            }
+        }
+        return furthest;
     }
 }

@@ -4,6 +4,7 @@ import java.util.*;
 
 public class Room {
     private int roomId, x, y;
+    private boolean isStartRoom, isEndRoom;
     private final int size = 80;
     private ArrayList<Room> connections;
     private HashMap<String, Room> doors;
@@ -18,6 +19,8 @@ public class Room {
         this.roomId = roomId;
         this.x = x;
         this.y = y;
+        isStartRoom = false;
+        isEndRoom = false;
         connections = new ArrayList<>();
         doors = new HashMap<>();
     }
@@ -160,7 +163,12 @@ public class Room {
 
     public void draw(Graphics2D g2d){
         // Inside
-        g2d.setColor(Color.DARK_GRAY);
+        if (isStartRoom) {
+            g2d.setColor(Color.RED);
+        } else if (isEndRoom){
+            g2d.setColor(Color.BLUE);
+        } else g2d.setColor(Color.DARK_GRAY);
+
         g2d.fillRect(x, y, size, size);
 
         // Border
@@ -200,5 +208,13 @@ public class Room {
 
     public boolean canAddMoreDoors(){
         return (doors.size() < 2);
+    }
+
+    public void setIsStartRoom(boolean isStartRoom) {
+        this.isStartRoom = isStartRoom;
+    }
+
+    public void setIsEndRoom(boolean isEndRoom) {
+        this.isEndRoom = isEndRoom;
     }
 }

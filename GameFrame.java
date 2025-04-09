@@ -35,7 +35,7 @@ public class GameFrame extends JFrame{
             @Override
             public void actionPerformed(ActionEvent ae){
                 // Get the player
-                MovableCharacter mc = gameCanvas.getPlayers().get(0);
+                Entity mc = gameCanvas.getPlayers().get(0);
 
                 // Determine the key pressed
                 String keyPressed = ae.getActionCommand();
@@ -56,7 +56,7 @@ public class GameFrame extends JFrame{
     }
 
     private class InputHandler {
-        public void handleInput(MovableCharacter player, String keyPressed) {
+        public void handleInput(Entity player, String keyPressed) {
             switch (keyPressed) {
                 case "w":
                     player.move(0, -1);

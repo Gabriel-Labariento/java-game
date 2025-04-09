@@ -5,7 +5,7 @@ import javax.swing.*;
 public class GameCanvas extends JComponent {
     private int width, height;
     private Map gameMap;
-    private ArrayList<MovableCharacter> players;
+    private ArrayList<Entity> players;
 
 
     public GameCanvas(int w, int h){
@@ -29,12 +29,12 @@ public class GameCanvas extends JComponent {
 
         gameMap.draw(g2d);
 
-        for (MovableCharacter movableCharacter : players) {
-            movableCharacter.draw(g2d);
+        for (Entity player : players) {
+            player.draw(g2d);
         }
     }
 
-    public ArrayList<MovableCharacter> getPlayers(){
+    public ArrayList<Entity> getPlayers(){
         return players;
     }
 
