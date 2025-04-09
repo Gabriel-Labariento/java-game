@@ -1,3 +1,187 @@
+import java.io.*;
+import java.net.*;
+import java.util.*;
+import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
+
 public class GameServer {
+    private static final int GAMELOOPINTERVAL = 16;
+    private ServerSocket ss;
+    private ArrayList<Socket> sockets;
+    private int clientNum = 1;
+    private CopyOnWriteArrayList<Entity> entities;
+    private ScheduledExecutorService sendAssetsScheduler;
+
+    public GameServer() {
+        entities = new CopyOnWriteArrayList<>();
+        sockets = new ArrayList<>();
+        sendAssetsScheduler = Executors.newSingleThreadScheduledExecutor();
+
+        try {
+            ss = new ServerSocket(60069);
+        } catch (IOException ex) 
+        {
+            System.out.println("IOException from GameServer constructor");
+        }
+        System.out.println("GAMESERVER HAS BEEN CREATED.");
+    }
+
+    public void closeSocketsOnShutdown(){
+        Runtime.getRuntime().addShutdownHook( new Thread(() -> {
+            try { 
+                for (Socket skt:sockets) {
+                    skt.close();
+                }
+            } catch(IOException e) {
+                System.out.println("IOException fromcloseSocketsOnShutdown() method.");
+            }
+        }));  
+    }
+
+    public void waitForConnections() {
+        try {
+            System.out.println("NOW ACCEPTING CONNECTIONS...");
+            while (true){
+                Socket sock = ss.accept();
+                //Disable Nagle's buffering algorithm: basically reduces latency
+                sock.setTcpNoDelay(true);
+                sockets.add(sock);
+
+                ConnectedPlayer cr = new ConnectedPlayer(sock, clientNum);
+                clientNum++;
+                cr.startThreads();
+            }        
+            } catch (IOException ex) {
+                System.out.println("IOException from waitForConnection() method.");
+        }
+    }
+
+    private class ConnectedPlayer {
+        private Socket clientSocket;
+        private DataInputStream dataIn;
+        private DataOutputStream dataOut;
+        private int cid;
+        private int userPlayerIndex;
+        private Room currentRoom;
     
+        public ConnectedPlayer(Socket sck, int n){
+            clientSocket = sck;
+            cid = n;
+            entities.add(new Player(cid, 300, 300));
+            try {
+                dataIn = new DataInputStream(clientSocket.getInputStream());
+                dataOut = new DataOutputStream(clientSocket.getOutputStream());
+            } catch (IOException ex) {
+                System.out.println("IOException from ConnectedPlayer constructor");
+            }
+        }
+
+        public void startThreads(){
+            startAssetsThread();
+            startInputsThread();
+        }
+
+        public void startAssetsThread(){
+            System.out.println("NEW PLAYER HAS ENTERED");
+
+            final Runnable sendAssetsData = new Runnable(){
+                @Override
+                public void run() {
+                    
+                    try {
+                        String assetsDataString = getAssetsData();
+                        byte[] assetsDataBytes = assetsDataString.getBytes("UTF-8");
+                        dataOut.writeInt(assetsDataBytes.length);
+                        dataOut.write(assetsDataBytes);
+                    } catch (IOException ex) {
+                        System.out.println("IOException from ConnectedPlayer's startAssetsThread method");
+                    }   
+                }
+            };
+            sendAssetsScheduler.scheduleAtFixedRate(sendAssetsData, 0, GAMELOOPINTERVAL, TimeUnit.MILLISECONDS);
+        }
+
+
+
+        public void startInputsThread(){
+            Thread getInputsThread = new Thread(){
+                
+                @Override
+                public void run(){
+                    while (true){
+                        String str = "";
+                        try {
+                            int byteLength = dataIn.readInt();
+                            byte[] buffer = new byte[byteLength];
+                            dataIn.readFully(buffer);
+                            str = new String(buffer, "UTF-8");
+
+                        } catch (IOException ex){
+                            System.out.println("IOEception from getInputsData()");
+                        }
+
+                        int length = str.length();
+                        boolean isLoadingY = false;
+                        String x = "";
+                        String y = "";
+
+                        for(int i = 0; i < length; i++){
+                            char parsedChar = str.charAt(i);
+                            
+                            if(!Character.isLetter(parsedChar)){
+                                //Delimiter for x and y
+                                if(parsedChar == ','){
+                                    isLoadingY = true;
+                                    continue;
+                                }
+                                    
+                                //Check if loading char to either x or y strings
+                                if (isLoadingY){
+                                    y += parsedChar;
+                                    //Check if last char in the parseable string
+                                    if(i == length - 1){
+                                        isLoadingY = false;
+                                        System.out.println("Mouse click at " + x + "," + y); //Replace with action handler
+                                    }
+                                }
+                                else
+                                    x += parsedChar;
+                            
+                            }
+                            else
+                                ((Player)entities.get(userPlayerIndex)).update(parsedChar);
+                        }
+                    }
+                }
+            };
+            getInputsThread.start();
+        } 
+
+        public String getAssetsData(){
+            String parseableStr = "" + cid;
+
+            for(Entity entity : entities){
+                parseableStr += "" + entity.getIdentifier() + entity.getWorldX() + "," + entity.getWorldY();
+                //If userplayer getClientId
+                if (entity.getIdentifier() == 'A' && entity.getClientId() == cid){
+                    parseableStr += "$";
+                    userPlayerIndex = entities.indexOf(entity);
+                }
+            }
+
+            //Load room
+            currentRoom = new Room('A');
+            parseableStr += currentRoom.getRoomId() + "0,0%";
+            return parseableStr;
+        }
+
+    }
+
+    public static void main(String[] args) {
+        GameServer cs = new GameServer();
+        cs.closeSocketsOnShutdown();
+        cs.waitForConnections();
+    }
 }
