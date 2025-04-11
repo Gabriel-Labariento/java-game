@@ -1,11 +1,11 @@
 import java.awt.*;
 import java.util.*;
 
-public class Map {
+public class GameMap {
     private ArrayList<Room> rooms;
     private Room startRoom, endRoom;
 
-    public Map() {
+    public GameMap() {
         rooms = new ArrayList<>();
     }
 
@@ -191,5 +191,21 @@ public class Map {
             }
         }
         return furthest;
+    }
+
+    public Room getStartRoom() {
+        return startRoom;
+    }
+
+    public void setStartRoom(Room startRoom) {
+        this.startRoom = startRoom;
+    }
+
+    public Room getEndRoom() {
+        return endRoom;
+    }
+
+    public void setEndRoom(Room endRoom) {
+        this.endRoom = endRoom;
     }
 }

@@ -1,13 +1,15 @@
 import java.awt.*;
 
 public abstract class Entity {
-    private int x, y, speed, roomId;
+    private int x, y, speed;
+    private final int SIZE = 10;
+    private Room currentRoom;
 
     public Entity(int x, int y, int speed) {
         this.x = x;
         this.y = y;
         this.speed = speed;
-        roomId = -1;
+        currentRoom = null;
     }
 
     public void draw(Graphics2D g2d){
@@ -15,8 +17,13 @@ public abstract class Entity {
     }
     
     public void move(int dx, int dy){
-        this.x += this.speed * dx;
-        this.y += this.speed * dy;
+        int newX = x + speed * dx;
+        int newY = y + speed * dy;
+
+        if ((currentRoom != null) && (isMoveInbound(dx, dy))) {
+            x = newX;
+            y = newY;
+        }
     }
 
     public int getX() {
@@ -43,13 +50,20 @@ public abstract class Entity {
         this.speed = speed;
     }
 
-    public int getRoomId() {
-        return roomId;
+    public Room getCurrentRoom() {
+        return currentRoom;
     }
 
-    public void setRoomId(int roomId) {
-        this.roomId = roomId;
+    public void setCurrentRoom(Room room) {
+        currentRoom = room;
     }
     
+    private boolean isMoveInbound(int dx, int dy) {
+        return !((x + dx < currentRoom.getX()) ||
+                ( (x + SIZE) + dx > currentRoom.getX() + currentRoom.getSize()) ||
+                (y + dy < currentRoom.getY()) ||
+                ((y + SIZE) + dy > currentRoom.getY() + currentRoom.getSize())
+             );
+    }
     
 } 

@@ -35,7 +35,7 @@ public class GameFrame extends JFrame{
             @Override
             public void actionPerformed(ActionEvent ae){
                 // Get the player
-                Entity mc = gameCanvas.getPlayers().get(0);
+                Entity mc = gameCanvas.getGame().getPlayers().get(0);
 
                 // Determine the key pressed
                 String keyPressed = ae.getActionCommand();
