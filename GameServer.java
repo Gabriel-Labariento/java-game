@@ -20,7 +20,8 @@ public class GameServer {
         sendAssetsScheduler = Executors.newSingleThreadScheduledExecutor();
 
         try {
-            ss = new ServerSocket(60069);
+            ss = new ServerSocket(7000);
+            System.out.println("Server started on port 7000");
         } catch (IOException ex) 
         {
             System.out.println("IOException from GameServer constructor");
@@ -44,11 +45,12 @@ public class GameServer {
         try {
             System.out.println("NOW ACCEPTING CONNECTIONS...");
             while (true){
+                // Create a socket for the client to use
                 Socket sock = ss.accept();
-                //Disable Nagle's buffering algorithm: basically reduces latency
+                // Disable Nagle's buffering algorithm: basically reduces latency
                 sock.setTcpNoDelay(true);
                 sockets.add(sock);
-
+                
                 ConnectedPlayer cr = new ConnectedPlayer(sock, clientNum);
                 clientNum++;
                 cr.startThreads();
@@ -89,7 +91,6 @@ public class GameServer {
             final Runnable sendAssetsData = new Runnable(){
                 @Override
                 public void run() {
-                    
                     try {
                         String assetsDataString = getAssetsData();
                         byte[] assetsDataBytes = assetsDataString.getBytes("UTF-8");
@@ -164,9 +165,9 @@ public class GameServer {
 
             for(Entity entity : entities){
                 parseableStr += "" + entity.getIdentifier() + entity.getWorldX() + "," + entity.getWorldY();
-                //If userplayer getClientId
+                // If the entity is the user player
                 if (entity.getIdentifier() == 'A' && entity.getClientId() == cid){
-                    parseableStr += "$";
+                    parseableStr += "$"; // Indicates that the userPlayerIndex comes next
                     userPlayerIndex = entities.indexOf(entity);
                 }
             }
@@ -179,6 +180,7 @@ public class GameServer {
 
     }
 
+    // When GameServer is run, the main method instantiates a new 
     public static void main(String[] args) {
         GameServer cs = new GameServer();
         cs.closeSocketsOnShutdown();

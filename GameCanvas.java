@@ -96,6 +96,7 @@ public class GameCanvas extends JComponent {
             console = new Scanner(System.in);
         }
 
+        
         public void closeSocketsOnShutdown(){
             Runtime.getRuntime().addShutdownHook(new Thread (()-> {
                 try {
