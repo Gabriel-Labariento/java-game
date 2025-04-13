@@ -40,6 +40,5 @@ public class Player extends Entity{
         int[] screenPos = {screenX, screenY};
         return screenPos;
     }
-    
-        
+   
 }

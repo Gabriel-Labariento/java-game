@@ -1,7 +1,6 @@
 import java.io.*;
 import java.net.*;
 import java.util.*;
-import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -11,11 +10,11 @@ public class GameServer {
     private ServerSocket ss;
     private ArrayList<Socket> sockets;
     private int clientNum = 1;
-    private CopyOnWriteArrayList<Entity> entities;
+    private GameStateManager gameStateManager;
     private ScheduledExecutorService sendAssetsScheduler;
 
     public GameServer() {
-        entities = new CopyOnWriteArrayList<>();
+        gameStateManager = new GameStateManager();
         sockets = new ArrayList<>();
         sendAssetsScheduler = Executors.newSingleThreadScheduledExecutor();
 
@@ -51,9 +50,9 @@ public class GameServer {
                 sock.setTcpNoDelay(true);
                 sockets.add(sock);
                 
-                ConnectedPlayer cr = new ConnectedPlayer(sock, clientNum);
+                ConnectedPlayer cp = new ConnectedPlayer(sock, clientNum);
                 clientNum++;
-                cr.startThreads();
+                cp.startThreads();
             }        
             } catch (IOException ex) {
                 System.out.println("IOException from waitForConnection() method.");
@@ -65,13 +64,11 @@ public class GameServer {
         private DataInputStream dataIn;
         private DataOutputStream dataOut;
         private int cid;
-        private int userPlayerIndex;
-        private Room currentRoom;
     
         public ConnectedPlayer(Socket sck, int n){
             clientSocket = sck;
             cid = n;
-            entities.add(new Player(cid, 300, 300));
+            gameStateManager.getEntities().add(new Player(cid, 300, 300));
             try {
                 dataIn = new DataInputStream(clientSocket.getInputStream());
                 dataOut = new DataOutputStream(clientSocket.getOutputStream());
@@ -85,14 +82,16 @@ public class GameServer {
             startInputsThread();
         }
 
-        public void startAssetsThread(){
+        private void startAssetsThread(){
             System.out.println("NEW PLAYER HAS ENTERED");
 
             final Runnable sendAssetsData = new Runnable(){
                 @Override
                 public void run() {
                     try {
-                        String assetsDataString = getAssetsData();
+                        String assetsDataString = gameStateManager.getAssetsData(cid);
+                        System.out.println(assetsDataString);
+                        gameStateManager.updateUserPlayerIndex(cid);
                         byte[] assetsDataBytes = assetsDataString.getBytes("UTF-8");
                         dataOut.writeInt(assetsDataBytes.length);
                         dataOut.write(assetsDataBytes);
@@ -104,9 +103,7 @@ public class GameServer {
             sendAssetsScheduler.scheduleAtFixedRate(sendAssetsData, 0, GAMELOOPINTERVAL, TimeUnit.MILLISECONDS);
         }
 
-
-
-        public void startInputsThread(){
+        private void startInputsThread(){
             Thread getInputsThread = new Thread(){
                 
                 @Override
@@ -152,34 +149,15 @@ public class GameServer {
                             
                             }
                             else
-                                ((Player)entities.get(userPlayerIndex)).update(parsedChar);
+                                ((Player) gameStateManager.getPlayerFromClientId(cid)).update(parsedChar);
                         }
                     }
                 }
             };
             getInputsThread.start();
         } 
-
-        public String getAssetsData(){
-            String parseableStr = "" + cid;
-
-            for(Entity entity : entities){
-                parseableStr += "" + entity.getIdentifier() + entity.getWorldX() + "," + entity.getWorldY();
-                // If the entity is the user player
-                if (entity.getIdentifier() == 'A' && entity.getClientId() == cid){
-                    parseableStr += "$"; // Indicates that the userPlayerIndex comes next
-                    userPlayerIndex = entities.indexOf(entity);
-                }
-            }
-
-            //Load room
-            currentRoom = new Room('A');
-            parseableStr += currentRoom.getRoomId() + "0,0%";
-            return parseableStr;
-        }
-
     }
-
+  
     // When GameServer is run, the main method instantiates a new 
     public static void main(String[] args) {
         GameServer cs = new GameServer();

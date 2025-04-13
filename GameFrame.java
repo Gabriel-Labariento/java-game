@@ -9,7 +9,7 @@ public class GameFrame extends JFrame{
     private JPanel cp;
     private GameCanvas gameCanvas;
     private Entity[] entities;
-    private GameCanvas.DataHandler dataHandler;
+    private DataHandler dataHandler;
 
     public GameFrame(int width, int height, String title){
         this.width = width;

@@ -30,6 +30,11 @@ public abstract class Entity {
     public char getIdentifier(){
         return identifier;
     }
+
+    public String getAssetData(){
+        return "" + identifier + worldX + ',' + worldY;
+    };
+
     // FOR TRANSFER
     // public byte[] getByteData(){
     //     ByteBuffer buffer = ByteBuffer.allocate(40);
