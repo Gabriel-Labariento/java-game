@@ -21,6 +21,7 @@ public abstract class Entity {
         int newY = y + speed * dy;
 
         if ((currentRoom != null) && (isMoveInbound(dx, dy))) {
+
             x = newX;
             y = newY;
         }
@@ -58,12 +59,14 @@ public abstract class Entity {
         currentRoom = room;
     }
     
-    private boolean isMoveInbound(int dx, int dy) {
+    public boolean isMoveInbound(int dx, int dy) {
         return !((x + dx < currentRoom.getX()) ||
-                ( (x + SIZE) + dx > currentRoom.getX() + currentRoom.getSize()) ||
+                ( (x + SIZE) + dx > currentRoom.getX() + currentRoom.getWidth()) ||
                 (y + dy < currentRoom.getY()) ||
-                ((y + SIZE) + dy > currentRoom.getY() + currentRoom.getSize())
+                ((y + SIZE) + dy > currentRoom.getY() + currentRoom.getHeight())
              );
     }
+
+    public abstract boolean isCollidingWithDoor(Door door);
     
 } 

@@ -43,6 +43,8 @@ public class GameFrame extends JFrame{
                 
                 // Move the player depending on the key pressed
                 ih.handleInput(mc, keyPressed);
+
+                gameCanvas.getGame().changePlayerRoomLocation();
                 gameCanvas.repaint();
             }
         };

@@ -22,7 +22,7 @@ public class GameMap {
                 while (room.getDoors().size() < maxDoors) {
                     room.addDoor();
                 }
-
+                
                 HashMap<String, Room> doors = room.getDoors();
 
                 // For each door in the current room
