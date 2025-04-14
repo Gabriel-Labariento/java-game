@@ -9,9 +9,9 @@ public class GameServer {
     private static final int GAMELOOPINTERVAL = 16;
     private ServerSocket ss;
     private ArrayList<Socket> sockets;
-    private int clientNum = 1;
     private GameStateManager gameStateManager;
     private ScheduledExecutorService sendAssetsScheduler;
+    private int clientNum = 1;
 
     public GameServer() {
         gameStateManager = new GameStateManager();

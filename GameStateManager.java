@@ -2,6 +2,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 
 public class GameStateManager {
     private CopyOnWriteArrayList<Entity> entities;
+    private DungeonMap dungeonMap;
     private int userPlayerIndex;
     private Room currentRoom;
 
@@ -9,6 +10,8 @@ public class GameStateManager {
         entities = new CopyOnWriteArrayList<>();
         userPlayerIndex = -1;
         currentRoom = null;
+        dungeonMap = new DungeonMap();
+        dungeonMap.generateRooms(2);
     }
 
     public void addEntity(Entity e){
@@ -67,6 +70,22 @@ public class GameStateManager {
 
     public void updateUserPlayerIndex(int cid){
         userPlayerIndex = entities.indexOf(getPlayerFromClientId(cid));
+    }
+
+    public DungeonMap getDungeonMap() {
+        return dungeonMap;
+    }
+
+    public void setDungeonMap(DungeonMap dungeonMap) {
+        this.dungeonMap = dungeonMap;
+    }
+
+    public Room getCurrentRoom() {
+        return currentRoom;
+    }
+
+    public void setCurrentRoom(Room currentRoom) {
+        this.currentRoom = currentRoom;
     }
 
 
