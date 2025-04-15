@@ -31,9 +31,7 @@ public abstract class Entity {
         return identifier;
     }
 
-    public String getAssetData(){
-        return "" + identifier + worldX + ',' + worldY;
-    };
+    public abstract String getAssetData();
 
     // FOR TRANSFER
     // public byte[] getByteData(){

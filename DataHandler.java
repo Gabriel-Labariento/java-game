@@ -16,7 +16,6 @@ public class DataHandler {
     private int clickedX;
     private int clickedY;
 
-
     public DataHandler(ClientGameState clientState){
         this.clientState = clientState;
 
@@ -33,7 +32,6 @@ public class DataHandler {
         console = new Scanner(System.in);
     }
 
-    
     public void closeSocketsOnShutdown(){
         Runtime.getRuntime().addShutdownHook(new Thread (()-> {
             try {
@@ -71,27 +69,27 @@ public class DataHandler {
         }
     }
 
-
     private void startAssetsThread(){
         Thread receiveAssetsThread = new Thread(){
             @Override
             public void run(){
                 while (true){
-                    String str = "";
                     try {
                         int byteLength = dataIn.readInt();
                         byte[] buffer = new byte[byteLength];
                         dataIn.readFully(buffer);
-                        str = new String(buffer, "UTF-8");
+                        String receivedMessage = new String(buffer, "UTF-8");
+
+                        // If the received message starts with the protocol identifier for map data, parse the map data
+                        // TODO: call parseMapData() after writing implementation
+                        // if (receivedMessage.startsWith(NetworkProtocol.MAP_DATA)) parseMapData(receivedMessage.substring(1));
+                        if (receivedMessage.startsWith(receivedMessage)){
+                            clientState.getEntities().clear();
+                            parseAssetsData(receivedMessage);
+                        }
                     } catch (IOException ex){
                         System.out.println("IOEception from receiveAssetsThread");
                     }
-                    
-                    // Dispose loaded assets
-                    clientState.getEntities().clear();
-
-                    // Parse entity data
-                    parseEntityData(str);
                 }}};
         receiveAssetsThread.start();
     }
@@ -109,8 +107,6 @@ public class DataHandler {
         int length = str.length();
         for (int i = 0; i < length; i++){
             char parsedChar = str.charAt(i);
-
-            
 
             //str is always in the form of "{clientiD}{identifier}{userPlayer indicator}{roomAsset indicator}{x},{y}"
             if (Character.isLetter(parsedChar)){
@@ -143,10 +139,9 @@ public class DataHandler {
                             System.out.println("Exception at parseEntityData() of DataHandler");
                         }
                         break;
-
                     //Check if currentRoom identifier
                     case '%':
-                        clientState.setCurrentRoom(new Room(identifier));
+                        // clientState.setCurrentRoom(new Room(identifier)); TODO
                         break;
                     //Check if x and y delimiter
                     case ',':
@@ -162,6 +157,47 @@ public class DataHandler {
                 }
             }}
     }
+
+    /**
+     * Parses a serialized string expected to be in the form ClientId|P:playerX,playerY|E:entity1X,entity1Y,entity2x,entity2Y...|
+     * @param message a serialized string in the form ClientId|P:playerX,playerY|E:entity1X,entity1Y,entity2x,entity2Y...|
+     */
+    private void parseAssetsData(String message){
+
+        String[] messageParts = message.split(NetworkProtocol.DELIMITER);
+        for (String part : messageParts) {
+            if (part.startsWith("P:")) {
+                String[] playerCoordinates = part.substring(2).split(NetworkProtocol.SUB_DELIMITER);
+                int playerX = Integer.parseInt(playerCoordinates[0]);
+                int playerY = Integer.parseInt(playerCoordinates[1]);
+                loadAsset('A', playerX, playerY);
+
+                try {
+                    clientState.setUserPlayer(new Player(clientId, playerX, playerY));    
+                } catch (Exception e) {
+                    System.out.println("Exception in parseAssetData() when setting user player");
+                }
+                
+            } else if (part.startsWith("E:")) {
+                // TODO: implementation for other entities
+                // String[] entityCoordinates = part.substring(2).split(NetworkProtocol.SUB_DELIMITER);
+                // int entityX = Integer.parseInt(entityCoordinates[0]);
+                // int entityY = Integer.parseInt(entityCoordinates[1]);
+                // loadAsset('B', entityX, entityY);
+            } else {
+                // This will always be parsed first
+                int clientId = Integer.parseInt(part);
+            }
+            
+
+        }
+        
+    }
+
+    // TODO: parseMapData implementation
+    // private void parseMapData(String message){
+    //     String
+    // }
 
     public void loadAsset(char identifier, int x, int y){
         String name = idToName.get(identifier);

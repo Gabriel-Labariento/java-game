@@ -82,25 +82,57 @@ public class GameServer {
             startInputsThread();
         }
 
+        /**
+         * Calls the sendMapData() once and sendEntitiesData() continuously every 16 miliseconds. 
+         */
         private void startAssetsThread(){
             System.out.println("NEW PLAYER HAS ENTERED");
 
             final Runnable sendAssetsData = new Runnable(){
+                boolean mapDataSent = false;
                 @Override
                 public void run() {
-                    try {
-                        String assetsDataString = gameStateManager.getAssetsData(cid);
-                        System.out.println(assetsDataString);
-                        gameStateManager.updateUserPlayerIndex(cid);
-                        byte[] assetsDataBytes = assetsDataString.getBytes("UTF-8");
-                        dataOut.writeInt(assetsDataBytes.length);
-                        dataOut.write(assetsDataBytes);
-                    } catch (IOException ex) {
-                        System.out.println("IOException from ConnectedPlayer's startAssetsThread method");
-                    }   
+                    if (!mapDataSent){
+                        sendMapData();
+                        mapDataSent = true;
+                        System.out.println("Map Data Sent");
+                    }
+                    sendEntitiesData();   
                 }
             };
             sendAssetsScheduler.scheduleAtFixedRate(sendAssetsData, 0, GAMELOOPINTERVAL, TimeUnit.MILLISECONDS);
+        }
+
+        /**
+         * Sends the serialized map data by converting it to a byte array
+         */
+        private void sendMapData(){
+            try {
+                String mapDataString = gameStateManager.getMapData();
+                byte[] mapDataBytes = mapDataString.getBytes("UTF-8");
+                System.out.println("Sending Map Data...");
+                dataOut.writeInt(mapDataString.length());
+                dataOut.write(mapDataBytes);
+            } catch (IOException ex) {
+                System.out.println("IOException from sendMapData() method");
+            }
+        }
+
+        /**
+         * Sends the serialized entities data by converting it to a byte array
+         */
+        private void sendEntitiesData(){
+            try {
+                String assetsDataString = gameStateManager.getAssetsData(cid);
+                System.out.println(assetsDataString);
+                gameStateManager.updateUserPlayerIndex(cid);
+                byte[] assetsDataBytes = assetsDataString.getBytes("UTF-8");
+                dataOut.writeInt(assetsDataBytes.length);
+                dataOut.write(assetsDataBytes);    
+            } catch (IOException e) {
+                System.out.println("IOException from sendEntitiesData() method");
+            }
+            
         }
 
         private void startInputsThread(){

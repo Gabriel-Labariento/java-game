@@ -21,9 +21,11 @@ import java.util.*;
 public class Room {
     private int roomId, x, y;
     private boolean isStartRoom, isEndRoom;
-    private final int size = 80;
+    private final int height = 80;
+    private final int width = 80;
     private ArrayList<Room> connections;
     private HashMap<String, Room> doors;
+    private ArrayList<Door> doorsArrayList;
 
     /**
      * Creates a Room object with an ID, x and y coordinates, ArrayList of connections, and HashMap of doors.
@@ -39,6 +41,28 @@ public class Room {
         isEndRoom = false;
         connections = new ArrayList<>();
         doors = new HashMap<>();
+        doorsArrayList = new ArrayList<>();
+    }
+
+    /**
+     * Returns a string containing the room data
+     * @return a string in the format roomId,x,y,isStart,isEnd|door1Data|door2Data|...
+     */
+    public String serialize(){
+        StringBuilder sb = new StringBuilder();
+
+        // roomId,x,y,isStart,isEnd|
+        sb.append(roomId).append(NetworkProtocol.SUB_DELIMITER)
+        .append(x).append(NetworkProtocol.SUB_DELIMITER)
+        .append(y).append(NetworkProtocol.SUB_DELIMITER)
+        .append(isStartRoom).append(NetworkProtocol.SUB_DELIMITER)
+        .append(isEndRoom);
+
+        for (Door door : doorsArrayList) {
+            sb.append(NetworkProtocol.DELIMITER).append(door.serialize());
+        }
+
+        return sb.toString();
     }
 
     /**
@@ -52,6 +76,7 @@ public class Room {
 
         // Put in the room's hashmap, the direction and the connected room
         doors.put(direction, other);
+        // doors.add(new Door)
 
         // Add this room to the other's connections 
         other.getConnections().add(this);
@@ -185,43 +210,65 @@ public class Room {
             g2d.setColor(Color.BLUE);
         } else g2d.setColor(Color.DARK_GRAY);
 
-        g2d.fillRect(x, y, size, size);
+        g2d.fillRect(x, y, width, height);
 
         // Border
         g2d.setColor(Color.BLACK);
-        g2d.drawRect(x, y, size, size);
+        g2d.drawRect(x, y, width, height);
         
         // Draw doors
         drawDoors(g2d);
-
-        System.out.println("Drawn Room " + roomId);
     }
 
+    /**
+     * Draws the doors inside doorsArrayList 
+     * @param g2d object used to draw
+     */
     private void drawDoors(Graphics2D g2d){
-        int centerX = x + size / 2;
-        int centerY = y + size / 2;
-        int doorSize = 5;
+        for (Door door : doorsArrayList) {
+            door.draw(g2d);
+        }
+    }
 
-        for (String direction : doors.keySet()) {
-            switch (direction) {
+    /**
+     * Populates the doorsArrayList with new Door objects based on 
+     * the contents of the doors HashMap. Called inside populateAllDoorsArrayList 
+     */
+    public void populateDoorsArrayList(){
+        int centerX = x + width / 2;
+        int centerY = y + height / 2;
+        int doorHeight = 10;
+        int doorWidth = 10;
+        Door d;
+
+        for (HashMap.Entry<String, Room> door : doors.entrySet()) {
+             switch (door.getKey()) {
                 case "T":
-                    g2d.fillRect(centerX - doorSize, y, doorSize, doorSize);
+                    d = new Door(centerX - doorWidth, y, door.getKey(), this, door.getValue());
+                    doorsArrayList.add(d);
                     break;
                 case "B":
-                    g2d.fillRect(centerX - doorSize, y + size - doorSize, doorSize, doorSize);
+                    d = new Door(centerX - doorWidth, y + height - doorHeight, door.getKey(), this, door.getValue());
+                    doorsArrayList.add(d);
                     break;
                 case "L":
-                    g2d.fillRect(x, centerY - doorSize, doorSize, doorSize);
+                    d = new Door(x, centerY - doorHeight, door.getKey(), this, door.getValue());
+                    doorsArrayList.add(d);
                     break;
                 case "R":
-                    g2d.fillRect(x + size - doorSize, centerY - doorSize, doorSize, doorSize);
+                    d = new Door(x + width - doorWidth, centerY - doorHeight, door.getKey(), this, door.getValue());
+                    doorsArrayList.add(d);
                     break;
                 default:
-                    throw new AssertionError("Error in drawDorrs method of Room " + roomId);
+                    throw new AssertionError("Error in populateDoorsArrayList method of Room " + roomId);
             }
         }
     }
 
+    /**
+     * Checks if a door has less than two rooms
+     * @return boolean true/false indicating whether a room has less than two doors
+     */
     public boolean canAddMoreDoors(){
         return (doors.size() < 2);
     }
@@ -232,5 +279,38 @@ public class Room {
 
     public void setIsEndRoom(boolean isEndRoom) {
         this.isEndRoom = isEndRoom;
+    }
+
+    public int getX() {
+        return x;
+    }
+
+    public void setX(int x) {
+        this.x = x;
+    }
+
+    public int getY() {
+        return y;
+    }
+
+    public void setY(int y) {
+        this.y = y;
+    }
+
+    
+    public ArrayList<Door> getDoorsArrayList() {
+        return doorsArrayList;
+    }
+
+    public void setDoorsArrayList(ArrayList<Door> doorsArrayList) {
+        this.doorsArrayList = doorsArrayList;
+    }
+
+    public int getHeight() {
+        return height;
+    }
+
+    public int getWidth() {
+        return width;
     }
 }

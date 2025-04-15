@@ -2,14 +2,21 @@ import java.awt.*;
 import java.util.*;
 
 public class DungeonMap {
-         private ArrayList<Room> rooms;
+    private ArrayList<Room> rooms;
     private Room startRoom, endRoom;
 
     public DungeonMap () {
         rooms = new ArrayList<>();
     }
 
+    /**
+     * Generates a certain number of rooms (numRooms <= 3). Connects them and calls pickStartAndEndRooms() and populateAllRoomsDoorsArrayList()
+     * @param numRooms number of rooms to be made, minimum of 3.
+     */
     public void generateRooms(int numRooms) {
+
+        // Algorithm will not work for when rooms < 3. So ensure 3 is the minumum
+        if (numRooms < 3) numRooms = 3;
 
         while (true) {
             rooms.clear();
@@ -50,10 +57,20 @@ public class DungeonMap {
                     if (areAllRoomsConnected()) {
                         System.out.println("All rooms connected.");
                         pickStartAndEndRooms();
+                        populateAllRoomsDoorsArrayList();
                         return;
                     } 
                 }
             }
+        }
+    }
+
+    /**
+     * Populates the doors ArrayList of all the rooms in the map only after they have been all connected.
+     */
+    private void populateAllRoomsDoorsArrayList(){
+        for (Room room : rooms) {
+            room.populateDoorsArrayList();
         }
     }
 
@@ -123,12 +140,19 @@ public class DungeonMap {
         }
     }
 
+    /**
+     * Calls the draw method on all the rooms of the dungeon
+     * @param g2d object used to draw
+     */
     public void draw(Graphics2D g2d) {
         for (Room room : rooms) {
             room.draw(g2d);
         }
     }
 
+    /**
+     * Randomly chooses a starting room and then sets the end room as the farthest from start room in terms of how many connections are in between them.
+     */
     private void pickStartAndEndRooms() {
         // If called before all the rooms are connected, return.
         if (!areAllRoomsConnected()) {
@@ -156,6 +180,11 @@ public class DungeonMap {
         System.out.println("End Room is Room " + endRoom.getRoomId());
     }
 
+    /**
+     * Returns the furthest room from a given room in terms of how many connections are between them
+     * @param start the room from which to start
+     * @return the furthest room from the given argument
+     */
     private Room getFurthestRoom(Room start) {
 
         Queue<Room> queue = new LinkedList<>();
@@ -185,5 +214,30 @@ public class DungeonMap {
             }
         }
         return furthest;
+    }
+
+    /**
+     * Returns a string containing the DungeonMap data
+     * @return a string in the format M:roomCount|room1Data|room2Data|...|startingRoomId 
+     */
+    public String serialize(){
+
+        StringBuilder sb = new StringBuilder();
+        // 1. Number of rooms
+        sb.append(NetworkProtocol.MAP_DATA).append(":").append(rooms.size()).append(NetworkProtocol.DELIMITER);
+        // 2. Data of each room
+        for (Room room : rooms) {
+            sb.append(room.serialize()).append(NetworkProtocol.DELIMITER);
+        }
+        // 3. Starting room
+        sb.append(startRoom.getRoomId());
+
+        return sb.toString();
+    }
+
+    public void deserialize(String str){
+        // TODO: IMPLEMENT MAP DESERIALIZATION
+        System.out.println("Received string:");
+        System.out.println(str);
     }
 }
