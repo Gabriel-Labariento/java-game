@@ -235,9 +235,40 @@ public class DungeonMap {
         return sb.toString();
     }
 
-    public void deserialize(String str){
+    public void deserialize(String message){
+        /*
+        Example message string with meaning:
+        M:3| => Map has three rooms
+        R:0,0,0,false,false|    => RoomId 0 at 0,0. not start room. not end room.
+        D:0,30,70,B,0,1|        => DoorId 0 at 30,70. Door at bottom of Room 0. Connects Room 0 and Room 1 
+        D:1,30,0,T,0,2|         => DoorId 1 at 30,0. Door at top of Room 0. Connects Room 0 and Room 2
+        R:1,100,100,true,false| => RoomId 1 at 100,100. is start room. not end room.
+        D:2,130,100,T,1,0|      => DoorId 2 at 130, 100. Door at top of Room 1. Connects Room 1 and Room 0
+        R:2,200,200,false,true| => RoomId 2 at 200,200. not start room. is end room.
+        D:3,230,270,B,2,0|      => DoorId 2 at 230,270. Door at bottom of Room 2. Connect Room 2 and Room 0 
+        1                       => Starting Room is Room 1
+         */ 
         // TODO: IMPLEMENT MAP DESERIALIZATION
-        System.out.println("Received string:");
-        System.out.println(str);
+        String[] messageParts = message.split(NetworkProtocol.DELIMITER); // Split at "|"
+        
+        int roomCount;
+        for (String part : messageParts) {
+            if (part.startsWith(NetworkProtocol.MAP_DATA + ":")) {
+                roomCount = Integer.parseInt(part.substring(2));
+            } else if (part.startsWith(NetworkProtocol.ROOM + ":")){
+                String roomData[] = part.split(NetworkProtocol.SUB_DELIMITER);
+                int roomId = Integer.parseInt(roomData[0]);
+                int roomX = Integer.parseInt(roomData[1]);
+                int roomY = Integer.parseInt(roomData[2]);
+                boolean isStart = Boolean.parseBoolean(roomData[3]);
+                boolean isEnd = Boolean.parseBoolean(roomData[3]);
+
+                Room r = new Room(roomId, roomX, roomY);
+                r.setIsStartRoom(isStart);
+                r.setIsEndRoom(isEnd);
+
+                
+            }
+        }
     }
 }

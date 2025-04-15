@@ -7,7 +7,7 @@ public class Door {
     private final int width = 10;
     private String direction;
     private Room roomA, roomB;
-    private int doorCount = 0;
+    private static int doorCount = 0;
 
     public Door(int x, int y, String direction, Room roomA, Room roomB){
         this.id = doorCount++;
