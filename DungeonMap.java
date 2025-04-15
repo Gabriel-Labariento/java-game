@@ -249,9 +249,13 @@ public class DungeonMap {
         1                       => Starting Room is Room 1
          */ 
         // TODO: IMPLEMENT MAP DESERIALIZATION
+        rooms.clear();
+
+        HashMap<Integer, Room> mapIdToRoom = new HashMap<>();
+
         String[] messageParts = message.split(NetworkProtocol.DELIMITER); // Split at "|"
-        
         int roomCount;
+        
         for (String part : messageParts) {
             if (part.startsWith(NetworkProtocol.MAP_DATA + ":")) {
                 roomCount = Integer.parseInt(part.substring(2));
@@ -266,8 +270,15 @@ public class DungeonMap {
                 Room r = new Room(roomId, roomX, roomY);
                 r.setIsStartRoom(isStart);
                 r.setIsEndRoom(isEnd);
-
-                
+                mapIdToRoom.put(roomId, r);
+                rooms.add(r);
+            } else if (part.startsWith(NetworkProtocol.DOOR + ":")){
+                String doorData[] = part.split(NetworkProtocol.SUB_DELIMITER);
+                int doorId = Integer.parseInt(doorData[0]);
+                int doorX = Integer.parseInt(doorData[1]);
+                int doorY = Integer.parseInt(doorData[2]);
+                String doorDirection = doorData[3];
+                // roomA = 
             }
         }
     }
