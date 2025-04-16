@@ -92,7 +92,7 @@ public class Room {
     /**
      * Adds a door at a random direction of the room. Only one door can be placed in one direction.
      */
-    public void addDoor(){
+    public void addDoorToHashMap(){
         // Choose a random direction
         String direction;
         while (true){
@@ -103,6 +103,14 @@ public class Room {
                 break;
             }
         }
+    }
+
+    /**
+     * Adds a door to the doorsArrayList field 
+     * @param door the door object to be added
+     */
+    public void addDoorToArrayList(Door door){
+        doorsArrayList.add(door);
     }
 
     /**

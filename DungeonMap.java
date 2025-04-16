@@ -27,7 +27,7 @@ public class DungeonMap {
                 // In the current room, generate 2 doors at random directions
                 int maxDoors = 2;
                 while (room.getDoors().size() < maxDoors) {
-                    room.addDoor();
+                    room.addDoorToHashMap();
                 }
 
                 HashMap<String, Room> doors = room.getDoors();
@@ -235,6 +235,8 @@ public class DungeonMap {
         return sb.toString();
     }
 
+
+
     public void deserialize(String message){
         /*
         Example message string with meaning:
@@ -248,24 +250,29 @@ public class DungeonMap {
         D:3,230,270,B,2,0|      => DoorId 2 at 230,270. Door at bottom of Room 2. Connect Room 2 and Room 0 
         1                       => Starting Room is Room 1
          */ 
-        // TODO: IMPLEMENT MAP DESERIALIZATION
+    
+        // Clear data 
         rooms.clear();
-
-        HashMap<Integer, Room> mapIdToRoom = new HashMap<>();
-
-        String[] messageParts = message.split(NetworkProtocol.DELIMITER); // Split at "|"
+        
         int roomCount;
         
+        // Helper utils
+        HashMap<Integer, Room> mapIdToRoom = new HashMap<>();
+        ArrayList<DoorDataHolder> doorDataList = new ArrayList<>();
+        Room startRoom = null;
+
+        String[] messageParts = message.split(NetworkProtocol.DELIMITER); // Split at "|"
         for (String part : messageParts) {
             if (part.startsWith(NetworkProtocol.MAP_DATA + ":")) {
                 roomCount = Integer.parseInt(part.substring(2));
             } else if (part.startsWith(NetworkProtocol.ROOM + ":")){
+                // Parse roomData
                 String roomData[] = part.split(NetworkProtocol.SUB_DELIMITER);
                 int roomId = Integer.parseInt(roomData[0]);
                 int roomX = Integer.parseInt(roomData[1]);
                 int roomY = Integer.parseInt(roomData[2]);
                 boolean isStart = Boolean.parseBoolean(roomData[3]);
-                boolean isEnd = Boolean.parseBoolean(roomData[3]);
+                boolean isEnd = Boolean.parseBoolean(roomData[4]);
 
                 Room r = new Room(roomId, roomX, roomY);
                 r.setIsStartRoom(isStart);
@@ -273,13 +280,81 @@ public class DungeonMap {
                 mapIdToRoom.put(roomId, r);
                 rooms.add(r);
             } else if (part.startsWith(NetworkProtocol.DOOR + ":")){
+                // Parse doorData
                 String doorData[] = part.split(NetworkProtocol.SUB_DELIMITER);
                 int doorId = Integer.parseInt(doorData[0]);
                 int doorX = Integer.parseInt(doorData[1]);
                 int doorY = Integer.parseInt(doorData[2]);
                 String doorDirection = doorData[3];
-                // roomA = 
+                int roomAID = Integer.parseInt(doorData[4]);
+                int roomBID = Integer.parseInt(doorData[5]);
+                doorDataList.add(new DoorDataHolder(doorId, doorX, doorY, doorDirection, roomAID, roomBID));
+            } else {
+                // Set start room
+                startRoom = mapIdToRoom.get(Integer.valueOf(part));
             }
         }
+
+        // By this point all room and door data have been parsed.
+        for (DoorDataHolder dataHolder : doorDataList) {
+            for (Room room : rooms) { // This is O(n^2) though, I'll try to optimize but it'll do for now
+                // If we see a match, create a new door with corresponding connections
+                if (dataHolder.getRoomAId() == room.getRoomId()) {
+                    Door d = dataHolder.createDoorFromDoorData(mapIdToRoom);
+                    room.addDoorToArrayList(d);
+                       
+                }
+            }
+        }
+
+        
     }
+
+    private class DoorDataHolder{
+        private int id, x, y, roomAId, roomBId;
+        private String direction;
+
+        public DoorDataHolder(int id, int x, int y, String direction, int roomAId, int roomBId) {
+            this.id = id;
+            this.x = x;
+            this.y = y;
+            this.roomAId = roomAId;
+            this.roomBId = roomBId;
+            this.direction = direction;
+        }
+
+        public Door createDoorFromDoorData(HashMap<Integer, Room> mapIdToRoom ) {
+            Door d = new Door(this.x, this.y, this.direction, mapIdToRoom.get(this.roomAId), mapIdToRoom.get(this.roomBId));
+            d.setId(this.id);
+            return d;
+        }
+
+        public int getId() {
+            return id;
+        }
+
+        public int getX() {
+            return x;
+        }
+
+        public int getY() {
+            return y;
+        }
+
+        public int getRoomAId() {
+            return roomAId;
+        }
+
+        public int getRoomBId() {
+            return roomBId;
+        }
+
+        public String getDirection() {
+            return direction;
+        }
+
+    }
+
+
+
 }
