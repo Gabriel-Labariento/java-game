@@ -111,7 +111,6 @@ public class DungeonMap {
 
     /**
      * Returns a random room from the rooms ArrayList.
-     * 
      * @return the random room chosen
      */
     private Room chooseRandomRoom() {
@@ -236,8 +235,12 @@ public class DungeonMap {
     }
 
 
-
-    public void deserialize(String message){
+    /**
+     * Deserializes the serialized map data string and returns the start room.
+     * @param message the serialized map data string to be parsed
+     * @return the starting room where the players will spawn.
+     */
+    public Room deserialize(String message){
         /*
         Example message string with meaning:
         M:3| => Map has three rooms
@@ -250,7 +253,7 @@ public class DungeonMap {
         D:3,230,270,B,2,0|      => DoorId 2 at 230,270. Door at bottom of Room 2. Connect Room 2 and Room 0 
         1                       => Starting Room is Room 1
          */ 
-    
+        
         // Clear data 
         rooms.clear();
         
@@ -263,33 +266,36 @@ public class DungeonMap {
 
         String[] messageParts = message.split(NetworkProtocol.DELIMITER); // Split at "|"
 
-        // Part 1: Deserialize Rooms
+        // Part 1: Deserialize Rooms and Doors
         for (String part : messageParts) {
             if (part.startsWith(NetworkProtocol.MAP_DATA + ":")) {
                 roomCount = Integer.parseInt(part.substring(2));
             } else if (part.startsWith(NetworkProtocol.ROOM + ":")){
                 // Parse roomData
                 deserializeRooms(part, mapIdToRoom);
+            } else if (part.startsWith(NetworkProtocol.DOOR + ":")) {
+                deserializeDoors(part, doorDataList);
             }
         }
 
-        // Part 2: Deserialize Doors
-        for (String part : messageParts) {
-            if (part.startsWith(NetworkProtocol.DOOR + ":")) {
-                deserializeDoors(message, doorDataList);
-            }
-        }
-
-        // Part 3: Connect Doors
+        // Part 2: Connect Doors
         for (DoorDataHolder ddh : doorDataList) {
             try {
                 Door door = ddh.createDoorFromDoorData(mapIdToRoom);
+                door.getRoomA().addDoorToArrayList(door);
             } catch (Exception e) {
-                // TODO: handle exception
+                System.out.println("Exception in adding doors for dungeon deserialize()");
             }
         }
 
+        // Part 4: Set start room
+        String lastPart = messageParts[messageParts.length - 1];
+        if (!lastPart.contains(":")) {
+            startRoom = mapIdToRoom.get(Integer.parseInt(lastPart));
+        }
 
+        if (startRoom == null) System.out.println("Start room is null");
+        return startRoom;
         
     }
 
@@ -348,31 +354,6 @@ public class DungeonMap {
             d.setId(this.id);
             return d;
         }
-
-        public int getId() {
-            return id;
-        }
-
-        public int getX() {
-            return x;
-        }
-
-        public int getY() {
-            return y;
-        }
-
-        public int getRoomAId() {
-            return roomAId;
-        }
-
-        public int getRoomBId() {
-            return roomBId;
-        }
-
-        public String getDirection() {
-            return direction;
-        }
-
     }
 
 
