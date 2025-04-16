@@ -262,52 +262,72 @@ public class DungeonMap {
         Room startRoom = null;
 
         String[] messageParts = message.split(NetworkProtocol.DELIMITER); // Split at "|"
+
+        // Part 1: Deserialize Rooms
         for (String part : messageParts) {
             if (part.startsWith(NetworkProtocol.MAP_DATA + ":")) {
                 roomCount = Integer.parseInt(part.substring(2));
             } else if (part.startsWith(NetworkProtocol.ROOM + ":")){
                 // Parse roomData
-                String roomData[] = part.split(NetworkProtocol.SUB_DELIMITER);
-                int roomId = Integer.parseInt(roomData[0]);
-                int roomX = Integer.parseInt(roomData[1]);
-                int roomY = Integer.parseInt(roomData[2]);
-                boolean isStart = Boolean.parseBoolean(roomData[3]);
-                boolean isEnd = Boolean.parseBoolean(roomData[4]);
-
-                Room r = new Room(roomId, roomX, roomY);
-                r.setIsStartRoom(isStart);
-                r.setIsEndRoom(isEnd);
-                mapIdToRoom.put(roomId, r);
-                rooms.add(r);
-            } else if (part.startsWith(NetworkProtocol.DOOR + ":")){
-                // Parse doorData
-                String doorData[] = part.split(NetworkProtocol.SUB_DELIMITER);
-                int doorId = Integer.parseInt(doorData[0]);
-                int doorX = Integer.parseInt(doorData[1]);
-                int doorY = Integer.parseInt(doorData[2]);
-                String doorDirection = doorData[3];
-                int roomAID = Integer.parseInt(doorData[4]);
-                int roomBID = Integer.parseInt(doorData[5]);
-                doorDataList.add(new DoorDataHolder(doorId, doorX, doorY, doorDirection, roomAID, roomBID));
-            } else {
-                // Set start room
-                startRoom = mapIdToRoom.get(Integer.valueOf(part));
+                deserializeRooms(part, mapIdToRoom);
             }
         }
 
-        // By this point all room and door data have been parsed.
-        for (DoorDataHolder dataHolder : doorDataList) {
-            for (Room room : rooms) { // This is O(n^2) though, I'll try to optimize but it'll do for now
-                // If we see a match, create a new door with corresponding connections
-                if (dataHolder.getRoomAId() == room.getRoomId()) {
-                    Door d = dataHolder.createDoorFromDoorData(mapIdToRoom);
-                    room.addDoorToArrayList(d);
-                       
-                }
+        // Part 2: Deserialize Doors
+        for (String part : messageParts) {
+            if (part.startsWith(NetworkProtocol.DOOR + ":")) {
+                deserializeDoors(message, doorDataList);
             }
         }
+
+        // Part 3: Connect Doors
+        for (DoorDataHolder ddh : doorDataList) {
+            try {
+                Door door = ddh.createDoorFromDoorData(mapIdToRoom);
+            } catch (Exception e) {
+                // TODO: handle exception
+            }
+        }
+
 
         
+    }
+
+    /**
+     * Deserializes a part of the serialized String responsible for Room data.
+     * @param messagePart a substring of the serialized string that contains Room data to be deserialized
+     * @param mapIdToRoom a hashmap from the deserialize() method that maps a Room object to its ID. 
+     */
+    private void deserializeRooms(String messagePart, HashMap<Integer, Room> mapIdToRoom){
+        String roomData[] = messagePart.split(NetworkProtocol.SUB_DELIMITER);
+        int roomId = Integer.parseInt(roomData[0]);
+        int roomX = Integer.parseInt(roomData[1]);
+        int roomY = Integer.parseInt(roomData[2]);
+        boolean isStart = Boolean.parseBoolean(roomData[3]);
+        boolean isEnd = Boolean.parseBoolean(roomData[4]);
+
+        Room r = new Room(roomId, roomX, roomY);
+        r.setIsStartRoom(isStart);
+        r.setIsEndRoom(isEnd);
+        mapIdToRoom.put(roomId, r);
+        rooms.add(r);
+    }
+
+    /**
+     * Deserializes a part of the serialized String responsible for Door data and stores it in a doorDataHolder
+     * that is added to the doorDataList.
+     * @param messagePart a substring of the serialized string that contains Door data to be deserialized
+     * @param doorDataList an ArrayList from the deserialize() method that contains a all doorDataHolders created
+     */
+    private void deserializeDoors(String messagePart, ArrayList<DoorDataHolder> doorDataList) {
+        String doorData[] = messagePart.split(NetworkProtocol.SUB_DELIMITER);
+        int doorId = Integer.parseInt(doorData[0]);
+        int doorX = Integer.parseInt(doorData[1]);
+        int doorY = Integer.parseInt(doorData[2]);
+        String doorDirection = doorData[3];
+        int roomAID = Integer.parseInt(doorData[4]);
+        int roomBID = Integer.parseInt(doorData[5]);
+        doorDataList.add(new DoorDataHolder(doorId, doorX, doorY, doorDirection, roomAID, roomBID));
     }
 
     private class DoorDataHolder{
