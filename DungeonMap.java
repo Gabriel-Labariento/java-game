@@ -217,7 +217,16 @@ public class DungeonMap {
 
     /**
      * Returns a string containing the DungeonMap data
-     * @return a string in the format M:roomCount|room1Data|room2Data|...|startingRoomId 
+     * @return a string in the example format with interpretation.
+     *  M:3| => Map has three rooms
+        R:0,0,0,false,false|    => RoomId 0 at 0,0. not start room. not end room.
+        D:0,30,70,B,0,1|        => DoorId 0 at 30,70. Door at bottom of Room 0. Connects Room 0 and Room 1 
+        D:1,30,0,T,0,2|         => DoorId 1 at 30,0. Door at top of Room 0. Connects Room 0 and Room 2
+        R:1,100,100,true,false| => RoomId 1 at 100,100. is start room. not end room.
+        D:2,130,100,T,1,0|      => DoorId 2 at 130, 100. Door at top of Room 1. Connects Room 1 and Room 0
+        R:2,200,200,false,true| => RoomId 2 at 200,200. not start room. is end room.
+        D:3,230,270,B,2,0|      => DoorId 2 at 230,270. Door at bottom of Room 2. Connect Room 2 and Room 0 
+        1                       => Starting room is Room Id 1
      */
     public String serialize(){
 
@@ -264,7 +273,10 @@ public class DungeonMap {
         ArrayList<DoorDataHolder> doorDataList = new ArrayList<>();
         Room startRoom = null;
 
-        String[] messageParts = message.split(NetworkProtocol.DELIMITER); // Split at "|"
+        String[] messageParts = message.split("\\" + NetworkProtocol.DELIMITER); // Split at "|"
+        for (String string : messageParts) {
+            System.out.println("Message part: " + string);
+        }
 
         // Part 1: Deserialize Rooms and Doors
         for (String part : messageParts) {
@@ -272,9 +284,9 @@ public class DungeonMap {
                 roomCount = Integer.parseInt(part.substring(2));
             } else if (part.startsWith(NetworkProtocol.ROOM + ":")){
                 // Parse roomData
-                deserializeRooms(part, mapIdToRoom);
+                deserializeRooms(part.substring(2), mapIdToRoom);
             } else if (part.startsWith(NetworkProtocol.DOOR + ":")) {
-                deserializeDoors(part, doorDataList);
+                deserializeDoors(part.substring(2), doorDataList);
             }
         }
 
@@ -291,7 +303,7 @@ public class DungeonMap {
         // Part 4: Set start room
         String lastPart = messageParts[messageParts.length - 1];
         if (!lastPart.contains(":")) {
-            startRoom = mapIdToRoom.get(Integer.parseInt(lastPart));
+            startRoom = mapIdToRoom.get(Integer.valueOf(lastPart));
         }
 
         if (startRoom == null) System.out.println("Start room is null");

@@ -17,10 +17,14 @@ public class GameStateManager {
 
     /**
      * Builds a string that is the serialized form of the map data.
-     * @return a string in the form TODO: INSERT FORM
+     * @return a string in the form M:{RoomCount}|R:{roomId},{roomX},{roomY},{isStart},{isEnd}|D:{doorId},{doorX},{doorY},{direction},{roomAId},{roomBId}|...|{startingRoomId}
      */
     public String getMapData(){
         return dungeonMap.serialize();
+    }
+
+    public Room parseMapData(String message){
+        return dungeonMap.deserialize(message);
     }
 
     /**

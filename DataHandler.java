@@ -16,6 +16,7 @@ public class DataHandler {
     private int clickedX;
     private int clickedY;
 
+
     public DataHandler(ClientGameState clientState){
         this.clientState = clientState;
 
@@ -81,8 +82,10 @@ public class DataHandler {
                         String receivedMessage = new String(buffer, "UTF-8");
 
                         // If the received message starts with the protocol identifier for map data, parse the map data
-                        // TODO: call parseMapData() after writing implementation
-                        // if (receivedMessage.startsWith(NetworkProtocol.MAP_DATA)) parseMapData(receivedMessage.substring(1));
+                        if (receivedMessage.startsWith(NetworkProtocol.MAP_DATA)) {
+                            // TODO: DESERIALIZE MAP DATA
+                        };
+
                         if (receivedMessage.startsWith(receivedMessage)){
                             clientState.getEntities().clear();
                             parseAssetsData(receivedMessage);
@@ -167,6 +170,7 @@ public class DataHandler {
         String[] messageParts = message.split(NetworkProtocol.DELIMITER);
         for (String part : messageParts) {
             if (part.startsWith("P:")) {
+
                 String[] playerCoordinates = part.substring(2).split(NetworkProtocol.SUB_DELIMITER);
                 int playerX = Integer.parseInt(playerCoordinates[0]);
                 int playerY = Integer.parseInt(playerCoordinates[1]);
@@ -194,10 +198,10 @@ public class DataHandler {
         
     }
 
-    // TODO: parseMapData implementation
-    // private void parseMapData(String message){
-    //     String
-    // }
+    //TODO: parseMapData method
+    private void parseMapData(String message){
+        // TODO: IMPLEMENT
+    }
 
     public void loadAsset(char identifier, int x, int y){
         String name = idToName.get(identifier);
