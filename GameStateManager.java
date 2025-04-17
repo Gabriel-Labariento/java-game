@@ -23,7 +23,7 @@ public class GameStateManager {
         return dungeonMap.serialize();
     }
 
-    public Room parseMapData(String message){
+    public DungeonMapDeserializeResult parseMapData(String message){
         return dungeonMap.deserialize(message);
     }
 

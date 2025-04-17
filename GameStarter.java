@@ -1,15 +1,12 @@
 public class GameStarter {
     public static void main(String[] args) {
-        GameStateManager gsm = new GameStateManager();
-        System.out.println(gsm.getMapData());
-
-        // GameFrame gameFrame = new GameFrame(720, 540, "Biting on Fish");
-        // DataHandler dataHandler = (gameFrame.getCanvas()).getDataHandler();
-        // dataHandler.connectToServer(gameFrame.getCanvas().getSendInputsScheduler());
-        // gameFrame.getCanvas().startRenderLoop();
-        // dataHandler.closeSocketsOnShutdown();
-        // gameFrame.setUpGUI();
-        // gameFrame.addKeyBindings();
+        GameFrame gameFrame = new GameFrame(720, 540, "Biting on Fish");
+        DataHandler dataHandler = (gameFrame.getCanvas()).getDataHandler();
+        dataHandler.connectToServer(gameFrame.getCanvas().getSendInputsScheduler());
+        gameFrame.getCanvas().startRenderLoop();
+        dataHandler.closeSocketsOnShutdown();
+        gameFrame.setUpGUI();
+        gameFrame.addKeyBindings();
 
     }
 }

@@ -82,11 +82,9 @@ public class DataHandler {
                         String receivedMessage = new String(buffer, "UTF-8");
 
                         // If the received message starts with the protocol identifier for map data, parse the map data
-                        if (receivedMessage.startsWith(NetworkProtocol.MAP_DATA)) {
-                            // TODO: DESERIALIZE MAP DATA
-                        };
-
-                        if (receivedMessage.startsWith(receivedMessage)){
+                        if (receivedMessage.startsWith(NetworkProtocol.MAP_DATA + ":")) {
+                            parseMapData(receivedMessage);
+                        } else if (receivedMessage.startsWith(receivedMessage)){
                             clientState.getEntities().clear();
                             parseAssetsData(receivedMessage);
                         }
@@ -198,9 +196,15 @@ public class DataHandler {
         
     }
 
-    //TODO: parseMapData method
+    /**
+     * TODO: JAVA-DOC
+     * @param message
+     */
     private void parseMapData(String message){
-        // TODO: IMPLEMENT
+        DungeonMapDeserializeResult result = new DungeonMap().deserialize(message);
+        clientState.setCurrentRoom(result.getStartRoom());
+        clientState.setAllRooms(result.getAllRooms());
+        
     }
 
     public void loadAsset(char identifier, int x, int y){

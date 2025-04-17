@@ -1,14 +1,25 @@
+import java.util.*;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 public class ClientGameState {
     private Player userPlayer;
+    private HashMap <Integer, Room> allRooms;
     private Room currentRoom;
     private CopyOnWriteArrayList<Entity> entities; 
 
     public ClientGameState(){
         userPlayer = null;
+        allRooms = null;
         currentRoom = null;
         entities = new CopyOnWriteArrayList<>();
+    }
+
+    public HashMap<Integer, Room> getAllRooms() {
+        return allRooms;
+    }
+
+    public void setAllRooms(HashMap<Integer, Room> allRooms) {
+        this.allRooms = allRooms;
     }
 
     public Player getUserPlayer() {
