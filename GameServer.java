@@ -68,7 +68,7 @@ public class GameServer {
         public ConnectedPlayer(Socket sck, int n){
             clientSocket = sck;
             cid = n;
-            gameStateManager.getEntities().add(new Player(cid, 300, 300));
+            gameStateManager.addEntity((new Player(cid, 300, 300)));
             try {
                 dataIn = new DataInputStream(clientSocket.getInputStream());
                 dataOut = new DataOutputStream(clientSocket.getOutputStream());
@@ -124,7 +124,7 @@ public class GameServer {
         private void sendEntitiesData(){
             try {
                 String assetsDataString = gameStateManager.getAssetsData(cid);
-                // System.out.println(assetsDataString);
+                System.out.println(assetsDataString);
                 gameStateManager.updateUserPlayerIndex(cid);
                 byte[] assetsDataBytes = assetsDataString.getBytes("UTF-8");
                 dataOut.writeInt(assetsDataBytes.length);

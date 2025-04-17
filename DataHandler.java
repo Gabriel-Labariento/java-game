@@ -45,11 +45,14 @@ public class DataHandler {
 
     public void connectToServer(ScheduledExecutorService sendInputsScheduler){
         try {
+            // TODO: REMOVE AUTOMATIC IP AND LOCALHOST
             System.out.println("Please input the server's IP address: ");    
-            String ipAddress = console.nextLine();
+            // String ipAddress = console.nextLine();
+            String ipAddress = "localhost";
 
             System.out.println("Please input the port number: ");
-            int portNum = Integer.parseInt(console.nextLine());
+            // int portNum = Integer.parseInt(console.nextLine());
+            int portNum = 7000;
 
             System.out.println("ATTEMPTING TO CONNECT TO SERVER...");
             theSocket = new Socket(ipAddress, portNum);
@@ -84,7 +87,7 @@ public class DataHandler {
                         // If the received message starts with the protocol identifier for map data, parse the map data
                         if (receivedMessage.startsWith(NetworkProtocol.MAP_DATA + ":")) {
                             parseMapData(receivedMessage);
-                        } else if (receivedMessage.startsWith(receivedMessage)){
+                        } else {
                             clientState.getEntities().clear();
                             parseAssetsData(receivedMessage);
                         }
@@ -169,21 +172,31 @@ public class DataHandler {
         this.clientId = Integer.parseInt(messageParts[0]);
 
         for (String part : messageParts) {
-            if (part.startsWith(NetworkProtocol.PLAYER + ":")) {
+            if (part.startsWith(NetworkProtocol.USER_PLAYER + ":")) {
                 // System.out.println("Parsing player");
-                String[] playerCoordinates = part.substring(2).split(NetworkProtocol.SUB_DELIMITER);
+                String[] playerCoordinates = part.substring(NetworkProtocol.USER_PLAYER.length() + 1).split(NetworkProtocol.SUB_DELIMITER);
                 int playerX = Integer.parseInt(playerCoordinates[0]);
                 int playerY = Integer.parseInt(playerCoordinates[1]);
-                // System.out.println("Player coors: (" + playerX + ", " + playerY + ")");
+        
                 loadAsset('P', playerX, playerY);
-                System.out.println("Player loaded");
+                // System.out.println(" user Player loaded");
+
                 try {
                     clientState.setUserPlayer(new Player(clientId, playerX, playerY));    
                 } catch (Exception e) {
                     System.out.println("Exception in parseAssetData() when setting user player");
-                }
+                } 
+            } else if (part.startsWith(NetworkProtocol.PLAYER + ":")) {
+                String[] otherPlayerData = part.substring(NetworkProtocol.PLAYER.length() + 1).split(NetworkProtocol.SUB_DELIMITER);
+                int otherId = Integer.parseInt(otherPlayerData[0]);
+                int x = Integer.parseInt(otherPlayerData[1]);
+                int y = Integer.parseInt(otherPlayerData[2]);
                 
-            } else if (part.startsWith("E:")) {
+                if (otherId != clientId) {
+                    loadAsset('P', x, y);
+                    clientState.addEntity(new Player(otherId, x, y));
+                } 
+            } else if (part.startsWith(NetworkProtocol.ENTITY + ":")) {
                 // TODO: implementation for other entities
                 // String[] entityCoordinates = part.substring(2).split(NetworkProtocol.SUB_DELIMITER);
                 // int entityX = Integer.parseInt(entityCoordinates[0]);

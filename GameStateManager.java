@@ -39,15 +39,18 @@ public class GameStateManager {
         sb.append(cid).append(NetworkProtocol.DELIMITER);
 
         // Player String : P:playerX,playerY|
-        Entity player = getPlayerFromClientId(cid);
-        sb.append(NetworkProtocol.PLAYER).append(":");
-        sb.append(player.getWorldX()).append(NetworkProtocol.SUB_DELIMITER).append(player.getWorldY()).append(NetworkProtocol.DELIMITER);
+        Entity userPlayer = getPlayerFromClientId(cid);
+        sb.append(NetworkProtocol.USER_PLAYER).append(":");
+        sb.append(userPlayer.getWorldX()).append(NetworkProtocol.SUB_DELIMITER)
+        .append(userPlayer.getWorldY()).append(NetworkProtocol.DELIMITER);
 
         // Entity String : E:entity1X,entity1Y,entity2X,entity2Y...|
-        sb.append(NetworkProtocol.ENTITY).append(":");
-            for(Entity entity : entities){
-                if (entity != player) sb.append(entity.getAssetData()).append(NetworkProtocol.SUB_DELIMITER);
-            }
+        for(Entity entity : entities){
+            if ( (entity instanceof Player) && (entity != userPlayer) ) {
+                sb.append(NetworkProtocol.PLAYER).append(":").append(entity.getAssetData()).append(NetworkProtocol.DELIMITER);
+            } 
+            // TODO: Add more implementations for other entities
+        }
 
             // TODO: implement currentRoom based on update of Room class
             // currentRoom = new Room('A'); 

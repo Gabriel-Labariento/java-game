@@ -211,7 +211,7 @@ public class Room {
         return roomId;
     }
 
-    public void draw(Graphics2D g2d){
+    public void draw(Graphics2D g2d, int cameraX, int cameraY){
         // Inside
         if (isStartRoom) {
             g2d.setColor(Color.RED);
@@ -219,11 +219,11 @@ public class Room {
             g2d.setColor(Color.BLUE);
         } else g2d.setColor(Color.DARK_GRAY);
 
-        g2d.fillRect(x, y, width, height);
+        g2d.fillRect(x - cameraX, y - cameraY, width, height);
 
         // Border
         g2d.setColor(Color.BLACK);
-        g2d.drawRect(x, y, width, height);
+        g2d.drawRect(x - cameraX, y - cameraY, width, height);
         
         // Draw doors
         // drawDoors(g2d);

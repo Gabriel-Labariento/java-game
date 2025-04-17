@@ -1,4 +1,3 @@
-import java.awt.*;
 import java.util.*;
 
 public class DungeonMap {
@@ -143,11 +142,11 @@ public class DungeonMap {
      * Calls the draw method on all the rooms of the dungeon
      * @param g2d object used to draw
      */
-    public void draw(Graphics2D g2d) {
-        for (Room room : rooms) {
-            room.draw(g2d);
-        }
-    }
+    // public void draw(Graphics2D g2d) {
+    //     for (Room room : rooms) {
+    //         room.draw(g2d);
+    //     }
+    // }
 
     /**
      * Randomly chooses a starting room and then sets the end room as the farthest from start room in terms of how many connections are in between them.

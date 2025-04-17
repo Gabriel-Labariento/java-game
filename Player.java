@@ -10,8 +10,8 @@ public class Player extends Entity{
         this.clientId = cid;
         this.identifier = NetworkProtocol.PLAYER.toCharArray()[0];
         speed = 5;
-        height = 50;
-        width = 50;
+        height = 10;
+        width = 10;
         screenX = 720/2 - width/2;
         screenY = 540/2 - height/2;
         worldX = x;
@@ -43,6 +43,6 @@ public class Player extends Entity{
    
     @Override
     public String getAssetData(){
-        return "" + identifier + worldX + ',' + worldY;
+        return "" + clientId + "," +  worldX + ',' + worldY;
     };
 }
