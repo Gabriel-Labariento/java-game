@@ -50,9 +50,11 @@ public class GameCanvas extends JComponent {
         }
 
         // Draw enemies, projectiles, other players
-        for (Entity entity : clientState.getEntities())
-            entity.draw(g2d, entity.getWorldX()- clientState.getUserPlayer().getWorldX() + screenX, entity.getWorldY()- clientState.getUserPlayer().getWorldY() + screenY);
-
+        synchronized (clientState.getEntities()) {
+            for (Entity entity : clientState.getEntities())
+            entity.draw(g2d, entity.getWorldX()- clientState.getUserPlayer().getWorldX() + screenX, entity.getWorldY()- clientState.getUserPlayer().getWorldY() + screenY);    
+        }
+        
         //Draw current user's player
         clientState.getUserPlayer().draw(g2d, screenX, screenY); //CHANGE 50 BY ACTUAL ASSET SIZE
 

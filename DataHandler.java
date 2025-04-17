@@ -88,8 +88,10 @@ public class DataHandler {
                         if (receivedMessage.startsWith(NetworkProtocol.MAP_DATA + ":")) {
                             parseMapData(receivedMessage);
                         } else {
-                            clientState.getEntities().clear();
-                            parseAssetsData(receivedMessage);
+                            synchronized (clientState.getEntities()) {
+                                clientState.getEntities().clear();
+                                parseAssetsData(receivedMessage);
+                            }
                         }
                     } catch (IOException ex){
                         System.out.println("IOEception from receiveAssetsThread");
