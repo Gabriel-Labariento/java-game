@@ -19,8 +19,8 @@ public class Door {
     }
 
 
-    public void draw(Graphics2D g2d) {
-        g2d.fillRect(x, y, width, height);
+    public void draw(Graphics2D g2d, int offsetX, int offsetY) {
+        g2d.fillRect(x - offsetX, y-offsetY, width, height);
     }
 
     

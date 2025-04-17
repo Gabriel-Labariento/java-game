@@ -26,7 +26,7 @@ public class GameCanvas extends JComponent {
     protected void paintComponent(Graphics g){
 
         //Dont draw canvas if userPlayer is null
-        if (clientState.getUserPlayer() == null) return; 
+        if ( (clientState.getUserPlayer() == null) || (clientState.getCurrentRoom() == null) )return; 
 
         Graphics2D g2d = (Graphics2D) g;
 
@@ -34,9 +34,22 @@ public class GameCanvas extends JComponent {
         int screenX = (720/2 - 50/2);
         int screenY = (540/2 - 50/2);
 
-        Rectangle2D.Double background = new Rectangle2D.Double(-clientState.getUserPlayer().getWorldX()+screenX, -clientState.getUserPlayer().getWorldY()+screenY, 1000, 1000);
+        Room currentRoom = clientState.getCurrentRoom();
+
+        Rectangle2D.Double roomRectangle = new Rectangle2D.Double
+        (-clientState.getUserPlayer().getWorldX()+screenX,
+         -clientState.getUserPlayer().getWorldY()+screenY,
+          currentRoom.getWidth(), currentRoom.getHeight());
+
         g2d.setColor(Color.GRAY);
-        g2d.fill(background);
+        g2d.fill(roomRectangle);
+
+        // Draw room doors
+        for (Door door : currentRoom.getDoorsArrayList()) {
+            door.draw(g2d,
+            clientState.getUserPlayer().getWorldX() - screenX,
+            clientState.getUserPlayer().getWorldY() - screenY);
+        }
 
         // Draw enemies, projectiles, other players
         for (Entity entity : clientState.getEntities())

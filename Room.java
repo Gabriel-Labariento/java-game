@@ -226,18 +226,18 @@ public class Room {
         g2d.drawRect(x, y, width, height);
         
         // Draw doors
-        drawDoors(g2d);
+        // drawDoors(g2d);
     }
 
-    /**
+    /** POSSIBLE TODO: DELETE IF UNECESSARY IN FINAL IMPLEMENTATION
      * Draws the doors inside doorsArrayList 
      * @param g2d object used to draw
      */
-    private void drawDoors(Graphics2D g2d){
-        for (Door door : doorsArrayList) {
-            door.draw(g2d);
-        }
-    }
+    // private void drawDoors(Graphics2D g2d){
+    //     for (Door door : doorsArrayList) {
+    //         door.draw(g2d);
+    //     }
+    // }
 
     /**
      * Populates the doorsArrayList with new Door objects based on 

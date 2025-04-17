@@ -124,7 +124,7 @@ public class GameServer {
         private void sendEntitiesData(){
             try {
                 String assetsDataString = gameStateManager.getAssetsData(cid);
-                System.out.println(assetsDataString);
+                // System.out.println(assetsDataString);
                 gameStateManager.updateUserPlayerIndex(cid);
                 byte[] assetsDataBytes = assetsDataString.getBytes("UTF-8");
                 dataOut.writeInt(assetsDataBytes.length);
@@ -180,8 +180,9 @@ public class GameServer {
                                     x += parsedChar;
                             
                             }
-                            else
+                            else {
                                 ((Player) gameStateManager.getPlayerFromClientId(cid)).update(parsedChar);
+                            }
                         }
                     }
                 }

@@ -262,9 +262,9 @@ public class DungeonMap {
         Room startRoom = null;
 
         String[] messageParts = message.split("\\" + NetworkProtocol.DELIMITER); // Split at "|"
-        for (String string : messageParts) {
-            System.out.println("Message part: " + string);
-        }
+        // for (String string : messageParts) {
+        //     // System.out.println("Message part: " + string);
+        // }
 
         // Part 1: Deserialize Rooms and Doors
         for (String part : messageParts) {

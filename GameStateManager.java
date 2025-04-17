@@ -56,12 +56,9 @@ public class GameStateManager {
         return sb.toString();
     }
 
-    private boolean isEntityTheUserPlayer(Entity e, int cid){
-        return (e.getIdentifier() == 'A' && e.getClientId() == cid);
-    }
     public Entity getPlayerFromClientId(int cid){
         for (Entity entity : entities) {
-            if (entity.getIdentifier() == 'A' && entity.getClientId() == cid) return entity;
+            if (entity.getIdentifier() == NetworkProtocol.PLAYER.toCharArray()[0] && entity.getClientId() == cid) return entity;
         }
         return null;
     }

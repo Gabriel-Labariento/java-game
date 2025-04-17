@@ -21,7 +21,7 @@ public class DataHandler {
         this.clientState = clientState;
 
         idToName = new HashMap<>();
-        idToName.put('A', "Player");
+        idToName.put('P', "Player");
         idToName.put('B', "Rat");
 
         keyMap = new HashMap<>();
@@ -165,15 +165,18 @@ public class DataHandler {
      */
     private void parseAssetsData(String message){
 
-        String[] messageParts = message.split(NetworkProtocol.DELIMITER);
-        for (String part : messageParts) {
-            if (part.startsWith("P:")) {
+        String[] messageParts = message.split("\\" + NetworkProtocol.DELIMITER); // Have to use \\ to escape. Turns out "|" is special for java
+        this.clientId = Integer.parseInt(messageParts[0]);
 
+        for (String part : messageParts) {
+            if (part.startsWith(NetworkProtocol.PLAYER + ":")) {
+                // System.out.println("Parsing player");
                 String[] playerCoordinates = part.substring(2).split(NetworkProtocol.SUB_DELIMITER);
                 int playerX = Integer.parseInt(playerCoordinates[0]);
                 int playerY = Integer.parseInt(playerCoordinates[1]);
-                loadAsset('A', playerX, playerY);
-
+                // System.out.println("Player coors: (" + playerX + ", " + playerY + ")");
+                loadAsset('P', playerX, playerY);
+                System.out.println("Player loaded");
                 try {
                     clientState.setUserPlayer(new Player(clientId, playerX, playerY));    
                 } catch (Exception e) {
@@ -186,9 +189,6 @@ public class DataHandler {
                 // int entityX = Integer.parseInt(entityCoordinates[0]);
                 // int entityY = Integer.parseInt(entityCoordinates[1]);
                 // loadAsset('B', entityX, entityY);
-            } else {
-                // This will always be parsed first
-                int clientId = Integer.parseInt(part);
             }
             
 
