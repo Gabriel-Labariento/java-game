@@ -1,28 +1,17 @@
-// public class Room{
-//     private char id;
-
-//     public Room(char identifier){
-//         id = identifier;
-//     }
-
-//     public char getRoomId(){
-//         return id;
-//     }
-
-//     // public void draw(Graphics2D g2d){
-        
-//     // }
-// }
-
 import java.awt.Color;
 import java.awt.Graphics2D;
 import java.util.*; 
 
 public class Room {
+    
+    private static final int TILESIZE = GameCanvas.TILESIZE;
+    private static final int WIDTH_TILES = 45; // 30 TILES WIDE
+    private static final int HEIGHT_TILES = 33; // 24 TILES TALL
     private int roomId, x, y;
     private boolean isStartRoom, isEndRoom;
-    private final int height = 80;
-    private final int width = 80;
+    private final int height = TILESIZE * HEIGHT_TILES;
+    private final int width = TILESIZE * WIDTH_TILES;
+
     private ArrayList<Room> connections;
     private HashMap<String, Room> doors;
     private ArrayList<Door> doorsArrayList;
@@ -65,6 +54,26 @@ public class Room {
 
         return sb.toString();
     }
+
+    public void draw(Graphics2D g2d, int cameraX, int cameraY){
+        // Inside
+        if (isStartRoom) {
+            g2d.setColor(Color.RED);
+        } else if (isEndRoom){
+            g2d.setColor(Color.BLUE);
+        } else g2d.setColor(Color.DARK_GRAY);
+
+        
+        g2d.fillRect(x - cameraX, y - cameraY, width, height);
+
+        // Border
+        g2d.setColor(Color.BLACK);
+        g2d.drawRect(x - cameraX, y - cameraY, width, height);
+        
+        // Draw doors
+        // drawDoors(g2d);
+    }
+
 
     /**
      * Adds the "other" argument to the list of connections of the calling room and adds the calling room to the connections of "other."
@@ -211,24 +220,7 @@ public class Room {
         return roomId;
     }
 
-    public void draw(Graphics2D g2d, int cameraX, int cameraY){
-        // Inside
-        if (isStartRoom) {
-            g2d.setColor(Color.RED);
-        } else if (isEndRoom){
-            g2d.setColor(Color.BLUE);
-        } else g2d.setColor(Color.DARK_GRAY);
-
-        g2d.fillRect(x - cameraX, y - cameraY, width, height);
-
-        // Border
-        g2d.setColor(Color.BLACK);
-        g2d.drawRect(x - cameraX, y - cameraY, width, height);
-        
-        // Draw doors
-        // drawDoors(g2d);
-    }
-
+    
     /** POSSIBLE TODO: DELETE IF UNECESSARY IN FINAL IMPLEMENTATION
      * Draws the doors inside doorsArrayList 
      * @param g2d object used to draw

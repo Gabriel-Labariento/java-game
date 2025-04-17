@@ -3,6 +3,7 @@ import java.util.concurrent.*;
 import javax.swing.*;
 
 public class GameCanvas extends JComponent {
+    public static final int TILESIZE = 16;
     private static final int GAMELOOPINTERVAL = 16;
     private static final int FPS = 60;
     private int width, height;
@@ -10,6 +11,7 @@ public class GameCanvas extends JComponent {
     private ClientGameState clientState;
     private ScheduledExecutorService renderLoopScheduler;
     private ScheduledExecutorService sendInputsScheduler;
+    private TileManager tileManager;
 
     public GameCanvas(int width, int height){
         this.width = width;
@@ -19,6 +21,7 @@ public class GameCanvas extends JComponent {
         clientState = new ClientGameState();
         dataHandler = new DataHandler(clientState);
         setPreferredSize(new Dimension(width, height));
+        tileManager = new TileManager(this);
     }
 
     @Override
@@ -33,6 +36,8 @@ public class GameCanvas extends JComponent {
             RenderingHints.KEY_ANTIALIASING,
             RenderingHints.VALUE_ANTIALIAS_ON);
         g2d.setRenderingHints(rh);
+
+        // tileManager.draw(g2d);
 
         //TEMPORARY OFFSET CONFIGURATIONS
         int screenX = (720/2 - 50/2);
