@@ -1,16 +1,18 @@
 import java.awt.Color;
 import java.awt.Graphics2D;
-import java.util.*; 
+import java.util.*;
 
 public class Room {
     
-    private static final int TILESIZE = GameCanvas.TILESIZE;
-    private static final int WIDTH_TILES = 45; // 30 TILES WIDE
-    private static final int HEIGHT_TILES = 33; // 24 TILES TALL
+    private final int TILESIZE = GameCanvas.TILESIZE;
+    private final int WIDTH_TILES = 45; // 30 TILES WIDE
+    private final int HEIGHT_TILES = 33; // 33 TILES TALL
+
     private int roomId, x, y;
     private boolean isStartRoom, isEndRoom;
     private final int height = TILESIZE * HEIGHT_TILES;
     private final int width = TILESIZE * WIDTH_TILES;
+    private  Tile[][] tiles;
 
     private ArrayList<Room> connections;
     private HashMap<String, Room> doors;
@@ -28,9 +30,22 @@ public class Room {
         this.y = y;
         isStartRoom = false;
         isEndRoom = false;
+
         connections = new ArrayList<>();
         doors = new HashMap<>();
         doorsArrayList = new ArrayList<>();
+
+        populateRoomTiles();
+    }
+
+    private void populateRoomTiles(){
+        tiles = new Tile[HEIGHT_TILES][WIDTH_TILES];
+
+        for (int i = 0; i < HEIGHT_TILES; i++) {
+            for (int j = 0; j < WIDTH_TILES; j++) {
+                tiles[i][j] = new Tile();
+            }
+        }
     }
 
     /**
@@ -63,6 +78,11 @@ public class Room {
             g2d.setColor(Color.BLUE);
         } else g2d.setColor(Color.DARK_GRAY);
 
+        // for (Tile[] tileArray : tiles) {
+        //     for (Tile tile : tileArray) {
+        //         tile.draw(g2d);
+        //     }
+        // }
         
         g2d.fillRect(x - cameraX, y - cameraY, width, height);
 
@@ -313,5 +333,13 @@ public class Room {
 
     public int getWidth() {
         return width;
+    }
+
+    public int getWIDTH_TILES() {
+        return WIDTH_TILES;
+    }
+
+    public int getHEIGHT_TILES() {
+        return HEIGHT_TILES;
     }
 }

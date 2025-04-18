@@ -37,7 +37,7 @@ public class GameCanvas extends JComponent {
             RenderingHints.VALUE_ANTIALIAS_ON);
         g2d.setRenderingHints(rh);
 
-        // tileManager.draw(g2d);
+        
 
         //TEMPORARY OFFSET CONFIGURATIONS
         int screenX = (720/2 - 50/2);
@@ -48,6 +48,8 @@ public class GameCanvas extends JComponent {
 
         Room currentRoom = clientState.getCurrentRoom();
         currentRoom.draw(g2d, cameraX, cameraY);
+
+        tileManager.draw(g2d, currentRoom, cameraX, cameraY);
 
         // Draw room doors
         for (Door door : currentRoom.getDoorsArrayList()) {
