@@ -335,6 +335,18 @@ public class DungeonMap {
         doorDataList.add(new DoorDataHolder(doorId, doorX, doorY, doorDirection, roomAID, roomBID));
     }
 
+    /**
+     * Searches for and returns a room based on its id
+     * @param id the id of the room
+     * @return the room object with the corresponding id
+     */
+    public Room getRoomFromId(int id) {
+        for (Room room : rooms) {
+            if (id == room.getRoomId()) return room;
+        }
+        return null;
+    }
+
     public ArrayList<Room> getRooms() {
         return rooms;
     }

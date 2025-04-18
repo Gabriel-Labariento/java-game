@@ -49,4 +49,8 @@ public class ClientGameState {
     public void addEntity(Entity e){
         entities.add(e);
     }
+
+    public Room getRoomById(int id) {
+        return allRooms.get(id);
+    }
 }

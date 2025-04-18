@@ -115,12 +115,17 @@ public class DataHandler {
                 String[] playerCoordinates = part.substring(NetworkProtocol.USER_PLAYER.length() + 1).split(NetworkProtocol.SUB_DELIMITER);
                 int playerX = Integer.parseInt(playerCoordinates[0]);
                 int playerY = Integer.parseInt(playerCoordinates[1]);
+                int playerRoomId = Integer.parseInt(playerCoordinates[2]);
         
                 loadAsset('P', playerX, playerY);
                 // System.out.println(" user Player loaded");
-
                 try {
-                    clientState.setUserPlayer(new Player(clientId, playerX, playerY));    
+                    Room currentRoom = clientState.getRoomById(playerRoomId);
+                    Player player = new Player(clientId, playerX, playerY);
+                    player.setCurrentRoom(currentRoom);
+                    clientState.setUserPlayer(new Player(clientId, playerX, playerY));
+                    clientState.setCurrentRoom(currentRoom);
+                        
                 } catch (Exception e) {
                     System.out.println("Exception in parseAssetData() when setting user player");
                 } 
@@ -148,8 +153,9 @@ public class DataHandler {
     }
 
     /**
-     * TODO: JAVA-DOC
-     * @param message
+     * Parses a part of the String received by the receiveAssetsThread responsible for the map data.
+     * After parsing, it sets the currentRoom and allRooms fields of the clientState.
+     * @param message the substring containing map data
      */
     private void parseMapData(String message){
         DungeonMapDeserializeResult result = new DungeonMap().deserialize(message);

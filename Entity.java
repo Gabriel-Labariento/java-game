@@ -68,5 +68,13 @@ public abstract class Entity {
     public void setCurrentRoom(Room currentRoom) {
         this.currentRoom = currentRoom;
     }
+
+    public void setWorldX(int worldX) {
+        this.worldX = worldX;
+    }
+
+    public void setWorldY(int worldY) {
+        this.worldY = worldY;
+    }
 }
     

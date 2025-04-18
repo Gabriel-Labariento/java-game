@@ -6,8 +6,10 @@ public class NetworkProtocol {
     public static final String USER_PLAYER = "P$"; // user player data
     public static final String ENTITY = "E";  // Other entities
     public static final String MAP_DATA = "M";       // Full map
-    public static final String ROOM = "R";    // Room transition
-    public static final String DOOR = "D"; // Door transition
+    public static final String ROOM = "R";    // Room 
+    public static final String DOOR = "D"; // Door 
+    public static final String ROOM_CHANGE = "RC";
     public static final String DELIMITER = "|";
     public static final String SUB_DELIMITER = ",";
+    
 }
