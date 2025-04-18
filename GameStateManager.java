@@ -10,9 +10,9 @@ public class GameStateManager {
     public GameStateManager(){
         entities = new CopyOnWriteArrayList<>();
         userPlayerIndex = -1;
-        currentRoom = null;
         dungeonMap = new DungeonMap();
         dungeonMap.generateRooms(3);
+        currentRoom = dungeonMap.getStartRoom();
     }
 
     /**
@@ -51,11 +51,6 @@ public class GameStateManager {
             } 
             // TODO: Add more implementations for other entities
         }
-
-            // TODO: implement currentRoom based on update of Room class
-            // currentRoom = new Room('A'); 
-            // parseableStr += currentRoom.getRoomId() + "0,0%";
-
         return sb.toString();
     }
 
@@ -101,6 +96,7 @@ public class GameStateManager {
     }
 
     public void addEntity(Entity e){
+        e.setCurrentRoom(currentRoom);
         entities.add(e);
     }
 

@@ -10,8 +10,8 @@ public class Player extends Entity{
         this.clientId = cid;
         this.identifier = NetworkProtocol.PLAYER.toCharArray()[0];
         speed = 5;
-        height = 10;
-        width = 10;
+        height = 16;
+        width = 16;
         screenX = 720/2 - width/2;
         screenY = 540/2 - height/2;
         worldX = x;
@@ -26,15 +26,31 @@ public class Player extends Entity{
     }
 
     public void update(char input){
-        if(input == 'W')
-            worldY -= speed;
-        if(input == 'A')
-            worldX -= speed;
-        if(input == 'S')
-            worldY += speed;
-        if(input == 'D')
-            worldX += speed;
+    
+        if(input == 'W') {
+            if (isMoveInbound(0, -1 * speed)) worldY -= speed;
+        }
+            // newWorldY -= speed;
+            // worldY -= speed;
+        if(input == 'A') {
+            if (isMoveInbound(-1 * speed, 0)) worldX -= speed;
+        }
+            // newWorldX -= speed;
+            // worldX -= speed;
+        if(input == 'S') {
+            if (isMoveInbound(0, speed)) worldY += speed;
+        }
+            // newWorldY += speed;
+            // worldY += speed;
+        if(input == 'D') {
+            if (isMoveInbound(speed, 0)) worldX += speed;
+        }
+            // newWorldX += speed;
+            // worldX += speed;
+        
     }
+
+    
 
     public int[] getScreenPos() {
         int[] screenPos = {screenX, screenY};

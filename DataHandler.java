@@ -155,7 +155,6 @@ public class DataHandler {
         DungeonMapDeserializeResult result = new DungeonMap().deserialize(message);
         clientState.setCurrentRoom(result.getStartRoom());
         clientState.setAllRooms(result.getAllRooms());
-        
     }
 
     public void loadAsset(char identifier, int x, int y){

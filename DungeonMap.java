@@ -335,6 +335,18 @@ public class DungeonMap {
         doorDataList.add(new DoorDataHolder(doorId, doorX, doorY, doorDirection, roomAID, roomBID));
     }
 
+    public ArrayList<Room> getRooms() {
+        return rooms;
+    }
+
+    public Room getStartRoom() {
+        return startRoom;
+    }
+
+    public Room getEndRoom() {
+        return endRoom;
+    }
+
     private class DoorDataHolder{
         private int id, x, y, roomAId, roomBId;
         private String direction;

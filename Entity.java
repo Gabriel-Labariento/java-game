@@ -10,6 +10,7 @@ public abstract class Entity {
     public double health;
     public double attack;
     public int clientId;
+    public Room currentRoom; 
 
     public void draw(Graphics2D g2d, int xOffset, int yOffset){}
 
@@ -33,6 +34,20 @@ public abstract class Entity {
 
     public abstract String getAssetData();
 
+    /**
+     * Checks if the move an entity will make will keep them inside the room they are currently in
+     * @param dx the change in x.
+     * @param dy the change in y
+     * @return a boolean that is true when the move is inbound, false when not.
+     */
+    public boolean isMoveInbound(int dx, int dy) {
+        return !((worldX + dx < currentRoom.getX()) ||
+                ( (worldX + width) + dx > currentRoom.getX() + currentRoom.getWidth()) ||
+                (worldY + dy < currentRoom.getY()) ||
+                ((worldY + height) + dy > currentRoom.getY() + currentRoom.getHeight())
+             );
+    }
+
     // FOR TRANSFER
     // public byte[] getByteData(){
     //     ByteBuffer buffer = ByteBuffer.allocate(40);
@@ -45,5 +60,13 @@ public abstract class Entity {
     //     buffer.putDouble(attack);
     //     return buffer.array();
     // }
+
+    public Room getCurrentRoom() {
+        return currentRoom;
+    }
+
+    public void setCurrentRoom(Room currentRoom) {
+        this.currentRoom = currentRoom;
+    }
 }
     
