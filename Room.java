@@ -258,8 +258,8 @@ public class Room {
     public void populateDoorsArrayList(){
         int centerX = x + width / 2;
         int centerY = y + height / 2;
-        int doorHeight = 10;
-        int doorWidth = 10;
+        int doorHeight = Door.HEIGHT_TILES * GameCanvas.TILESIZE;
+        int doorWidth = Door.WIDTH_TILES * GameCanvas.TILESIZE;
         Door d;
 
         for (HashMap.Entry<String, Room> door : doors.entrySet()) {

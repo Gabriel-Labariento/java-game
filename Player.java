@@ -43,7 +43,7 @@ public class Player extends Entity{
 
 
     /**
-     * Builds a String storing room transition data in the form RC:destinationRoomId,newX,newY
+     * Builds a String storing room transition data in the form RC:clientId,newX,newY,destinationRoomId
      * @param room the room to transition to
      */
     private String getRoomTransitionData(Door origin, Room next) {
@@ -54,13 +54,20 @@ public class Player extends Entity{
         int newY = newCoors[1];
 
         sb.append(NetworkProtocol.ROOM_CHANGE).append(":")
-        .append(next.getRoomId()).append(NetworkProtocol.SUB_DELIMITER)
+        .append(clientId).append(NetworkProtocol.SUB_DELIMITER)
         .append(newX).append(NetworkProtocol.SUB_DELIMITER)
-        .append(newY);
+        .append(newY).append(NetworkProtocol.SUB_DELIMITER)
+        .append(next.getRoomId());
 
         return sb.toString();
     }
 
+    /**
+     * Gets the new position of the player in the new room after using a door.
+     * @param origin the door in the previous room where the player came from
+     * @param next the room the player is going to
+     * @return an int array with the new position of the player in the next room, index 0 as the x position and index 1 as the y position
+     */
     private int[] getNewPositionAfterRoomTransition(Door origin, Room next){
         int[] newCoordinates = new int[2];
 
@@ -132,16 +139,24 @@ public class Player extends Entity{
         int[] screenPos = {screenX, screenY};
         return screenPos;
     }
-   
-    @Override
-    public String getAssetData(){
+    
+    
+    /**
+     * Returns a string containing the player data
+     * @param isUserPlayer true if the calling player is the user player, false otherwise
+     * @return a string in the possible forms: RC:clientId,newX,newY,destinationRoomId or clientId,newX,newY,currentRoomId 
+     * 
+     */
+    public String getAssetData(boolean isUserPlayer){
         StringBuilder sb = new StringBuilder();
 
         Door d = getCollidingDoor();
-        if (d != null) {
+        if ( isUserPlayer && d != null) { // Only send room transition data for the user player
             return getRoomTransitionData(d, d.getOtherRoom(currentRoom)); // return a different string upon room change
         } else {
-            sb.append(worldX).append(NetworkProtocol.SUB_DELIMITER)
+            // String format: clientId,x,y,roomId
+            sb.append(clientId).append(NetworkProtocol.SUB_DELIMITER)
+            .append(worldX).append(NetworkProtocol.SUB_DELIMITER)
             .append(worldY).append(NetworkProtocol.SUB_DELIMITER)
             .append(currentRoom.getRoomId()).append(NetworkProtocol.DELIMITER);
         }

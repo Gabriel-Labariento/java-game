@@ -3,8 +3,10 @@ import java.awt.Graphics2D;
 
 public class Door {
     private int id, x, y;
-    private final int height = 10;
-    private final int width = 10;
+    public static final int HEIGHT_TILES = 2;
+    public static final int WIDTH_TILES = 2;
+    private final int height = HEIGHT_TILES * GameCanvas.TILESIZE;
+    private final int width = WIDTH_TILES * GameCanvas.TILESIZE;
     private String direction;
     private Room roomA, roomB;
     private static int doorCount = 0;

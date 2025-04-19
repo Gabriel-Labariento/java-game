@@ -31,7 +31,7 @@ public class GameStateManager {
     /**
      * Builds a string that serializes all the asset data (player and entities).
      * In the form
-     * ClientId|P:playerX,playerY|E:entityIdentifier,entity1X,entity1Y,entityIdentifier,entity2x,entity2Y...|
+     * ClientId|P:clientId,playerX,playerY,currentRoom|E:entityIdentifier,entity1X,entity1Y,entityIdentifier,entity2x,entity2Y...|
      * 
      * @param cid id of the client
      * @return a serialized string containing the data of all entities
@@ -41,45 +41,77 @@ public class GameStateManager {
 
         sb.append(cid).append(NetworkProtocol.DELIMITER);
 
-        // Player String : P:playerX,playerY|
-        Entity userPlayer = getPlayerFromClientId(cid);
-        String userPlayerData = userPlayer.getAssetData();
+        // User Player String: P$:clientId,playerX,playerY 
+        Player userPlayer = (Player) getPlayerFromClientId(cid);
+        String userPlayerData = userPlayer.getAssetData(true);
 
         if (userPlayerData.startsWith(NetworkProtocol.ROOM_CHANGE)) {
             // Handle room change logic here on the server side
-            String[] dataParts = userPlayerData.split(NetworkProtocol.SUB_DELIMITER);
-            int newRoomId = Integer.parseInt(dataParts[0].substring((NetworkProtocol.ROOM_CHANGE + ":").length()));
-            int newX = Integer.parseInt(dataParts[1]);
-            int newY = Integer.parseInt(dataParts[2]);
-
-            Room newRoom = dungeonMap.getRoomFromId(newRoomId);
-            userPlayer.setWorldX(newX);
-            userPlayer.setWorldY(newY);
-            userPlayer.setCurrentRoom(newRoom);
-
-            sb.append(NetworkProtocol.USER_PLAYER).append(":")
-            .append(newX).append(NetworkProtocol.SUB_DELIMITER)
-            .append(newY).append(NetworkProtocol.SUB_DELIMITER)
-            .append(newRoomId).append(NetworkProtocol.DELIMITER);
+            sb.append(handleRoomTransition(userPlayer, userPlayerData));
         } else {
             // Normal data without room change
             sb.append(NetworkProtocol.USER_PLAYER).append(":")
             .append(userPlayerData);
         }
 
-        
-
         // Entity String : E:entity1X,entity1Y,entity2X,entity2Y...|
         for (Entity entity : entities) {
             if ((entity instanceof Player) && (entity != userPlayer)) {
-                sb.append(NetworkProtocol.PLAYER).append(":").append(entity.getAssetData())
-                        .append(NetworkProtocol.DELIMITER);
+                // Player String: P:clientId,playerX,playerY
+                sb.append(NetworkProtocol.PLAYER).append(":").append((entity.getAssetData(false)))
+                .append(NetworkProtocol.DELIMITER);
             }
             // TODO: Add more implementations for other entities
         }
         return sb.toString();
     }
 
+
+    /**
+     * Called when the userPlayer's getAssetData() string indicates a room change.
+     * Allows the program to handle the userPlayer's room change logic on the server side
+     * by setting the userPlayer's new room and coordinates.
+     * @param userPlayer the Player object of the user who indicated the room change
+     * @param userPlayerData the String returned by the getAssetData() method of the userPlayer
+     * @return a serialized String to be sent to the client's data handler indicating the userPlayer's new position.
+     * The returned string is in the form: P$:clientId,newx,newY,newRoomId|
+     */
+    private String handleRoomTransition(Player userPlayer, String userPlayerData) {
+            StringBuilder sb = new StringBuilder();
+
+            // Split the userPlayerData string by ","
+            String[] dataParts = userPlayerData.split(NetworkProtocol.SUB_DELIMITER);
+            
+            // Extract data from it
+            int clientId = Integer.parseInt(dataParts[0].substring((NetworkProtocol.ROOM_CHANGE + ":").length()));
+            int newX = Integer.parseInt(dataParts[1]);
+            int newY = Integer.parseInt(dataParts[2]);
+            int newRoomId = Integer.parseInt(dataParts[3]);
+
+            // Use the data to set relevant fields
+            Room newRoom = dungeonMap.getRoomFromId(newRoomId);
+            userPlayer.setWorldX(newX);
+            userPlayer.setWorldY(newY);
+            userPlayer.setCurrentRoom(newRoom);
+
+            // Build String to be returned
+            sb.append(NetworkProtocol.USER_PLAYER).append(":")
+            .append(clientId).append(NetworkProtocol.SUB_DELIMITER)
+            .append(newX).append(NetworkProtocol.SUB_DELIMITER)
+            .append(newY).append(NetworkProtocol.SUB_DELIMITER)
+            .append(newRoomId).append(NetworkProtocol.DELIMITER);
+
+            // System.out.println("String returned by handleRoomTransition: " + sb.toString());
+
+            return sb.toString();
+    }
+
+
+    /**
+     * Searches through the entities arrayList to look for a player object with the provided clientId
+     * @param cid the clientId of the connectedPlayer
+     * @return the Player object with the corresponding clientId
+     */
     public Entity getPlayerFromClientId(int cid) {
         for (Entity entity : entities) {
             if (entity.getIdentifier() == NetworkProtocol.PLAYER.toCharArray()[0] && entity.getClientId() == cid)

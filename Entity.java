@@ -32,7 +32,7 @@ public abstract class Entity {
         return identifier;
     }
 
-    public abstract String getAssetData();
+    public abstract String getAssetData(boolean isUserPlayer);
 
     /**
      * Checks if the move an entity will make will keep them inside the room they are currently in
