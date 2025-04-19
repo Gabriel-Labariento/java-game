@@ -37,7 +37,9 @@ public class GameCanvas extends JComponent {
             RenderingHints.VALUE_ANTIALIAS_ON);
         g2d.setRenderingHints(rh);
 
-        
+        // Set the background/outside of the room
+        g2d.setColor(Color.BLACK);
+        g2d.fillRect(0, 0, width, height);
 
         //TEMPORARY OFFSET CONFIGURATIONS
         int screenX = (720/2 - 50/2);
@@ -48,8 +50,7 @@ public class GameCanvas extends JComponent {
 
         Room currentRoom = clientState.getCurrentRoom();
         currentRoom.draw(g2d, cameraX, cameraY);
-
-        tileManager.draw(g2d, currentRoom, cameraX, cameraY);
+        tileManager.drawRoom(g2d, currentRoom, cameraX, cameraY);
 
         // Draw room doors
         for (Door door : currentRoom.getDoorsArrayList()) {
@@ -76,22 +77,6 @@ public class GameCanvas extends JComponent {
         //Since putting Thread.sleep in a loop as necessary for this Loop is bad, use ScheduledExecutorService instead
         final Runnable renderLoop = this::repaint;
         renderLoopScheduler.scheduleAtFixedRate(renderLoop, 0, ((long)1000/FPS), TimeUnit.MILLISECONDS);
-    }
-
-    public int getWidth() {
-        return width;
-    }
-
-    public void setWidth(int width) {
-        this.width = width;
-    }
-
-    public int getHeight() {
-        return height;
-    }
-
-    public void setHeight(int height) {
-        this.height = height;
     }
 
     public ClientGameState getClientState() {

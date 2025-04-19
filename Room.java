@@ -5,7 +5,7 @@ import java.util.*;
 public class Room {
     
     private final int TILESIZE = GameCanvas.TILESIZE;
-    private final int WIDTH_TILES = 45; // 30 TILES WIDE
+    private final int WIDTH_TILES = 45; // 45 TILES WIDE
     private final int HEIGHT_TILES = 33; // 33 TILES TALL
 
     private int roomId, x, y;
@@ -239,17 +239,6 @@ public class Room {
     public int getRoomId(){
         return roomId;
     }
-
-    
-    /** POSSIBLE TODO: DELETE IF UNECESSARY IN FINAL IMPLEMENTATION
-     * Draws the doors inside doorsArrayList 
-     * @param g2d object used to draw
-     */
-    // private void drawDoors(Graphics2D g2d){
-    //     for (Door door : doorsArrayList) {
-    //         door.draw(g2d);
-    //     }
-    // }
 
     /**
      * Populates the doorsArrayList with new Door objects based on 

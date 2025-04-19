@@ -140,13 +140,13 @@ public class Player extends Entity{
         return screenPos;
     }
     
-    
+
     /**
-     * Returns a string containing the player data
+     * {@inheritDoc }
      * @param isUserPlayer true if the calling player is the user player, false otherwise
      * @return a string in the possible forms: RC:clientId,newX,newY,destinationRoomId or clientId,newX,newY,currentRoomId 
-     * 
      */
+    @Override
     public String getAssetData(boolean isUserPlayer){
         StringBuilder sb = new StringBuilder();
 
