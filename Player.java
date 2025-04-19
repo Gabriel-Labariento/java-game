@@ -16,6 +16,8 @@ public class Player extends Entity{
         screenY = 540/2 - height/2;
         worldX = x;
         worldY = y;
+        maxHealth = 50;
+        health = maxHealth;
     }
 
     @Override
@@ -38,7 +40,6 @@ public class Player extends Entity{
         if(input == 'D') {
             if (isMoveInbound(speed, 0)) worldX += speed;
         }
-
     }
 
 
@@ -53,7 +54,7 @@ public class Player extends Entity{
         int newX = newCoors[0];
         int newY = newCoors[1];
 
-        sb.append(NetworkProtocol.ROOM_CHANGE).append(":")
+        sb.append(NetworkProtocol.ROOM_CHANGE)
         .append(clientId).append(NetworkProtocol.SUB_DELIMITER)
         .append(newX).append(NetworkProtocol.SUB_DELIMITER)
         .append(newY).append(NetworkProtocol.SUB_DELIMITER)
@@ -163,4 +164,9 @@ public class Player extends Entity{
 
         return sb.toString();
     };
+
+    @Override
+    public void updateEntity() {
+        System.out.println("For player, use update() instead of updateEntity().");
+    }
 }

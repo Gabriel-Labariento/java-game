@@ -231,7 +231,7 @@ public class DungeonMap {
 
         StringBuilder sb = new StringBuilder();
         // 1. Number of rooms
-        sb.append(NetworkProtocol.MAP_DATA).append(":").append(rooms.size()).append(NetworkProtocol.DELIMITER);
+        sb.append(NetworkProtocol.MAP_DATA).append(rooms.size()).append(NetworkProtocol.DELIMITER);
         // 2. Data of each room
         for (Room room : rooms) {
             sb.append(room.serialize()).append(NetworkProtocol.DELIMITER);
@@ -261,19 +261,16 @@ public class DungeonMap {
         Room startRoom = null;
 
         String[] messageParts = message.split("\\" + NetworkProtocol.DELIMITER); // Split at "|"
-        // for (String string : messageParts) {
-        //     // System.out.println("Message part: " + string);
-        // }
-
+        
         // Part 1: Deserialize Rooms and Doors
         for (String part : messageParts) {
-            if (part.startsWith(NetworkProtocol.MAP_DATA + ":")) {
-                roomCount = Integer.parseInt(part.substring(2));
-            } else if (part.startsWith(NetworkProtocol.ROOM + ":")){
+            if (part.startsWith(NetworkProtocol.MAP_DATA)) {
+                roomCount = Integer.parseInt(part.substring(NetworkProtocol.MAP_DATA.length()));
+            } else if (part.startsWith(NetworkProtocol.ROOM )){
                 // Parse roomData
-                deserializeRooms(part.substring(2), mapIdToRoom);
-            } else if (part.startsWith(NetworkProtocol.DOOR + ":")) {
-                deserializeDoors(part.substring(2), doorDataList);
+                deserializeRooms(part.substring(NetworkProtocol.ROOM.length()), mapIdToRoom);
+            } else if (part.startsWith(NetworkProtocol.DOOR)) {
+                deserializeDoors(part.substring(NetworkProtocol.DOOR.length()), doorDataList);
             }
         }
 

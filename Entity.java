@@ -7,14 +7,15 @@ public abstract class Entity {
     public int worldY;
     public int width;
     public int height;
-    public double health;
-    public double attack;
+    public int maxHealth;
+    public int health;
+    public int attack;
     public int clientId;
     public Room currentRoom; 
 
     public void draw(Graphics2D g2d, int xOffset, int yOffset){}
 
-    public void update(){}
+    public abstract void updateEntity();
 
     public int getWorldX(){
         return worldX;

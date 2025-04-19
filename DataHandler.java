@@ -85,10 +85,10 @@ public class DataHandler {
                         String receivedMessage = new String(buffer, "UTF-8");
 
                         // If the received message starts with the protocol identifier for map data, parse the map data
-                        if (receivedMessage.startsWith(NetworkProtocol.MAP_DATA + ":")) {
+                        if (receivedMessage.startsWith(NetworkProtocol.MAP_DATA)) {
                             parseMapData(receivedMessage);
                         } else {
-                            synchronized (clientState.getEntities()) {
+                            synchronized (clientState.getEntities()) { // Synchronize entities arraylist to remove flickering
                                 clientState.getEntities().clear();
                                 parseAssetsData(receivedMessage);
                             }
@@ -110,16 +110,15 @@ public class DataHandler {
         this.clientId = Integer.parseInt(messageParts[0]);
 
         for (String part : messageParts) {
-            if (part.startsWith(NetworkProtocol.USER_PLAYER + ":")) {
+            if (part.startsWith(NetworkProtocol.USER_PLAYER)) {
                 // System.out.println("Parsing player");
-                String[] playerData = part.substring(NetworkProtocol.USER_PLAYER.length() + 1).split(NetworkProtocol.SUB_DELIMITER);
+                String[] playerData = part.substring(NetworkProtocol.USER_PLAYER.length()).split(NetworkProtocol.SUB_DELIMITER);
                 System.out.println("User player data: " + part);
                 int playerId = Integer.parseInt(playerData[0]);
                 int playerX = Integer.parseInt(playerData[1]);
                 int playerY = Integer.parseInt(playerData[2]);
                 int playerRoomId = Integer.parseInt(playerData[3]);
         
-                loadAsset('P', playerId, playerX, playerY);
                 // System.out.println(" user Player loaded");
                 try {
                     Room currentRoom = clientState.getRoomById(playerRoomId);
@@ -131,27 +130,41 @@ public class DataHandler {
                 } catch (Exception e) {
                     System.out.println("Exception in parseAssetData() when setting user player");
                 } 
-            } else if (part.startsWith(NetworkProtocol.PLAYER + ":")) {
-                String[] otherPlayerData = part.substring(NetworkProtocol.PLAYER.length() + 1).split(NetworkProtocol.SUB_DELIMITER);
+            } else if (part.startsWith(NetworkProtocol.PLAYER)) {
+                String[] otherPlayerData = part.substring(NetworkProtocol.PLAYER.length()).split(NetworkProtocol.SUB_DELIMITER);
                 System.out.println("Other player data: " + part);
+
+                // Don't load if not in the same room as the client
+                int otherRoomId = Integer.parseInt(otherPlayerData[3]);
+                if (otherRoomId != clientState.getCurrentRoom().getRoomId()) continue;
+
                 int otherId = Integer.parseInt(otherPlayerData[0]);
                 int x = Integer.parseInt(otherPlayerData[1]);
                 int y = Integer.parseInt(otherPlayerData[2]);
-                int otherRoomId = Integer.parseInt(otherPlayerData[3]);
+                
                 
                 // Only load the player if it is not the user player and it is in the same room
                 if ( (otherId != clientId) && (otherRoomId == clientState.getCurrentRoom().getRoomId()) ) {
-                    loadAsset('P', otherId, x, y);
                     Player other = new Player(otherId, x, y);
                     other.setCurrentRoom(clientState.getRoomById(otherRoomId));
                     clientState.addEntity(other);
                 } 
-            } else if (part.startsWith(NetworkProtocol.ENTITY + ":")) {
-                // TODO: implementation for other entities
-                // String[] entityCoordinates = part.substring(2).split(NetworkProtocol.SUB_DELIMITER);
-                // int entityX = Integer.parseInt(entityCoordinates[0]);
-                // int entityY = Integer.parseInt(entityCoordinates[1]);
-                // loadAsset('B', entityX, entityY);
+            } else if (part.startsWith(NetworkProtocol.ENTITY)) {
+                System.out.println("Whole entity string: " + part);
+                String[] entityData = part.substring(NetworkProtocol.ENTITY.length()).split(NetworkProtocol.SUB_DELIMITER);
+                
+                for (String string : entityData) {
+                    System.out.println("Entity string: " + string);
+                }
+                // Don't load if not in the same room as the client.
+                int roomId = Integer.parseInt(entityData[4]);
+                if (!(roomId == clientState.getCurrentRoom().getRoomId())) continue;
+                
+                char identifier = entityData[0].toCharArray()[0];
+                int id = Integer.parseInt(entityData[1]);
+                int x = Integer.parseInt(entityData[2]);
+                int y = Integer.parseInt(entityData[3]);
+                loadEntity(identifier, id, x, y, roomId);
             }
             
 
@@ -170,12 +183,16 @@ public class DataHandler {
         clientState.setAllRooms(result.getAllRooms());
     }
 
-    public void loadAsset(char identifier, int id, int x, int y){
+
+    public void loadEntity(char identifier, int id, int x, int y, int roomId){
         String name = idToName.get(identifier);
-        if(name.equals("Player"))
-            clientState.addEntity((new Player(id, x, y)));
-        else if(name.equals("Rat"))
-            System.out.println("different name accessed");
+        if (name == null) System.out.println("Name not found in loadEntity()");
+        else if(name.equals("Rat")) {
+            Rat r = new Rat(x, y);
+            r.setId(id);
+            r.setCurrentRoom(clientState.getRoomById(roomId));
+            clientState.addEntity(r);
+        };
     }
 
     public void startInputsThread(ScheduledExecutorService sendInputsScheduler){

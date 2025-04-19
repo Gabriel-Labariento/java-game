@@ -36,7 +36,7 @@ public class Door {
      */
     public String serialize(){
         StringBuilder sb = new StringBuilder();
-        sb.append(NetworkProtocol.DOOR).append(":")
+        sb.append(NetworkProtocol.DOOR)
         .append(id).append(",")
         .append(x).append(",")
         .append(y).append(",")

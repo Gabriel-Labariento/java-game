@@ -56,7 +56,7 @@ public class Room {
         StringBuilder sb = new StringBuilder();
 
         // roomId,x,y,isStart,isEnd|
-        sb.append(NetworkProtocol.ROOM).append(":")
+        sb.append(NetworkProtocol.ROOM)
         .append(roomId).append(NetworkProtocol.SUB_DELIMITER)
         .append(x).append(NetworkProtocol.SUB_DELIMITER)
         .append(y).append(NetworkProtocol.SUB_DELIMITER)

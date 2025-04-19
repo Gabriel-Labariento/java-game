@@ -50,18 +50,23 @@ public class GameStateManager {
             sb.append(handleRoomTransition(userPlayer, userPlayerData));
         } else {
             // Normal data without room change
-            sb.append(NetworkProtocol.USER_PLAYER).append(":")
+            sb.append(NetworkProtocol.USER_PLAYER)
             .append(userPlayerData);
         }
 
-        // Entity String : E:entity1X,entity1Y,entity2X,entity2Y...|
+        // Loop through entities array
         for (Entity entity : entities) {
             if ((entity instanceof Player) && (entity != userPlayer)) {
                 // Player String: P:clientId,playerX,playerY
-                sb.append(NetworkProtocol.PLAYER).append(":").append((entity.getAssetData(false)))
+                sb.append(NetworkProtocol.PLAYER).append((entity.getAssetData(false)))
                 .append(NetworkProtocol.DELIMITER);
-            }
-            // TODO: Add more implementations for other entities
+            } else if (!(entity instanceof  Player)) {
+                // NPCs ex. E:B,x,y| => Rat
+                if (entity == null) break;
+                sb.append(NetworkProtocol.ENTITY)
+                .append(entity.getAssetData(false));  
+            } 
+            
         }
         return sb.toString();
     }
@@ -83,7 +88,7 @@ public class GameStateManager {
             String[] dataParts = userPlayerData.split(NetworkProtocol.SUB_DELIMITER);
             
             // Extract data from it
-            int clientId = Integer.parseInt(dataParts[0].substring((NetworkProtocol.ROOM_CHANGE + ":").length()));
+            int clientId = Integer.parseInt(dataParts[0].substring((NetworkProtocol.ROOM_CHANGE).length()));
             int newX = Integer.parseInt(dataParts[1]);
             int newY = Integer.parseInt(dataParts[2]);
             int newRoomId = Integer.parseInt(dataParts[3]);
@@ -95,7 +100,7 @@ public class GameStateManager {
             userPlayer.setCurrentRoom(newRoom);
 
             // Build String to be returned
-            sb.append(NetworkProtocol.USER_PLAYER).append(":")
+            sb.append(NetworkProtocol.USER_PLAYER)
             .append(clientId).append(NetworkProtocol.SUB_DELIMITER)
             .append(newX).append(NetworkProtocol.SUB_DELIMITER)
             .append(newY).append(NetworkProtocol.SUB_DELIMITER)
@@ -134,7 +139,7 @@ public class GameStateManager {
 
     public void update() {
         for (Entity entity : entities) {
-            entity.update();
+            entity.updateEntity();
         }
     }
 
