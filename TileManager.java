@@ -22,7 +22,7 @@ public class TileManager {
             tile[1].image = ImageIO.read(getClass().getResourceAsStream("wallTile1.png")); 
 
         } catch (IOException e) {
-            e.printStackTrace();
+            System.out.println("IOException in getTileImage");
         }
     }
 

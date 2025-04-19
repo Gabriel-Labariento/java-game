@@ -128,6 +128,6 @@ public class Door {
     }
 
     public void setDoorCount(int doorCount) {
-        this.doorCount = doorCount;
+        Door.doorCount = doorCount;
     }
 }
