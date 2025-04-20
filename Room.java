@@ -18,6 +18,7 @@ public class Room {
     private HashMap<String, Room> doors;
     private ArrayList<Door> doorsArrayList;
 
+
     /**
      * Creates a Room object with an ID, x and y coordinates, ArrayList of connections, and HashMap of doors.
      * @param roomId the unique int used to identify the room
@@ -330,5 +331,17 @@ public class Room {
 
     public int getHEIGHT_TILES() {
         return HEIGHT_TILES;
+    }
+
+    public Tile[][] getTiles() {
+        return tiles;
+    }
+
+    public boolean isStartRoom() {
+        return isStartRoom;
+    }
+
+    public boolean isEndRoom() {
+        return isEndRoom;
     }
 }

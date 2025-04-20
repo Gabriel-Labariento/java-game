@@ -5,6 +5,8 @@ public class GameStateManager {
     private DungeonMap dungeonMap;
     private int userPlayerIndex;
     private Room currentRoom;
+    private MobSpawner mobSpawner;
+    private int gameLevel = 0; // TODO: INCREMENT WHEN DEFEAT BOSS
 
     public GameStateManager() {
         entities = new CopyOnWriteArrayList<>();
@@ -12,6 +14,8 @@ public class GameStateManager {
         dungeonMap = new DungeonMap();
         dungeonMap.generateRooms(3);
         currentRoom = dungeonMap.getStartRoom();
+        mobSpawner = new MobSpawner(gameLevel, this);
+        mobSpawner.spawn();
     }
 
     /**
@@ -61,7 +65,7 @@ public class GameStateManager {
                 sb.append(NetworkProtocol.PLAYER).append((entity.getAssetData(false)))
                 .append(NetworkProtocol.DELIMITER);
             } else if (!(entity instanceof  Player)) {
-                // NPCs ex. E:B,x,y| => Rat
+                // NPCs ex. E:B,id,x,y,currentRoomId| => Rat with id at currentRoomId (x,y)
                 if (entity == null) break;
                 sb.append(NetworkProtocol.ENTITY)
                 .append(entity.getAssetData(false));  
@@ -137,9 +141,12 @@ public class GameStateManager {
         userPlayerIndex = entities.indexOf(getPlayerFromClientId(cid));
     }
 
-    public void update() {
+    /**
+     * Calls the update method of all non-player entities. 
+     */
+    public void updateEntities() {
         for (Entity entity : entities) {
-            entity.updateEntity();
+            if (!(entity instanceof Player) && (entity != null)) entity.updateEntity(this);
         }
     }
 

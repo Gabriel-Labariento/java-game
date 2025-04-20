@@ -1,21 +1,23 @@
 import java.awt.Graphics2D;
 
 public abstract class Entity {
-    public char identifier;
-    public int speed;
-    public int worldX;
-    public int worldY;
-    public int width;
-    public int height;
-    public int maxHealth;
-    public int health;
-    public int attack;
-    public int clientId;
-    public Room currentRoom; 
+    char identifier;
+    int speed;
+    int worldX;
+    int worldY;
+    int centerX;
+    int centerY;
+    int width;
+    int height;
+    int maxHealth;
+    int health;
+    int attack;
+    int clientId;
+    Room currentRoom; 
 
     public void draw(Graphics2D g2d, int xOffset, int yOffset){}
 
-    public abstract void updateEntity();
+    public abstract void updateEntity(GameStateManager gsm);
 
     public int getWorldX(){
         return worldX;
@@ -24,6 +26,13 @@ public abstract class Entity {
     public int getWorldY(){
         return worldY;
     }
+
+    public void updateCenterCoordinates(){
+        centerX = (int) ((worldX + width) / 2);
+        centerY = (int) ((worldY + height) / 2);
+    }
+
+    
 
     public int getClientId(){
         return clientId;
@@ -76,6 +85,22 @@ public abstract class Entity {
 
     public void setWorldY(int worldY) {
         this.worldY = worldY;
+    }
+
+    public int getCenterX() {
+        return centerX;
+    }
+
+    public int calculateCenterX(int x) {
+        return (int) ((x + this.width) / 2);
+    }
+
+    public int getCenterY() {
+        return centerY;
+    }
+
+    public int calculateCenterY(int y) {
+        return (int) ((y + this.height) / 2);
     }
 }
     
