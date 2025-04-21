@@ -9,7 +9,7 @@ public class GameFrame extends JFrame{
     private JPanel cp;
     private GameCanvas gameCanvas;
     private Entity[] entities;
-    private DataHandler dataHandler;
+    private GameClient gameClient;
 
     public GameFrame(int width, int height, String title){
         this.width = width;
@@ -17,12 +17,12 @@ public class GameFrame extends JFrame{
         this.title = title;
         cp = (JPanel) this.getContentPane();
         gameCanvas = new GameCanvas(width, height);
-        dataHandler = gameCanvas.getDataHandler();
+        gameClient = gameCanvas.getGameClient();
 
         addMouseListener(new MouseAdapter() {
             @Override
             public void mousePressed(MouseEvent e){
-                dataHandler.clickInput(e.getX(), e.getY());
+                gameClient.clickInput(e.getX(), e.getY());
             }
         });
     }
@@ -43,56 +43,56 @@ public class GameFrame extends JFrame{
         AbstractAction keyInputW = new AbstractAction() {
             @Override
             public void actionPerformed(ActionEvent ae){
-                dataHandler.keyInput("W", true);
+                gameClient.keyInput("W", true);
             }
         };
 
         AbstractAction keyInputS = new AbstractAction() {
             @Override
             public void actionPerformed(ActionEvent ae){
-                dataHandler.keyInput("S", true);
+                gameClient.keyInput("S", true);
             }
         };
 
         AbstractAction keyInputA = new AbstractAction() {
             @Override
             public void actionPerformed(ActionEvent ae){
-                dataHandler.keyInput("A", true);
+                gameClient.keyInput("A", true);
             }
         };
 
         AbstractAction keyInputD = new AbstractAction() {
             @Override
             public void actionPerformed(ActionEvent ae){
-                dataHandler.keyInput("D", true);
+                gameClient.keyInput("D", true);
             }
         };
 
         AbstractAction stopInputW = new AbstractAction() {
             @Override
             public void actionPerformed(ActionEvent ae){
-                dataHandler.keyInput("W", false);
+                gameClient.keyInput("W", false);
             }
         };
 
         AbstractAction stopInputS = new AbstractAction() {
             @Override
             public void actionPerformed(ActionEvent ae){
-                dataHandler.keyInput("S", false);
+                gameClient.keyInput("S", false);
             }
         };
 
         AbstractAction stopInputA = new AbstractAction() {
             @Override
             public void actionPerformed(ActionEvent ae){
-                dataHandler.keyInput("A", false);
+                gameClient.keyInput("A", false);
             }
         };
 
         AbstractAction stopInputD = new AbstractAction() {
             @Override
             public void actionPerformed(ActionEvent ae){
-                dataHandler.keyInput("D", false);
+                gameClient.keyInput("D", false);
             }
         };
 

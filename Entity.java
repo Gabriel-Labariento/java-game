@@ -8,13 +8,47 @@ public abstract class Entity {
     public int width;
     public int height;
     public double health;
-    public double attack;
+    public double damage;
     public int clientId;
-    public Room currentRoom; 
+    public int[] hitBoxBounds;
+    public int endTime;
 
     public void draw(Graphics2D g2d, int xOffset, int yOffset){}
 
-    public void update(){}
+    public void move(char input){
+        if(input == 'W')
+            worldY -= speed;
+        if(input == 'A')
+            worldX -= speed;
+        if(input == 'S')
+            worldY += speed;
+        if(input == 'D')
+            worldX += speed;
+        
+        matchHitBoxBounds();
+    }
+    
+    public void matchHitBoxBounds(){}
+
+    public void changeHealth(double change){
+        health += change;
+    }
+
+    public void setWorldX (int x){
+        worldX = x;
+    }
+
+    public void setWorldY (int y){
+        worldY = y;
+    }
+
+    public String getAssetData(){
+        return "" + identifier + worldX + ',' + worldY;
+    }
+
+    public int[] getHitBoxBounds(){
+        return hitBoxBounds;
+    }
 
     public int getWorldX(){
         return worldX;
@@ -32,49 +66,24 @@ public abstract class Entity {
         return identifier;
     }
 
-    public abstract String getAssetData(boolean isUserPlayer);
-
-    /**
-     * Checks if the move an entity will make will keep them inside the room they are currently in
-     * @param dx the change in x.
-     * @param dy the change in y
-     * @return a boolean that is true when the move is inbound, false when not.
-     */
-    public boolean isMoveInbound(int dx, int dy) {
-        return !((worldX + dx < currentRoom.getX()) ||
-                ( (worldX + width) + dx > currentRoom.getX() + currentRoom.getWidth()) ||
-                (worldY + dy < currentRoom.getY()) ||
-                ((worldY + height) + dy > currentRoom.getY() + currentRoom.getHeight())
-             );
+    public double getDamage(){
+        return damage;
     }
 
-    // FOR TRANSFER
-    // public byte[] getByteData(){
-    //     ByteBuffer buffer = ByteBuffer.allocate(40);
-    //     buffer.putInt(identifier);
-    //     buffer.putInt(worldX);
-    //     buffer.putInt(worldY);
-    //     buffer.putInt(width);
-    //     buffer.putInt(height);
-    //     buffer.putDouble(health);
-    //     buffer.putDouble(attack);
-    //     return buffer.array();
-    // }
-
-    public Room getCurrentRoom() {
-        return currentRoom;
+    public double getHealth(){
+        return health;
     }
 
-    public void setCurrentRoom(Room currentRoom) {
-        this.currentRoom = currentRoom;
+    public int getWidth(){
+        return width;
     }
 
-    public void setWorldX(int worldX) {
-        this.worldX = worldX;
+    public int getHeight(){
+        return height;
     }
 
-    public void setWorldY(int worldY) {
-        this.worldY = worldY;
+    public int getSpeed(){
+        return speed;
     }
 }
     

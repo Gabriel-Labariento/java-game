@@ -1,31 +1,62 @@
 import java.io.*;
 import java.net.*;
 import java.util.*;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.*;
 
 public class GameServer {
     private static final int GAMELOOPINTERVAL = 16;
     private ServerSocket ss;
     private ArrayList<Socket> sockets;
-    private GameStateManager gameStateManager;
-    private ScheduledExecutorService sendAssetsScheduler;
-    private int clientNum = 1;
+    private int clientNum;
+    private ServerMaster serverMaster;
+    private ArrayList<ConnectedPlayer> connectedPlayers;
+    private ScheduledExecutorService gameLoopScheduler;
+    private int port;
 
     public GameServer() {
-        gameStateManager = new GameStateManager();
+        clientNum = 1;
+        serverMaster = new ServerMaster();
         sockets = new ArrayList<>();
-        sendAssetsScheduler = Executors.newSingleThreadScheduledExecutor();
+        connectedPlayers = new ArrayList<>();
+        gameLoopScheduler = Executors.newSingleThreadScheduledExecutor();
 
-        try {
-            ss = new ServerSocket(7000);
-            System.out.println("Server started on port 7000");
-        } catch (IOException ex) 
-        {
-            System.out.println("IOException from GameServer constructor");
+        
+        port = 5000;
+        while(true) {
+            try {
+                ss = new ServerSocket(port);
+            } catch (IOException ex) 
+            {
+                System.out.println("IOException from GameServer constructor ");
+            }
+
+            if (ss != null){
+                System.out.println("Routed to port " + port);
+                break;
+            }
+
+            port++;
         }
+
         System.out.println("GAMESERVER HAS BEEN CREATED.");
+    }
+
+        public void startGameLoop(){
+        final Runnable gameLoop = new Runnable(){
+            @Override
+            public void run(){
+                serverMaster.update();
+                
+                //Send assets data to individual players
+                if(!connectedPlayers.isEmpty()){
+                    for (ConnectedPlayer cp : connectedPlayers){
+                        String data = serverMaster.getAssetsData(cp.cid);
+                        cp.promptAssetsThread(data);
+                    }
+                }
+            }
+        };
+        gameLoopScheduler.scheduleAtFixedRate(gameLoop, 0, GAMELOOPINTERVAL, TimeUnit.MILLISECONDS);
     }
 
     public void closeSocketsOnShutdown(){
@@ -53,6 +84,7 @@ public class GameServer {
                 ConnectedPlayer cp = new ConnectedPlayer(sock, clientNum);
                 clientNum++;
                 cp.startThreads();
+                connectedPlayers.add(cp);
             }        
             } catch (IOException ex) {
                 System.out.println("IOException from waitForConnection() method.");
@@ -63,12 +95,17 @@ public class GameServer {
         private Socket clientSocket;
         private DataInputStream dataIn;
         private DataOutputStream dataOut;
+        //For halting operations within a thread
+        private BlockingQueue<String> sendQueue;
         private int cid;
+    
     
         public ConnectedPlayer(Socket sck, int n){
             clientSocket = sck;
             cid = n;
-            gameStateManager.addEntity((new Player(cid, 300, 300)));
+            sendQueue = new LinkedBlockingQueue<>();
+
+            serverMaster.getEntities().add(new Player(cid, 0, 0));
             try {
                 dataIn = new DataInputStream(clientSocket.getInputStream());
                 dataOut = new DataOutputStream(clientSocket.getOutputStream());
@@ -81,58 +118,33 @@ public class GameServer {
             startAssetsThread();
             startInputsThread();
         }
-
-        /**
-         * Calls the sendMapData() once and sendEntitiesData() continuously every 16 miliseconds. 
-         */
         private void startAssetsThread(){
             System.out.println("NEW PLAYER HAS ENTERED");
-
-            final Runnable sendAssetsData = new Runnable(){
-                boolean mapDataSent = false;
+            Thread sendAssetsThread = new Thread(){
                 @Override
-                public void run() {
-                    if (!mapDataSent){
-                        sendMapData();
-                        mapDataSent = true;
-                        System.out.println("Map Data Sent");
+                public void run(){
+                    while (true) { 
+                        try {
+                        //Only start the rest of the thread if data is sent\
+                        String assetsDataString = sendQueue.take();
+
+                        byte[] assetsDataBytes = assetsDataString.getBytes("UTF-8");
+                        dataOut.writeInt(assetsDataBytes.length);
+                        dataOut.write(assetsDataBytes);
+                        } catch (IOException ex) {
+                            System.out.println("IOException from ConnectedPlayer's startAssetsThread method");
+                            break;
+                        } catch (InterruptedException ex) {
+                            System.out.println("InterrupedException from ConnectedPlayer's startAssetsThread method");
+                        }   
                     }
-                    sendEntitiesData();   
-                }
+                }    
             };
-            sendAssetsScheduler.scheduleAtFixedRate(sendAssetsData, 0, GAMELOOPINTERVAL, TimeUnit.MILLISECONDS);
+            sendAssetsThread.start();
         }
 
-        /**
-         * Sends the serialized map data by converting it to a byte array
-         */
-        private void sendMapData(){
-            try {
-                String mapDataString = gameStateManager.getMapData();
-                byte[] mapDataBytes = mapDataString.getBytes("UTF-8");
-                System.out.println("Sending Map Data...");
-                dataOut.writeInt(mapDataString.length());
-                dataOut.write(mapDataBytes);
-            } catch (IOException ex) {
-                System.out.println("IOException from sendMapData() method");
-            }
-        }
-
-        /**
-         * Sends the serialized entities data by converting it to a byte array
-         */
-        private void sendEntitiesData(){
-            try {
-                String assetsDataString = gameStateManager.getAssetsData(cid);
-                // System.out.println(assetsDataString);
-                gameStateManager.updateUserPlayerIndex(cid);
-                byte[] assetsDataBytes = assetsDataString.getBytes("UTF-8");
-                dataOut.writeInt(assetsDataBytes.length);
-                dataOut.write(assetsDataBytes);    
-            } catch (IOException e) {
-                System.out.println("IOException from sendEntitiesData() method");
-            }
-            
+        public void promptAssetsThread(String data){
+            sendQueue.offer(data);
         }
 
         private void startInputsThread(){
@@ -150,12 +162,16 @@ public class GameServer {
 
                         } catch (IOException ex){
                             System.out.println("IOEception from getInputsData()");
+                            break;
                         }
 
                         int length = str.length();
                         boolean isLoadingY = false;
                         String x = "";
                         String y = "";
+                        Player player = (Player) serverMaster.getPlayerFromClientId(cid);
+                        Attack playerAttack = (Attack) serverMaster.getAttackFromClientId(cid);
+                        System.out.println(str);
 
                         for(int i = 0; i < length; i++){
                             char parsedChar = str.charAt(i);
@@ -164,27 +180,28 @@ public class GameServer {
                                 //Delimiter for x and y
                                 if(parsedChar == ','){
                                     isLoadingY = true;
-                                    continue;
+                                    continue;   
                                 }
                                     
                                 //Check if loading char to either x or y strings
-                                if (isLoadingY){
-                                    y += parsedChar;
-                                    //Check if last char in the parseable string
-                                    if(i == length - 1){
-                                        isLoadingY = false;
-                                        System.out.println("Mouse click at " + x + "," + y); //Replace with action handler
-                                    }
-                                }
+                                if (isLoadingY)
+                                    y += parsedChar;                        
                                 else
                                     x += parsedChar;
-                            
                             }
-                            else {
-                                ((Player) gameStateManager.getPlayerFromClientId(cid)).update(parsedChar);
+                            else{
+                                player.move(parsedChar);
+                                if (playerAttack != null) playerAttack.move(parsedChar);
                             }
+                                
                         }
+
+                        if(!x.isEmpty() && !y.isEmpty()){
+                            System.out.println("Mouse click at " + x + "," + y); //Replace with action handler
+                            serverMaster.playerClick(Integer.parseInt(x), Integer.parseInt(y), player, playerAttack, cid); 
+                        }   
                     }
+
                 }
             };
             getInputsThread.start();
@@ -194,6 +211,7 @@ public class GameServer {
     // When GameServer is run, the main method instantiates a new 
     public static void main(String[] args) {
         GameServer cs = new GameServer();
+        cs.startGameLoop();
         cs.closeSocketsOnShutdown();
         cs.waitForConnections();
     }
