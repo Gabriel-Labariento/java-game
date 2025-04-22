@@ -49,4 +49,16 @@ public abstract class GameObject {
         return width;
     }
 
+    /**
+     * Checks for collision with other GameObject
+     * @param other object colliding/not colliding with
+     * @return true if colliding with other, false otherwise.
+     */
+    public boolean isColliding(GameObject other){
+        return !((worldX < other.getWorldX()) ||
+                ( (worldX + width) > other.getWorldX() + other.getWidth()) ||
+                (worldY < other.getWorldY()) ||
+                ((worldY + height) > other.getWorldY() + other.getHeight())
+        );
+    }
 }

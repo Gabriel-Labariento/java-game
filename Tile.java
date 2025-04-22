@@ -1,7 +1,7 @@
 
 import java.awt.image.*;
 
-public class Tile {
+public class Tile extends GameObject{
 
     public BufferedImage image;
     public boolean collision = false;

@@ -118,24 +118,10 @@ public class Player extends Entity{
      */
     private Door getCollidingDoor(){
         for (Door d : currentRoom.getDoorsArrayList()) {
-            if (isCollidingWithDoor(d)) return d;
+            if (isColliding(d)) return d;
         }
         return null;
     }
-
-    /**
-     * Checks if a player is colliding with a door
-     * @param door the door object to be checked for collision with player
-     * @return boolean true if the player and the door are colliding, false otherwise
-     */
-    private boolean isCollidingWithDoor(Door door) {
-        return !((worldX < door.getWorldX()) ||
-                ( (worldX + width) > door.getWorldX() + door.getWidth()) ||
-                (worldY < door.getWorldY()) ||
-                ((worldY + height) > door.getWorldY() + door.getHeight())
-        );
-    }
-
 
     public int[] getScreenPos() {
         int[] screenPos = {screenX, screenY};
