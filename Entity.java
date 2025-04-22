@@ -33,7 +33,6 @@ public abstract class Entity {
     }
 
     
-
     public int getClientId(){
         return clientId;
     }
@@ -56,6 +55,50 @@ public abstract class Entity {
                 (worldY + dy < currentRoom.getY()) ||
                 ((worldY + height) + dy > currentRoom.getY() + currentRoom.getHeight())
              );
+    }
+
+    /**
+     * Checks for collision with other entity
+     * @param other entity colliding/not colliding with
+     * @return true if colliding with other, false otherwise.
+     */
+    public boolean isCollidingWithOtherEntity(Entity other){
+        return !((worldX < other.getWorldX()) ||
+                ( (worldX + width) > other.getWorldX() + other.getWidth()) ||
+                (worldY < other.getWorldY()) ||
+                ((worldY + height) > other.getWorldY() + other.getHeight())
+        );
+    }
+
+    // TODO: JAVADOC
+    private double[] calculateRepulsionForce(Entity other) {
+        final int repulsionFactor = 32;
+
+        int dx = centerX - other.getCenterX();
+        int dy = centerY - other.getCenterY();
+        int distanceSquared = dx * dx + dy * dy;
+        double distance = Math.sqrt(distanceSquared);
+
+
+        // Avoid division by zero and extremely strong forces at small distances
+        if (distance < 1e-5) {
+            return new double[] {0,0};
+        } 
+
+        int forceMagnitude = repulsionFactor / distanceSquared;
+
+        double x = (dx / distance) * forceMagnitude;
+        double y = (dy / distance) * forceMagnitude;
+
+        double[] repulsionForce = {x,y};
+        return repulsionForce; 
+    }
+
+    // TODO: FIGURE OUT HOW TO MAKE ENEMIES NOT COLLIDE WITH EACH OTHER
+    public void moveAwayFromOtherEntity(Entity other) {
+        double[] repulsionForce = calculateRepulsionForce(other);
+        worldX += repulsionForce[0];
+        worldY += repulsionForce[1];
     }
 
     // FOR TRANSFER
@@ -102,5 +145,15 @@ public abstract class Entity {
     public int calculateCenterY(int y) {
         return (int) ((y + this.height) / 2);
     }
+
+    public int getWidth() {
+        return width;
+    }
+
+    public int getHeight() {
+        return height;
+    }
 }
     
+    
+   

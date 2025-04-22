@@ -10,13 +10,13 @@ public class Rat extends Entity{
     public Rat(int x, int y) {
         id = ratCount++;
         identifier = NetworkProtocol.RAT.toCharArray()[0];
-        speed = 2;
+        speed = 1;
         height = 16;
         width = 16;
         worldX = x;
         worldY = y;
         centerX = calculateCenterX(x);
-        centerY = calculateCenterX(y);
+        centerY = calculateCenterY(y);
         maxHealth = 10;
         health = maxHealth;
         currentRoom = null;
@@ -47,18 +47,26 @@ public class Rat extends Entity{
     @Override
     public void updateEntity(GameStateManager gsm){
         // TODO: ENEMY AI LOGIC
-        Player pursued = scanForPlayer(gsm);
-        if (pursued != null) {
-            // System.out.println("Pursued player: " + pursued.getIdentifier());
-            pursuePlayer(pursued);
+        updateCenterCoordinates();
 
+        Player pursued = scanForPlayer(gsm);
+        if (pursued != null) pursuePlayer(pursued);
+
+        for (Entity e : gsm.getEntities()) {
+            if (e == this) continue;
+            if (e instanceof Player) continue;
+            if (isCollidingWithOtherEntity(e)) moveAwayFromOtherEntity(e);
         }
+        
     }
 
     // Right now, simple logic that scans if the distance between the player and the entity is <= scanRadius.
     // Pursues if yes. Does not yet consider obstacles.
     private Player scanForPlayer(GameStateManager gsm){
         final int scanRadius = 96;
+        Player closestPlayer = null;
+        double minDistance = 10000; // Random large number
+
         for (Entity e : gsm.getEntities()) {
             if (e instanceof Player player) {
                 // Get the center distance between the player and the entity
@@ -67,10 +75,14 @@ public class Rat extends Entity{
                     (Math.pow(centerX - e.getCenterX(), 2) + 
                     Math.pow(centerY - e.getCenterY(), 2))
                 );
-                if (distance <= scanRadius) return player;
+                
+                if ( (distance <= scanRadius) && (distance < minDistance)) {
+                    closestPlayer = player;
+                    minDistance = distance;
+                }
             }
         }
-        return null;
+        return closestPlayer;
     }
 
     private void pursuePlayer(Player player) {
@@ -79,8 +91,6 @@ public class Rat extends Entity{
 
         if (player.getCenterY() > centerY) worldY += speed;
         else if (player.getCenterY() < centerY) worldY -= speed;
-
-        updateCenterCoordinates();
     }
 
     public int getId() {

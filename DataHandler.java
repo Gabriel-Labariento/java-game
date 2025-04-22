@@ -113,7 +113,7 @@ public class DataHandler {
             if (part.startsWith(NetworkProtocol.USER_PLAYER)) {
                 // System.out.println("Parsing player");
                 String[] playerData = part.substring(NetworkProtocol.USER_PLAYER.length()).split(NetworkProtocol.SUB_DELIMITER);
-                System.out.println("User player data: " + part);
+                // System.out.println("User player data: " + part);
                 int playerId = Integer.parseInt(playerData[0]);
                 int playerX = Integer.parseInt(playerData[1]);
                 int playerY = Integer.parseInt(playerData[2]);
@@ -150,11 +150,11 @@ public class DataHandler {
                     clientState.addEntity(other);
                 } 
             } else if (part.startsWith(NetworkProtocol.ENTITY)) {
-                System.out.println("Whole entity string: " + part);
+                // System.out.println("Whole entity string: " + part);
                 String[] entityData = part.substring(NetworkProtocol.ENTITY.length()).split(NetworkProtocol.SUB_DELIMITER);
                 
                 for (String string : entityData) {
-                    System.out.println("Entity string: " + string);
+                    // System.out.println("Entity string: " + string);
                 }
                 // Don't load if not in the same room as the client.
                 int roomId = Integer.parseInt(entityData[4]);

@@ -49,7 +49,7 @@ public class GameCanvas extends JComponent {
         int cameraY = clientState.getUserPlayer().getWorldY() - screenY;
 
         Room currentRoom = clientState.getCurrentRoom();
-        currentRoom.draw(g2d, cameraX, cameraY);
+        // currentRoom.draw(g2d, cameraX, cameraY);
         tileManager.drawRoom(g2d, currentRoom, cameraX, cameraY);
 
         // Draw room doors

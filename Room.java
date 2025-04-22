@@ -5,8 +5,8 @@ import java.util.*;
 public class Room {
     
     private final int TILESIZE = GameCanvas.TILESIZE;
-    private final int WIDTH_TILES = 45; // 45 TILES WIDE
-    private final int HEIGHT_TILES = 33; // 33 TILES TALL
+    public static final int WIDTH_TILES = 45; // 45 TILES WIDE
+    public static final int HEIGHT_TILES = 33; // 33 TILES TALL
 
     private int roomId, x, y;
     private boolean isStartRoom, isEndRoom;
