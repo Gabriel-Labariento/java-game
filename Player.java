@@ -16,8 +16,6 @@ public class Player extends Entity{
         screenY = 540/2 - height/2;
         worldX = x;
         worldY = y;
-        centerX = (int) ( (x + width) / 2 );
-        centerY = (int) ( (y + height) / 2 );
         maxHealth = 50;
         health = maxHealth;
     }
@@ -42,7 +40,6 @@ public class Player extends Entity{
         if(input == 'D') {
             if (isMoveInbound(speed, 0)) worldX += speed;
         }
-        updateCenterCoordinates();
     }
 
     
@@ -170,7 +167,7 @@ public class Player extends Entity{
     };
 
     @Override
-    public void updateEntity(GameStateManager gsm) {
+    public void updateEntity(ServerMaster gsm) {
         System.out.println("For player, use update() instead of updateEntity().");
         // TODO: IMPROVE THIS IF HAVE
     }

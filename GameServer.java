@@ -9,12 +9,12 @@ public class GameServer {
     private static final int GAMELOOPINTERVAL = 16;
     private ServerSocket ss;
     private ArrayList<Socket> sockets;
-    private GameStateManager gameStateManager;
+    private ServerMaster gameStateManager;
     private ScheduledExecutorService sendAssetsScheduler;
     private int clientNum = 1;
 
     public GameServer() {
-        gameStateManager = new GameStateManager();
+        gameStateManager = new ServerMaster();
         sockets = new ArrayList<>();
         sendAssetsScheduler = Executors.newSingleThreadScheduledExecutor();
 

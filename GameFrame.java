@@ -1,4 +1,4 @@
-import java.awt.*;
+    import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
 
@@ -9,7 +9,7 @@ public class GameFrame extends JFrame{
     private JPanel cp;
     private GameCanvas gameCanvas;
     private Entity[] entities;
-    private DataHandler dataHandler;
+    private GameClient dataHandler;
 
     public GameFrame(int width, int height, String title){
         this.width = width;

@@ -1,37 +1,18 @@
 import java.awt.Graphics2D;
 
-public abstract class Entity {
-    char identifier;
-    int speed;
-    int worldX;
-    int worldY;
-    int centerX;
-    int centerY;
-    int width;
-    int height;
-    int maxHealth;
-    int health;
-    int attack;
-    int clientId;
+public abstract class Entity extends GameObject {
+    protected char identifier;
+    protected int speed;
+    protected double maxHealth;
+    protected double health;
+    protected double damage;
+    protected int clientId;
+    int[][] hitBoxBounds;
     Room currentRoom; 
 
     public void draw(Graphics2D g2d, int xOffset, int yOffset){}
 
-    public abstract void updateEntity(GameStateManager gsm);
-
-    public int getWorldX(){
-        return worldX;
-    }
-
-    public int getWorldY(){
-        return worldY;
-    }
-
-    public void updateCenterCoordinates(){
-        centerX = (int) ((worldX + width) / 2);
-        centerY = (int) ((worldY + height) / 2);
-    }
-
+    public abstract void updateEntity(ServerMaster gsm);
     
     public int getClientId(){
         return clientId;
@@ -74,8 +55,8 @@ public abstract class Entity {
     private double[] calculateRepulsionForce(Entity other) {
         final int repulsionFactor = 32;
 
-        int dx = centerX - other.getCenterX();
-        int dy = centerY - other.getCenterY();
+        int dx = getCenterX() - other.getCenterX();
+        int dy = getCenterY() - other.getCenterY();
         int distanceSquared = dx * dx + dy * dy;
         double distance = Math.sqrt(distanceSquared);
 
@@ -130,29 +111,6 @@ public abstract class Entity {
         this.worldY = worldY;
     }
 
-    public int getCenterX() {
-        return centerX;
-    }
-
-    public int calculateCenterX(int x) {
-        return (int) ((x + this.width) / 2);
-    }
-
-    public int getCenterY() {
-        return centerY;
-    }
-
-    public int calculateCenterY(int y) {
-        return (int) ((y + this.height) / 2);
-    }
-
-    public int getWidth() {
-        return width;
-    }
-
-    public int getHeight() {
-        return height;
-    }
 }
     
     

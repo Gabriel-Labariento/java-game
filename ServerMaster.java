@@ -1,6 +1,6 @@
 import java.util.concurrent.CopyOnWriteArrayList;
 
-public class GameStateManager {
+public class ServerMaster {
     private CopyOnWriteArrayList<Entity> entities;
     private DungeonMap dungeonMap;
     private int userPlayerIndex;
@@ -8,7 +8,7 @@ public class GameStateManager {
     private MobSpawner mobSpawner;
     private int gameLevel = 0; // TODO: INCREMENT WHEN DEFEAT BOSS
 
-    public GameStateManager() {
+    public ServerMaster() {
         entities = new CopyOnWriteArrayList<>();
         userPlayerIndex = -1;
         dungeonMap = new DungeonMap();

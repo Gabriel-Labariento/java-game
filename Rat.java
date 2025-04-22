@@ -15,8 +15,6 @@ public class Rat extends Entity{
         width = 16;
         worldX = x;
         worldY = y;
-        centerX = calculateCenterX(x);
-        centerY = calculateCenterY(y);
         maxHealth = 10;
         health = maxHealth;
         currentRoom = null;
@@ -45,9 +43,8 @@ public class Rat extends Entity{
     }
 
     @Override
-    public void updateEntity(GameStateManager gsm){
+    public void updateEntity(ServerMaster gsm){
         // TODO: ENEMY AI LOGIC
-        updateCenterCoordinates();
 
         Player pursued = scanForPlayer(gsm);
         if (pursued != null) pursuePlayer(pursued);
@@ -62,7 +59,7 @@ public class Rat extends Entity{
 
     // Right now, simple logic that scans if the distance between the player and the entity is <= scanRadius.
     // Pursues if yes. Does not yet consider obstacles.
-    private Player scanForPlayer(GameStateManager gsm){
+    private Player scanForPlayer(ServerMaster gsm){
         final int scanRadius = 96;
         Player closestPlayer = null;
         double minDistance = 10000; // Random large number
@@ -72,8 +69,8 @@ public class Rat extends Entity{
                 // Get the center distance between the player and the entity
                 double distance = 
                 Math.sqrt(
-                    (Math.pow(centerX - e.getCenterX(), 2) + 
-                    Math.pow(centerY - e.getCenterY(), 2))
+                    (Math.pow(getCenterX() - e.getCenterX(), 2) + 
+                    Math.pow(getCenterY() - e.getCenterY(), 2))
                 );
                 
                 if ( (distance <= scanRadius) && (distance < minDistance)) {
@@ -86,11 +83,11 @@ public class Rat extends Entity{
     }
 
     private void pursuePlayer(Player player) {
-        if (player.getCenterX() > centerX) worldX += speed;
-        else if (player.getCenterX() < centerX) worldX -= speed;
+        if (player.getCenterX() > getCenterX()) worldX += speed;
+        else if (player.getCenterX() < getCenterX()) worldX -= speed;
 
-        if (player.getCenterY() > centerY) worldY += speed;
-        else if (player.getCenterY() < centerY) worldY -= speed;
+        if (player.getCenterY() > getCenterY()) worldY += speed;
+        else if (player.getCenterY() < getCenterY()) worldY -= speed;
     }
 
     public int getId() {

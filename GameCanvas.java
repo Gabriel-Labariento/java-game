@@ -7,8 +7,8 @@ public class GameCanvas extends JComponent {
     private static final int GAMELOOPINTERVAL = 16;
     private static final int FPS = 60;
     private int width, height;
-    private DataHandler dataHandler;
-    private ClientGameState clientState;
+    private GameClient dataHandler;
+    private ClientMaster clientState;
     private ScheduledExecutorService renderLoopScheduler;
     private ScheduledExecutorService sendInputsScheduler;
     private TileManager tileManager;
@@ -18,8 +18,8 @@ public class GameCanvas extends JComponent {
         this.height = height;
         renderLoopScheduler = Executors.newSingleThreadScheduledExecutor();
         sendInputsScheduler = Executors.newSingleThreadScheduledExecutor();
-        clientState = new ClientGameState();
-        dataHandler = new DataHandler(clientState);
+        clientState = new ClientMaster();
+        dataHandler = new GameClient(clientState);
         setPreferredSize(new Dimension(width, height));
         tileManager = new TileManager(this);
     }
@@ -69,7 +69,7 @@ public class GameCanvas extends JComponent {
         
     }
 
-    public DataHandler getDataHandler(){
+    public GameClient getDataHandler(){
         return dataHandler;
     }
 
@@ -79,11 +79,11 @@ public class GameCanvas extends JComponent {
         renderLoopScheduler.scheduleAtFixedRate(renderLoop, 0, ((long)1000/FPS), TimeUnit.MILLISECONDS);
     }
 
-    public ClientGameState getClientState() {
+    public ClientMaster getClientState() {
         return clientState;
     }
 
-    public void setClientState(ClientGameState clientState) {
+    public void setClientState(ClientMaster clientState) {
         this.clientState = clientState;
     }
 

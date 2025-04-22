@@ -4,8 +4,8 @@ import java.net.*;
 import java.util.*;
 import java.util.concurrent.*;
 
-public class DataHandler {
-    private ClientGameState clientState;
+public class GameClient {
+    private ClientMaster clientState;
     private Socket theSocket;
     private DataInputStream dataIn;
     private DataOutputStream dataOut;
@@ -17,7 +17,7 @@ public class DataHandler {
     private int clickedY;
 
 
-    public DataHandler(ClientGameState clientState){
+    public GameClient(ClientMaster clientState){
         this.clientState = clientState;
 
         idToName = new HashMap<>();

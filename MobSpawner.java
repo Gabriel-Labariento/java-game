@@ -16,9 +16,9 @@ public class MobSpawner {
     private static String[] spawnableEntities = {"Rat"};
     private ScheduledExecutorService spawnMobsScheduler;
 
-    private GameStateManager gsm;
+    private ServerMaster gsm;
 
-    public MobSpawner(int level, GameStateManager gsm){
+    public MobSpawner(int level, ServerMaster gsm){
         this.level = level;
         this.gsm = gsm;
         spawnRate =  5; //((6 - level) < 1) ? 1 : 6 - level; // Min spawn rate is 1 enemy every 6 seconds, max is 1 per second. modifiable
