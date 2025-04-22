@@ -41,15 +41,17 @@ public class GameCanvas extends JComponent {
         g2d.setColor(Color.BLACK);
         g2d.fillRect(0, 0, width, height);
 
-        //TEMPORARY OFFSET CONFIGURATIONS
-        int screenX = (720/2 - 50/2);
-        int screenY = (540/2 - 50/2);
+        int scaleFactor = 1;
+        g2d.scale(scaleFactor, scaleFactor );
+        Player userPlayer = clientState.getUserPlayer();
+        
+        int screenX = (720/ (2 * scaleFactor) - userPlayer.getWidth() / (2 * scaleFactor));
+        int screenY = (540/ (2 * scaleFactor) - userPlayer.getHeight() / (2 * scaleFactor));
 
-        int cameraX = clientState.getUserPlayer().getWorldX() - screenX;
-        int cameraY = clientState.getUserPlayer().getWorldY() - screenY;
+        int cameraX = userPlayer.getWorldX() - screenX;
+        int cameraY = userPlayer.getWorldY() - screenY;
 
         Room currentRoom = clientState.getCurrentRoom();
-        // currentRoom.draw(g2d, cameraX, cameraY);
         tileManager.drawRoom(g2d, currentRoom, cameraX, cameraY);
 
         // Draw room doors
