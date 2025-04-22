@@ -31,10 +31,10 @@ public abstract class Entity extends GameObject {
      * @return a boolean that is true when the move is inbound, false when not.
      */
     public boolean isMoveInbound(int dx, int dy) {
-        return !((worldX + dx < currentRoom.getX()) ||
-                ( (worldX + width) + dx > currentRoom.getX() + currentRoom.getWidth()) ||
-                (worldY + dy < currentRoom.getY()) ||
-                ((worldY + height) + dy > currentRoom.getY() + currentRoom.getHeight())
+        return !((worldX + dx < currentRoom.getWorldX()) ||
+                ( (worldX + width) + dx > currentRoom.getWorldX() + currentRoom.getWidth()) ||
+                (worldY + dy < currentRoom.getWorldY()) ||
+                ((worldY + height) + dy > currentRoom.getWorldY() + currentRoom.getHeight())
              );
     }
 

@@ -91,12 +91,12 @@ public final class TileManager {
 
     public void drawRoom (Graphics2D g2d, Room room, int cameraX, int cameraY) {
         // Get the position of the room in the world
-        int roomX = room.getX();
-        int roomY = room.getY();
+        int roomX = room.getWorldX();
+        int roomY = room.getWorldY();
         
         // For each row and column
-        for (int row = 0; row < room.getHEIGHT_TILES(); row++) {
-            for (int col = 0; col < room.getWIDTH_TILES(); col++) {
+        for (int row = 0; row < Room.HEIGHT_TILES; row++) {
+            for (int col = 0; col < Room.WIDTH_TILES; col++) {
                 int tileNum = mapTileNum[col][row];
 
                 int screenX = roomX + col * GameCanvas.TILESIZE - cameraX;

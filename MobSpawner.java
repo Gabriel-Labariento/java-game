@@ -38,8 +38,8 @@ public class MobSpawner {
                 if (currentRoom.isEndRoom() || spawnedEntities >= maxSpawned ) return;
 
                 // Pick a randoom tile coordinate
-                int spawnX = currentRoom.getX() + ((LOWESTX + (int) (Math.random() * ((HIGHESTX - LOWESTX) + 1))) * GameCanvas.TILESIZE);
-                int spawnY = currentRoom.getY() + ((LOWESTY + (int) (Math.random() * ((HIGHESTY - LOWESTY) + 1))) * GameCanvas.TILESIZE);
+                int spawnX = currentRoom.getWorldX() + ((LOWESTX + (int) (Math.random() * ((HIGHESTX - LOWESTX) + 1))) * GameCanvas.TILESIZE);
+                int spawnY = currentRoom.getWorldY() + ((LOWESTY + (int) (Math.random() * ((HIGHESTY - LOWESTY) + 1))) * GameCanvas.TILESIZE);
                 
                 // Pick random enemy to spawn
                 String toSpawn = spawnableEntities[(int)(Math.random() * spawnableEntities.length)];

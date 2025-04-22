@@ -2,16 +2,12 @@ import java.awt.Color;
 import java.awt.Graphics2D;
 import java.util.*;
 
-public class Room {
+public class Room extends GameObject{
     
-    private final int TILESIZE = GameCanvas.TILESIZE;
     public static final int WIDTH_TILES = 45; // 45 TILES WIDE
     public static final int HEIGHT_TILES = 33; // 33 TILES TALL
-
-    private int roomId, x, y;
+    private int roomId;
     private boolean isStartRoom, isEndRoom;
-    private final int height = TILESIZE * HEIGHT_TILES;
-    private final int width = TILESIZE * WIDTH_TILES;
     private  Tile[][] tiles;
 
     private ArrayList<Room> connections;
@@ -27,8 +23,11 @@ public class Room {
      */
     public Room(int roomId, int x, int y){
         this.roomId = roomId;
-        this.x = x;
-        this.y = y;
+        this.worldX = x;
+        this.worldY = y;
+        height = GameCanvas.TILESIZE * HEIGHT_TILES;
+        width = GameCanvas.TILESIZE * WIDTH_TILES;
+
         isStartRoom = false;
         isEndRoom = false;
 
@@ -39,6 +38,9 @@ public class Room {
         populateRoomTiles();
     }
 
+    /**
+     * Populates the 2D array Tile field of the room with new Tile objects.
+     */
     private void populateRoomTiles(){
         tiles = new Tile[HEIGHT_TILES][WIDTH_TILES];
 
@@ -59,8 +61,8 @@ public class Room {
         // roomId,x,y,isStart,isEnd|
         sb.append(NetworkProtocol.ROOM)
         .append(roomId).append(NetworkProtocol.SUB_DELIMITER)
-        .append(x).append(NetworkProtocol.SUB_DELIMITER)
-        .append(y).append(NetworkProtocol.SUB_DELIMITER)
+        .append(worldX).append(NetworkProtocol.SUB_DELIMITER)
+        .append(worldY).append(NetworkProtocol.SUB_DELIMITER)
         .append(isStartRoom).append(NetworkProtocol.SUB_DELIMITER)
         .append(isEndRoom);
 
@@ -85,14 +87,12 @@ public class Room {
         //     }
         // }
         
-        g2d.fillRect(x - cameraX, y - cameraY, width, height);
+        g2d.fillRect(worldX - cameraX, worldY - cameraY, width, height);
 
         // Border
         g2d.setColor(Color.BLACK);
-        g2d.drawRect(x - cameraX, y - cameraY, width, height);
+        g2d.drawRect(worldX - cameraX, worldY - cameraY, width, height);
         
-        // Draw doors
-        // drawDoors(g2d);
     }
 
 
@@ -164,17 +164,6 @@ public class Room {
         return null;
     }
 
-    /**
-     * Gets the doors hashmap of the room object.
-     * @return the doors hashmap in the form <String s, Room r> where s is the direction and r is the connected room
-     */
-    public HashMap<String, Room> getDoors(){
-        return doors;
-    }
-
-    public ArrayList<Room> getConnections(){
-        return connections;
-    }
 
     /**
      * Provides the opposite of the provided direction
@@ -246,8 +235,10 @@ public class Room {
      * the contents of the doors HashMap. Called inside populateAllDoorsArrayList 
      */
     public void populateDoorsArrayList(){
-        int centerX = x + width / 2;
-        int centerY = y + height / 2;
+        int centerX = getCenterX();
+        int centerY = getCenterY();
+        
+        // Needed to position the door just right
         int doorHeight = Door.HEIGHT_TILES * GameCanvas.TILESIZE;
         int doorWidth = Door.WIDTH_TILES * GameCanvas.TILESIZE;
         Door d;
@@ -255,19 +246,19 @@ public class Room {
         for (HashMap.Entry<String, Room> door : doors.entrySet()) {
              switch (door.getKey()) {
                 case "T":
-                    d = new Door(centerX - doorWidth, y, door.getKey(), this, door.getValue());
+                    d = new Door(centerX - doorWidth, worldY, door.getKey(), this, door.getValue());
                     doorsArrayList.add(d);
                     break;
                 case "B":
-                    d = new Door(centerX - doorWidth, y + height - doorHeight, door.getKey(), this, door.getValue());
+                    d = new Door(centerX - doorWidth, worldY + height - doorHeight, door.getKey(), this, door.getValue());
                     doorsArrayList.add(d);
                     break;
                 case "L":
-                    d = new Door(x, centerY - doorHeight, door.getKey(), this, door.getValue());
+                    d = new Door(worldX, centerY - doorHeight, door.getKey(), this, door.getValue());
                     doorsArrayList.add(d);
                     break;
                 case "R":
-                    d = new Door(x + width - doorWidth, centerY - doorHeight, door.getKey(), this, door.getValue());
+                    d = new Door(worldX + width - doorWidth, centerY - doorHeight, door.getKey(), this, door.getValue());
                     doorsArrayList.add(d);
                     break;
                 default:
@@ -284,64 +275,62 @@ public class Room {
         return (doors.size() < 2);
     }
 
+     /**
+     * Gets the doors hashmap of the room object.
+     * @return the doors hashmap in the form <String s, Room r> where s is the direction and r is the connected room
+     */
+    public HashMap<String, Room> getDoors(){
+        return doors;
+    }
+
+    /**
+     * Returns the ArrayList of Rooms that are connected to the colling room.
+     * @return connections, an ArrayList of connected Rooms.
+     */
+    public ArrayList<Room> getConnections(){
+        return connections;
+    }
+
+    /**
+     * Returns the ArrayList of created Door objects of the calling Room.
+     * @return doorsArrayList, an ArrayList of Door objects children to the Room.
+     */
+    public ArrayList<Door> getDoorsArrayList() {
+        return doorsArrayList;
+    }
+
+    /**
+     * Returns the 2D Tile array of the Room
+     * @return tiles[][], a 2D array containing the tiles of the room
+     */
+    public Tile[][] getTiles() {
+        return tiles;
+    }
+
+    /**
+     * Asks whether the calling room is the starting room of the map.
+     * @return true if it is the starting room, false otherwise.
+     */
+    public boolean isStartRoom() {
+        return isStartRoom;
+    }
+
+    /**
+     * Asks whether the calling room is the end room of the map.
+     * @return true if it is the end room, false otherwise.
+     */
+    public boolean isEndRoom() {
+        return isEndRoom;
+    }
+    
     public void setIsStartRoom(boolean isStartRoom) {
         this.isStartRoom = isStartRoom;
     }
+
 
     public void setIsEndRoom(boolean isEndRoom) {
         this.isEndRoom = isEndRoom;
     }
 
-    public int getX() {
-        return x;
-    }
-
-    public void setX(int x) {
-        this.x = x;
-    }
-
-    public int getY() {
-        return y;
-    }
-
-    public void setY(int y) {
-        this.y = y;
-    }
-
     
-    public ArrayList<Door> getDoorsArrayList() {
-        return doorsArrayList;
-    }
-
-    public void setDoorsArrayList(ArrayList<Door> doorsArrayList) {
-        this.doorsArrayList = doorsArrayList;
-    }
-
-    public int getHeight() {
-        return height;
-    }
-
-    public int getWidth() {
-        return width;
-    }
-
-    public int getWIDTH_TILES() {
-        return WIDTH_TILES;
-    }
-
-    public int getHEIGHT_TILES() {
-        return HEIGHT_TILES;
-    }
-
-    public Tile[][] getTiles() {
-        return tiles;
-    }
-
-    public boolean isStartRoom() {
-        return isStartRoom;
-    }
-
-    public boolean isEndRoom() {
-        return isEndRoom;
-    }
 }

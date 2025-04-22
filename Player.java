@@ -90,20 +90,20 @@ public class Player extends Entity{
 
         switch (otherDoorDirection) {
             case "T":
-                newCoordinates[0] = next.getX() + (next.getWidth() / 2) - origin.getHeight();
-                newCoordinates[1] = next.getY() + origin.getHeight() + offset;
+                newCoordinates[0] = next.getWorldX() + (next.getWidth() / 2) - origin.getHeight();
+                newCoordinates[1] = next.getWorldY() + origin.getHeight() + offset;
                 break;
             case "B":
-                newCoordinates[0] = next.getX() + (next.getWidth() / 2) - origin.getWidth();
-                newCoordinates[1] = next.getY() + next.getHeight() - (origin.getHeight() + offset);
+                newCoordinates[0] = next.getWorldX() + (next.getWidth() / 2) - origin.getWidth();
+                newCoordinates[1] = next.getWorldY() + next.getHeight() - (origin.getHeight() + offset);
                 break;
             case "L":
-                newCoordinates[0] = next.getX() + origin.getWidth() + offset;
-                newCoordinates[1] = next.getY() + (next.getHeight() / 2) - origin.getHeight();
+                newCoordinates[0] = next.getWorldX() + origin.getWidth() + offset;
+                newCoordinates[1] = next.getWorldY() + (next.getHeight() / 2) - origin.getHeight();
                 break;
             case "R":
-                newCoordinates[0] = next.getX() + next.getWidth() - (origin.getWidth() + offset);
-                newCoordinates[1] = next.getY() + (next.getHeight() / 2) - origin.getHeight();
+                newCoordinates[0] = next.getWorldX() + next.getWidth() - (origin.getWidth() + offset);
+                newCoordinates[1] = next.getWorldY() + (next.getHeight() / 2) - origin.getHeight();
                 break;
             default:
                 throw new AssertionError("Assertion in getNewPositionAfterRoomTransition");
@@ -129,10 +129,10 @@ public class Player extends Entity{
      * @return boolean true if the player and the door are colliding, false otherwise
      */
     private boolean isCollidingWithDoor(Door door) {
-        return !((worldX < door.getX()) ||
-                ( (worldX + width) > door.getX() + door.getWidth()) ||
-                (worldY < door.getY()) ||
-                ((worldY + height) > door.getY() + door.getHeight())
+        return !((worldX < door.getWorldX()) ||
+                ( (worldX + width) > door.getWorldX() + door.getWidth()) ||
+                (worldY < door.getWorldY()) ||
+                ((worldY + height) > door.getWorldY() + door.getHeight())
         );
     }
 

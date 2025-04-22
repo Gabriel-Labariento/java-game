@@ -1,20 +1,20 @@
 
 import java.awt.Graphics2D;
 
-public class Door {
-    private int id, x, y;
+public class Door extends GameObject {
+    private int id;
     public static final int HEIGHT_TILES = 2;
     public static final int WIDTH_TILES = 2;
-    private final int height = HEIGHT_TILES * GameCanvas.TILESIZE;
-    private final int width = WIDTH_TILES * GameCanvas.TILESIZE;
     private String direction;
     private Room roomA, roomB;
     private static int doorCount = 0;
 
     public Door(int x, int y, String direction, Room roomA, Room roomB){
         this.id = doorCount++;
-        this.x = x;
-        this.y = y;
+        worldX = x;
+        worldY = y;
+        height = GameCanvas.TILESIZE * HEIGHT_TILES;
+        width = GameCanvas.TILESIZE * WIDTH_TILES;
         this.direction = direction;
         this.roomA = roomA;
         this.roomB = roomB;
@@ -22,7 +22,7 @@ public class Door {
 
 
     public void draw(Graphics2D g2d, int offsetX, int offsetY) {
-        g2d.fillRect(x - offsetX, y-offsetY, width, height);
+        g2d.fillRect(worldX - offsetX, worldY - offsetY, width, height);
     }
 
     
@@ -37,38 +37,14 @@ public class Door {
     public String serialize(){
         StringBuilder sb = new StringBuilder();
         sb.append(NetworkProtocol.DOOR)
-        .append(id).append(",")
-        .append(x).append(",")
-        .append(y).append(",")
-        .append(direction).append(",")
-        .append(roomA.getRoomId()).append(",")
+        .append(id).append(NetworkProtocol.SUB_DELIMITER)
+        .append(worldX).append(NetworkProtocol.SUB_DELIMITER)
+        .append(worldY).append(NetworkProtocol.SUB_DELIMITER)
+        .append(direction).append(NetworkProtocol.SUB_DELIMITER)
+        .append(roomA.getRoomId()).append(NetworkProtocol.SUB_DELIMITER)
         .append(roomB.getRoomId());
 
         return sb.toString();
-    }
-
-    public int getX() {
-        return x;
-    }
-
-    public void setX(int x) {
-        this.x = x;
-    }
-
-    public int getY() {
-        return y;
-    }
-
-    public void setY(int y) {
-        this.y = y;
-    }
-
-    public int getHeight() {
-        return height;
-    }
-
-    public int getWidth() {
-        return width;
     }
 
     public String getDirection() {
@@ -83,16 +59,8 @@ public class Door {
         return roomA;
     }
 
-    public void setRoomA(Room roomA) {
-        this.roomA = roomA;
-    }
-
     public Room getRoomB() {
         return roomB;
-    }
-
-    public void setRoomB(Room roomB) {
-        this.roomB = roomB;
     }
 
     public int getId() {
