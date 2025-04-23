@@ -2,6 +2,7 @@ public abstract class GameObject {
     protected int worldX, worldY, height, width;
     protected int HEIGHT_TILES, WIDTH_TILES;
     protected Tile[][] tiles;
+    protected int[][] tileLayout;
 
     /**
      * Returns the x position of the object in terms of the entire game world. 
@@ -99,6 +100,10 @@ public abstract class GameObject {
 
     public Tile[][] getTiles() {
         return tiles;
+    }
+
+    public int[][] getTileLayout() {
+        return tileLayout;
     }
 
 

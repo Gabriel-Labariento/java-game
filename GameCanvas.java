@@ -53,7 +53,6 @@ public class GameCanvas extends JComponent {
 
         Room currentRoom = clientState.getCurrentRoom();
         tileManager.drawTiledObject(g2d, currentRoom, cameraX, cameraY);
-        System.out.println("Current room: " + currentRoom.getWorldX() + ", " + currentRoom.getWorldY());
         
         // Draw room doors
         for (Door door : currentRoom.getDoorsArrayList()) {

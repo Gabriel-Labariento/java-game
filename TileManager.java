@@ -38,9 +38,11 @@ public final class TileManager {
     }
 
     public void drawTiledObject (Graphics2D g2d, GameObject go, int cameraX, int cameraY) {
-        
+        if (!(go instanceof Tileable)) return;
         // Create a 2D array to store the object layout
-        loadLayout(go);
+        
+        Tileable tiledObj = (Tileable) go;
+        int[][] layout = tiledObj.loadLayout();
 
         // Get the position of the object in the world
         int goX = go.getWorldX();
@@ -51,52 +53,13 @@ public final class TileManager {
         // For each row and column
         for (int row = 0; row < heightTiles; row++) {
             for (int col = 0; col < widthTiles; col++) {
-                int tileNum = mapTileNum[row][col];
+                int tileNum = layout[row][col];
                 int screenX = goX + col * GameCanvas.TILESIZE - cameraX;
                 int screenY = goY + row * GameCanvas.TILESIZE - cameraY;
                 g2d.drawImage(tileImages[tileNum].image, screenX, screenY, GameCanvas.TILESIZE, GameCanvas.TILESIZE, null);       
             }
         }
     }
-
-    public void loadLayout(GameObject go) {
-        if (go == null) { System.err.println("Object not found in loadLayout"); return; }
-        String filePath = null;
-        int heightTiles = go.getHeight() / GameCanvas.TILESIZE;
-        int widthTiles = go.getWidth() / GameCanvas.TILESIZE;
-
-        // Check what type of object it is. TODO: MAKE PRETTIER
-        if ((go instanceof Door)) {
-            mapTileNum = new int[heightTiles][widthTiles];
-
-            if (((Door) go).isOpen()) {
-                filePath = "Object Layouts\\openDoor.txt";
-            } else filePath = "Object Layouts\\closedDoor.txt";
-            System.out.println(filePath);
-
-        } else if (go instanceof  Room) {
-            mapTileNum = new int[heightTiles][widthTiles]; // TODO: ASSIGN PROPERLY
-            filePath = "Object Layouts\\roomLayout0.txt";
-        }
-
-        // Safety first
-        if (filePath == null) { System.err.println("Object layout not found in loadLayout()"); return; } 
-        try {
-            InputStream is = getClass().getResourceAsStream(filePath);
-            BufferedReader br = new BufferedReader(new InputStreamReader(is));
-                for (int row = 0; row < heightTiles; row++) {
-                    String line = br.readLine();
-                    for (int col = 0; col < widthTiles; col++) {
-                        String[] nums = line.split(",");
-                        int num = Integer.parseInt(nums[col]);
-                        mapTileNum[row][col] = num;
-                    }
-            }                
-        } catch (IOException | NumberFormatException e) {
-            System.out.println("Exception in loadMap()");
-        }
-    }
-
 }
 
 // TODO: DELETE TILE REFERENCE AFTER ALL DESIGNS

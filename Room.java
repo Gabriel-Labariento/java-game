@@ -1,8 +1,8 @@
-import java.awt.Color;
-import java.awt.Graphics2D;
+import java.awt.*;
+import java.io.*;
 import java.util.*;
 
-public class Room extends GameObject{
+public class Room extends GameObject implements Tileable{
     
     public static final int WIDTH_TILES = 45;
     public static final int HEIGHT_TILES = 33;
@@ -80,6 +80,30 @@ public class Room extends GameObject{
         
     }
 
+    @Override
+    public int[][] loadLayout() {
+        int layout[][] = new int[HEIGHT_TILES][WIDTH_TILES];
+        // Check what type of object it is. TODO: MAKE PRETTIER
+        String filePath = "Object Layouts\\roomLayout0.txt";
+        try {
+            InputStream is = getClass().getResourceAsStream(filePath);
+            BufferedReader br = new BufferedReader(new InputStreamReader(is));
+                for (int row = 0; row < HEIGHT_TILES; row++) {
+                    String line = br.readLine();
+                    for (int col = 0; col < WIDTH_TILES; col++) {
+                        String[] nums = line.split(",");
+                        int num = Integer.parseInt(nums[col]);
+                        layout[row][col] = num;
+                    }
+            }                
+        } catch (IOException | NumberFormatException e) {
+            System.out.println("Exception in loadMap()");
+        }
+
+        return layout;
+    }
+    
+    
     /**
      * Opens all of the room's doors
      */
@@ -92,6 +116,7 @@ public class Room extends GameObject{
         }
     }
 
+    //<----------------- METHODS BELOW USED FOR PROCEDURAL GENERATION LOGIC --------------------------------->>
 
     /**
      * Adds the "other" argument to the list of connections of the calling room and adds the calling room to the connections of "other."
@@ -308,6 +333,8 @@ public class Room extends GameObject{
     public void setIsEndRoom(boolean isEndRoom) {
         this.isEndRoom = isEndRoom;
     }
+
+    
 
     
 }
