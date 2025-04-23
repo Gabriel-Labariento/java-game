@@ -166,26 +166,6 @@ public class Room extends GameObject{
 
 
     /**
-     * Provides the opposite of the provided direction
-     * @param direction the direction whose opposite is to be determined
-     * @return the opposite of the passed direction "T" <-> "B" and "L" <-> "R"
-     */
-    private String getOppositeDirection(String direction){
-        switch (direction) {
-            case "T":
-                return "B";
-            case "R":
-                return "L";
-            case "B":
-                return "T";
-            case "L":
-                return "R";
-            default:
-                throw new AssertionError("Assertion in getOppositeDirection() method of the Room.");
-        }
-    }
-
-    /**
      * Checks whether the calling room has a direct connection to the passed room
      * @param other the room to which the calling room is checked for connection
      * @return

@@ -61,4 +61,24 @@ public abstract class GameObject {
                 ((worldY + height) > other.getWorldY() + other.getHeight())
         );
     }
+
+    /**
+     * Provides the opposite of the provided direction
+     * @param direction the direction whose opposite is to be determined
+     * @return the opposite of the passed direction "T" <-> "B" and "L" <-> "R"
+     */
+    public static String getOppositeDirection(String direction){
+        switch (direction) {
+            case "T":
+                return "B";
+            case "R":
+                return "L";
+            case "B":
+                return "T";
+            case "L":
+                return "R";
+            default:
+                throw new AssertionError("Assertion in getOppositeDirection() method of the Room.");
+        }
+    }
 }

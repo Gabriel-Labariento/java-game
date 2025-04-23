@@ -73,7 +73,7 @@ public class Player extends Entity{
     private int[] getNewPositionAfterRoomTransition(Door origin, Room next){
         int[] newCoordinates = new int[2];
 
-        String otherDoorDirection = origin.getOppositeDirection(origin.getDirection());
+        String otherDoorDirection = getOppositeDirection(origin.getDirection());
 
         Door otherDoor = null;
 

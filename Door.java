@@ -71,25 +71,6 @@ public class Door extends GameObject {
         this.id = id;
     }
     
-    /**
-     * Provides the opposite of the provided direction
-     * @param direction the direction whose opposite is to be determined
-     * @return the opposite of the passed direction "T" <-> "B" and "L" <-> "R"
-     */
-    public String getOppositeDirection(String direction){
-        switch (direction) {
-            case "T":
-                return "B";
-            case "R":
-                return "L";
-            case "B":
-                return "T";
-            case "L":
-                return "R";
-            default:
-                throw new AssertionError("Assertion in getOppositeDirection() method of the Room.");
-        }
-    }
 
     public int getDoorCount() {
         return doorCount;
