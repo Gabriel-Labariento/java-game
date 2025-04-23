@@ -113,12 +113,12 @@ public class Player extends Entity{
     }
 
     /**
-     * Checks if a player is colliding with any door in the currentRoom and returns that door
+     * Checks if a player is colliding with any door in the currentRoom and returns that door if the door is open
      * @return the door the player is colliding with
      */
     private Door getCollidingDoor(){
         for (Door d : currentRoom.getDoorsArrayList()) {
-            if (isColliding(d)) return d;
+            if (isColliding(d) && (d.isOpen())) return d;
         }
         return null;
     }

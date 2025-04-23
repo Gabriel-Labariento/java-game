@@ -326,6 +326,7 @@ public class DungeonMap {
         int doorId = Integer.parseInt(doorData[0]);
         int doorX = Integer.parseInt(doorData[1]);
         int doorY = Integer.parseInt(doorData[2]);
+        System.out.println("Door Y: " + doorY);
         String doorDirection = doorData[3];
         int roomAID = Integer.parseInt(doorData[4]);
         int roomBID = Integer.parseInt(doorData[5]);
@@ -370,7 +371,7 @@ public class DungeonMap {
         }
 
         public Door createDoorFromDoorData(HashMap<Integer, Room> mapIdToRoom ) {
-            Door d = new Door(this.x, this.y, this.direction, mapIdToRoom.get(this.roomAId), mapIdToRoom.get(this.roomBId));
+            Door d = new Door(x, y, direction, mapIdToRoom.get(roomAId), mapIdToRoom.get(roomBId));
             d.setId(this.id);
             return d;
         }

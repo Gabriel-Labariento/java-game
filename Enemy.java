@@ -62,4 +62,6 @@ public abstract class Enemy extends Entity {
         if (player.getCenterY() > getCenterY()) worldY += speed;
         else if (player.getCenterY() < getCenterY()) worldY -= speed;
     }
+
+    
 }

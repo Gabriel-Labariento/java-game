@@ -38,6 +38,14 @@ public abstract class Entity extends GameObject {
              );
     }
 
+    /**
+     * Checks whether an entity is dead or alive based on its health.
+     * @return true if the entity is dead, false otherwise.
+     */
+    public boolean isDead(){
+        return (health <= 0);
+    }
+
     // FOR TRANSFER
     // public byte[] getByteData(){
     //     ByteBuffer buffer = ByteBuffer.allocate(40);

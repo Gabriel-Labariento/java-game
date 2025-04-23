@@ -4,16 +4,14 @@ import java.util.*;
 
 public class Room extends GameObject{
     
-    public static final int WIDTH_TILES = 45; // 45 TILES WIDE
-    public static final int HEIGHT_TILES = 33; // 33 TILES TALL
+    public static final int WIDTH_TILES = 45;
+    public static final int HEIGHT_TILES = 33;
     private int roomId;
     private boolean isStartRoom, isEndRoom;
-    private  Tile[][] tiles;
-
+  
     private ArrayList<Room> connections;
     private HashMap<String, Room> doors;
     private ArrayList<Door> doorsArrayList;
-
 
     /**
      * Creates a Room object with an ID, x and y coordinates, ArrayList of connections, and HashMap of doors.
@@ -34,21 +32,8 @@ public class Room extends GameObject{
         connections = new ArrayList<>();
         doors = new HashMap<>();
         doorsArrayList = new ArrayList<>();
-
-        populateRoomTiles();
-    }
-
-    /**
-     * Populates the 2D array Tile field of the room with new Tile objects.
-     */
-    private void populateRoomTiles(){
         tiles = new Tile[HEIGHT_TILES][WIDTH_TILES];
-
-        for (int i = 0; i < HEIGHT_TILES; i++) {
-            for (int j = 0; j < WIDTH_TILES; j++) {
-                tiles[i][j] = new Tile();
-            }
-        }
+        populateTiles();
     }
 
     /**
@@ -83,7 +68,7 @@ public class Room extends GameObject{
 
         // for (Tile[] tileArray : tiles) {
         //     for (Tile tile : tileArray) {
-        //         tile.draw(g2d);
+        //         tile.draw(g2d, cameraX, cameraY);
         //     }
         // }
         
@@ -93,6 +78,18 @@ public class Room extends GameObject{
         g2d.setColor(Color.BLACK);
         g2d.drawRect(worldX - cameraX, worldY - cameraY, width, height);
         
+    }
+
+    /**
+     * Opens all of the room's doors
+     */
+    public void openDoors(){
+        // Safety first
+        if (doorsArrayList == null || doorsArrayList.size() <= 0) return;
+
+        for (Door d : doorsArrayList) {
+            d.setIsOpen(true);            
+        }
     }
 
 
@@ -212,7 +209,7 @@ public class Room extends GameObject{
 
     /**
      * Populates the doorsArrayList with new Door objects based on 
-     * the contents of the doors HashMap. Called inside populateAllDoorsArrayList 
+     * the contents of the doors HashMap. Called inside populateAllDoorsArrayList.
      */
     public void populateDoorsArrayList(){
         int centerX = getCenterX();

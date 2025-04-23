@@ -6,7 +6,7 @@ public class ServerMaster {
     private int userPlayerIndex;
     private Room currentRoom;
     private MobSpawner mobSpawner;
-    private int gameLevel = 0; // TODO: INCREMENT WHEN DEFEAT BOSS
+    private static int gameLevel = 0; // TODO: INCREMENT WHEN DEFEAT BOSS
 
     public ServerMaster() {
         entities = new CopyOnWriteArrayList<>();
@@ -14,15 +14,14 @@ public class ServerMaster {
         dungeonMap = new DungeonMap();
         dungeonMap.generateRooms(3);
         currentRoom = dungeonMap.getStartRoom();
-        mobSpawner = new MobSpawner(gameLevel, this);
-        mobSpawner.spawn();
+        mobSpawner = new MobSpawner(gameLevel, this); 
     }
 
     /**
      * Builds a string that is the serialized form of the map data.
      * 
      * @return a string in the form
-     *         M:{RoomCount}|R:{roomId},{roomX},{roomY},{isStart},{isEnd}|D:{doorId},{doorX},{doorY},{direction},{roomAId},{roomBId}|...|{startingRoomId}
+     * M:{RoomCount}|R:{roomId},{roomX},{roomY},{isStart},{isEnd}|D:{doorId},{doorX},{doorY},{direction},{roomAId},{roomBId}|...|{startingRoomId}
      */
     public String getMapData() {
         return dungeonMap.serialize();
@@ -177,5 +176,9 @@ public class ServerMaster {
 
     public CopyOnWriteArrayList<Entity> getEntities() {
         return entities;
+    }
+
+    public int getGameLevel() {
+        return gameLevel;
     }
 }

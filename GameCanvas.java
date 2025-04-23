@@ -52,21 +52,22 @@ public class GameCanvas extends JComponent {
         int cameraY = userPlayer.getWorldY() - screenY;
 
         Room currentRoom = clientState.getCurrentRoom();
-        tileManager.drawRoom(g2d, currentRoom, cameraX, cameraY);
-
+        tileManager.drawTiledObject(g2d, currentRoom, cameraX, cameraY);
+        System.out.println("Current room: " + currentRoom.getWorldX() + ", " + currentRoom.getWorldY());
+        
         // Draw room doors
         for (Door door : currentRoom.getDoorsArrayList()) {
-            door.draw(g2d, cameraX, cameraY);
+            tileManager.drawTiledObject(g2d, door, cameraX, cameraY);
         }
 
         // Draw enemies, projectiles, other players
         synchronized (clientState.getEntities()) {
             for (Entity entity : clientState.getEntities())
-            entity.draw(g2d, entity.getWorldX()- clientState.getUserPlayer().getWorldX() + screenX, entity.getWorldY()- clientState.getUserPlayer().getWorldY() + screenY);    
+            entity.draw(g2d, entity.getWorldX() - userPlayer.getWorldX() + screenX, entity.getWorldY()- userPlayer.getWorldY() + screenY);    
         }
         
         //Draw current user's player
-        clientState.getUserPlayer().draw(g2d, screenX, screenY); //CHANGE 50 BY ACTUAL ASSET SIZE
+        userPlayer.draw(g2d, screenX, screenY); //CHANGE 50 BY ACTUAL ASSET SIZE
 
         
     }
