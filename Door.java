@@ -1,5 +1,4 @@
 import java.awt.Graphics2D;
-import java.io.*;
 
 public class Door extends GameObject implements Tileable {
     private int id;
@@ -8,7 +7,11 @@ public class Door extends GameObject implements Tileable {
     private String direction;
     private Room roomA, roomB; // The door only appears on roomA, but is connected to another door in roomB 
     private boolean isOpen;
+    
     private static int doorCount = 0;
+    private static final int[][] CLOSED_DOOR_LAYOUT = {{16,17}, {18,19}};
+    private static final int[][] OPEN_DOOR_LAYOUT = {{20,21}, {22,23}};
+    
 
     public Door(int x, int y, String direction, Room roomA, Room roomB){
         this.id = doorCount++;
@@ -52,27 +55,11 @@ public class Door extends GameObject implements Tileable {
     }
 
     @Override
-    public int[][] loadLayout() {
-        int layout[][] = new int[HEIGHT_TILES][WIDTH_TILES];
-        String filePath = (isOpen) ? "Object Layouts\\openDoor.txt" : "Object Layouts\\closedDoor.txt";
-        try {
-            InputStream is = getClass().getResourceAsStream(filePath);
-            BufferedReader br = new BufferedReader(new InputStreamReader(is));
-                for (int row = 0; row < HEIGHT_TILES; row++) {
-                    String line = br.readLine();
-                    for (int col = 0; col < WIDTH_TILES; col++) {
-                        String[] nums = line.split(",");
-                        int num = Integer.parseInt(nums[col]);
-                        layout[row][col] = num;
-                    }
-            }                
-        } catch (IOException | NumberFormatException e) {
-            System.out.println("Exception in loadMap()");
-        }
-
-        return layout;
+    public int[][] loadLayout(){
+        return (isOpen) ? OPEN_DOOR_LAYOUT : CLOSED_DOOR_LAYOUT;
     }
 
+    
     public String getDirection() {
         return direction;
     }

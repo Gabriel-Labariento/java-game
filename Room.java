@@ -13,6 +13,8 @@ public class Room extends GameObject implements Tileable{
     private HashMap<String, Room> doors;
     private ArrayList<Door> doorsArrayList;
 
+    int[][] loadedLayout;
+
     /**
      * Creates a Room object with an ID, x and y coordinates, ArrayList of connections, and HashMap of doors.
      * @param roomId the unique int used to identify the room
@@ -81,7 +83,15 @@ public class Room extends GameObject implements Tileable{
     }
 
     @Override
-    public int[][] loadLayout() {
+    public int[][] loadLayout(){
+        if (loadedLayout == null) {
+            loadedLayout = loadLayoutFromFile();
+        }
+        return loadedLayout;
+    }
+
+    
+    public int[][] loadLayoutFromFile() {
         int layout[][] = new int[HEIGHT_TILES][WIDTH_TILES];
         // Check what type of object it is. TODO: MAKE PRETTIER
         String filePath = "Object Layouts\\roomLayout0.txt";
