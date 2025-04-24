@@ -1,7 +1,8 @@
 public abstract class Enemy extends Entity {
 
     private double[] calculateRepulsionForce(Entity other) {
-        final int repulsionFactor = 32;
+        final int repulsionFactor = 2;
+        final int minDistance = 32;
 
         int dx = getCenterX() - other.getCenterX();
         int dy = getCenterY() - other.getCenterY();
@@ -10,11 +11,11 @@ public abstract class Enemy extends Entity {
 
 
         // Avoid division by zero and extremely strong forces at small distances
-        if (distance < 1e-5) {
+        if (distance > minDistance) {
             return new double[] {0,0};
         } 
 
-        int forceMagnitude = repulsionFactor / distanceSquared;
+        int forceMagnitude = (int) (repulsionFactor * (1 - (distance / minDistance)));
 
         double x = (dx / distance) * forceMagnitude;
         double y = (dy / distance) * forceMagnitude;

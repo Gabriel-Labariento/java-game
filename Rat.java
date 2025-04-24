@@ -52,7 +52,7 @@ public class Rat extends Enemy{
         for (Entity e : gsm.getEntities()) {
             if (e == this) continue;
             if (e instanceof Player) continue;
-            if (isColliding(e)) moveAwayFromOtherEntity(e);
+            moveAwayFromOtherEntity(e);
         }
         
     }
