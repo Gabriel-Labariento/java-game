@@ -3,10 +3,18 @@ import java.util.*;
 public class DungeonMap {
     private ArrayList<Room> rooms;
     private Room startRoom, endRoom;
+    private int gameLevel;
 
-    public DungeonMap () {
+    public DungeonMap (int gameLevel) {
         rooms = new ArrayList<>();
+        this.gameLevel = gameLevel;
     }
+
+    // Multiple constructors in the meantime while refactoring  
+    public DungeonMap(){
+        gameLevel = 0;
+    }
+
 
     /**
      * Generates a certain number of rooms (numRooms <= 3). Connects them and calls pickStartAndEndRooms() and populateAllRoomsDoorsArrayList()
@@ -15,13 +23,14 @@ public class DungeonMap {
     public void generateRooms(int numRooms) {
 
         // Algorithm will not work for when rooms < 3. So ensure 3 is the minumum
-        if (numRooms < 3) numRooms = 3;
+        numRooms = Math.max(3, numRooms + gameLevel);
 
+        // Room generation
         while (true) {
             rooms.clear();
             createRoomsNoConnections(numRooms);
-            System.out.println("Rooms created");
-
+            
+            // Room Connection
             for (Room room : rooms) {
                 // In the current room, generate 2 doors at random directions
                 int maxDoors = 2;
@@ -51,17 +60,44 @@ public class DungeonMap {
                             break;
                         } 
                     }
-
+                    
                     // If all rooms have been connected, stop.
                     if (areAllRoomsConnected()) {
-                        System.out.println("All rooms connected.");
                         pickStartAndEndRooms();
+                        assignRoomDifficulties();
                         populateAllRoomsDoorsArrayList();
                         return;
                     } 
                 }
             }
         }
+    }
+
+    /**
+     * Assigns a room's "difficulty" (in terms of the enemies) depending on the current gameLevel
+     * and its "distance" (how many connections away) it is from the starting room.
+     */
+    private void assignRoomDifficulties(){
+        HashMap<Room, Integer> roomToDistanceFromStart = calculateDistancesFromStart();
+
+        for (Room room : rooms) {
+            // Assign difficulty of the room based on the current gameLevel and its distance from the start.
+            int distance = roomToDistanceFromStart.get(room);
+            room.assignDifficulty(gameLevel, distance);
+
+            if (!(room.isStartRoom())) {
+                MobSpawner spawner = new MobSpawner(gameLevel, room.getDifficulty(), gsm);
+                room.setMobSpawner(spawner);  // Delay spawning until player enters
+            }
+
+            // Handle boss room
+            if (room.isEndRoom()) {
+                MobSpawner bossSpawner = new MobSpawner(gameLevel, 3, gsm);
+                bossSpawner.setBossRoom(true);
+                room.setMobSpawner(bossSpawner);    
+            }
+        }
+
     }
 
     /**
@@ -117,8 +153,8 @@ public class DungeonMap {
     }
 
     /**
-     * Creates a number of rooms separated by at least 100px and at most 400px.
-     * 
+     * Creates numRooms number of distinct rooms laid out to prevent collisions
+     * and adds them to the rooms ArrayList. 
      * @param numRooms the number of rooms to be made
      */
     private void createRoomsNoConnections(int numRooms) {
@@ -137,16 +173,6 @@ public class DungeonMap {
             rooms.add(r);
         }
     }
-
-    /**
-     * Calls the draw method on all the rooms of the dungeon
-     * @param g2d object used to draw
-     */
-    // public void draw(Graphics2D g2d) {
-    //     for (Room room : rooms) {
-    //         room.draw(g2d);
-    //     }
-    // }
 
     /**
      * Randomly chooses a starting room and then sets the end room as the farthest from start room in terms of how many connections are in between them.
@@ -213,6 +239,34 @@ public class DungeonMap {
         }
         return furthest;
     }
+
+    /**
+     * Calculates each Room's distance (in connections) from the determined starting room through BFS.
+     * @return a HashMap that maps a room to its distance from the starting room.
+     */
+    private HashMap<Room, Integer> calculateDistancesFromStart(){
+        Queue<Room> queue = new LinkedList<>();
+        Set<Room> visited = new HashSet<>();
+        HashMap<Room, Integer> distances = new HashMap<>();
+
+        queue.add(startRoom);
+        visited.add(startRoom);
+        distances.put(startRoom, 0);
+
+        while (!queue.isEmpty()) {
+            Room currentRoom = queue.poll();
+
+            for (Room neighbor : currentRoom.getConnections()) {
+                if (!visited.contains(neighbor)) {
+                    visited.add(neighbor);
+                    queue.add(neighbor);
+                    distances.put(neighbor, distances.get(currentRoom) + 1);
+                }
+            }
+        }
+        return distances;
+    } 
+
 
     /**
      * Returns a string containing the DungeonMap data
@@ -357,6 +411,17 @@ public class DungeonMap {
         return endRoom;
     }
 
+    public int getGameLevel() {
+        return gameLevel;
+    }
+
+    /**
+     * Holds door data after deserialization for door creation.
+     * Needed to avoid null errors as in the parsed String door data
+     * comes in between Room data. Door might try to connect to a Room
+     * that does not yet exist. From the data stored in the instance of
+     * DoorDataHolder, a new Door object can be made.
+     */
     private class DoorDataHolder{
         private int id, x, y, roomAId, roomBId;
         private String direction;

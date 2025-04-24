@@ -7,13 +7,16 @@ public class Room extends GameObject implements Tileable{
     public static final int WIDTH_TILES = 45;
     public static final int HEIGHT_TILES = 33;
     private int roomId;
+    private int difficulty; // 0 => 3, easiest to hardest
     private boolean isStartRoom, isEndRoom;
+    private MobSpawner mobSpawner;
   
     private ArrayList<Room> connections;
     private HashMap<String, Room> doors;
     private ArrayList<Door> doorsArrayList;
 
     int[][] loadedLayout;
+    
 
     /**
      * Creates a Room object with an ID, x and y coordinates, ArrayList of connections, and HashMap of doors.
@@ -61,23 +64,25 @@ public class Room extends GameObject implements Tileable{
     }
 
     public void draw(Graphics2D g2d, int cameraX, int cameraY){
-        // Inside
-        if (isStartRoom) {
-            g2d.setColor(Color.RED);
-        } else if (isEndRoom){
-            g2d.setColor(Color.BLUE);
-        } else g2d.setColor(Color.DARK_GRAY);
 
-        // for (Tile[] tileArray : tiles) {
-        //     for (Tile tile : tileArray) {
-        //         tile.draw(g2d, cameraX, cameraY);
-        //     }
-        // }
-        
-        g2d.fillRect(worldX - cameraX, worldY - cameraY, width, height);
+        if (isStartRoom) {
+            g2d.setColor(Color.GREEN);
+        } else if (isEndRoom){
+            g2d.setColor(Color.RED);
+        } else {
+            switch (difficulty) {
+                case 0:
+                    g2d.setColor(Color.LIGHT_GRAY); break;
+                case 1:
+                    g2d.setColor(Color.WHITE); break;
+                case 2:
+                    g2d.setColor(Color.DARK_GRAY); break;
+                default:
+                    g2d.setColor(Color.BLACK);
+            }
+        }
 
         // Border
-        g2d.setColor(Color.BLACK);
         g2d.drawRect(worldX - cameraX, worldY - cameraY, width, height);
         
     }
@@ -125,6 +130,21 @@ public class Room extends GameObject implements Tileable{
             d.setIsOpen(true);            
         }
     }
+
+
+    public void assignDifficulty(int gameLevel, int distanceFromStart){
+        if (isStartRoom) { difficulty = 0; return; }
+        if (isEndRoom) { difficulty = 3; return; }
+
+        if (distanceFromStart <= 1) difficulty = 0;
+        else if (distanceFromStart <= 3) difficulty = 1;
+        else difficulty = 2;
+
+        // Difficulty can be increased for normal rooms based on gameLevel, but capped at 2.
+        difficulty = Math.min(2, difficulty + (gameLevel / 3));
+    }
+
+
 
     //<----------------- METHODS BELOW USED FOR PROCEDURAL GENERATION LOGIC --------------------------------->>
 
@@ -344,6 +364,21 @@ public class Room extends GameObject implements Tileable{
         this.isEndRoom = isEndRoom;
     }
 
+    public MobSpawner getMobSpawner() {
+        return mobSpawner;
+    }
+
+    public void setMobSpawner(MobSpawner mobSpawner) {
+        this.mobSpawner = mobSpawner;
+    }
+
+    public int getDifficulty() {
+        return difficulty;
+    }
+
+    public void setDifficulty(int difficulty) {
+        this.difficulty = difficulty;
+    }
     
 
     

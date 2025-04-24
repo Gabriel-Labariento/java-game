@@ -6,10 +6,13 @@ public class MobSpawner {
     
     int spawnX, spawnY; // Where the mob will spawn in the room, x = (5 => 40), y = (5 => 28) 
     int level;
+    int difficulty;
+    boolean inBossRoom;
     private int spawnRate; 
     private int spawnedCount;
     private int maxSpawned;
     private ArrayList<Enemy> spawnedEnemies; 
+    private boolean isSpawning;
 
     private static final int HIGHESTX = 40;
     private static final int LOWESTX = 5;
@@ -17,19 +20,32 @@ public class MobSpawner {
     private static final int LOWESTY = 5;
     private static final int INITIALSPAWNDELAY = 10;
     
-    private static String[] spawnableEnemies = {"Rat"};
-    private ScheduledExecutorService spawnMobsScheduler;
+    private static String[][] spawnableEnemiesAtLevel = {
+        {"Rat"} // TODO: ADD OTHER ENEMIES
+    };
 
+    private static String[] bosses = {
+        "RatKing" // TODO: ADD OTHER BOSSES
+    };
+
+    private ScheduledExecutorService spawnMobsScheduler;
     private ServerMaster gsm;
 
-    public MobSpawner(int level, ServerMaster gsm){
+
+    public MobSpawner(int level, int difficulty, ServerMaster gsm){
         this.level = level;
+        this.difficulty = difficulty;
         this.gsm = gsm;
         spawnRate =  5; // Spawns one enemy per spawnRate seconds
         spawnMobsScheduler = Executors.newSingleThreadScheduledExecutor();
+        
+        spawnRate = Math.max(2, 5 - (level / 2 - difficulty));
+        maxSpawned = (difficulty == 3) ? 1 : (3 + level + difficulty);
+
         spawnedEnemies = new ArrayList<>();
         spawnedCount = 0;
         maxSpawned = 5;
+        isSpawning = false;
     }
 
     public void spawn() {
@@ -50,18 +66,27 @@ public class MobSpawner {
                     int spawnX = currentRoom.getWorldX() + ((LOWESTX + (int) (Math.random() * ((HIGHESTX - LOWESTX) + 1))) * GameCanvas.TILESIZE);
                     int spawnY = currentRoom.getWorldY() + ((LOWESTY + (int) (Math.random() * ((HIGHESTY - LOWESTY) + 1))) * GameCanvas.TILESIZE);
                     
-                    // Pick random enemy to spawn
-                    String toSpawn = spawnableEnemies[(int)(Math.random() * spawnableEnemies.length)];
-                    switch (toSpawn) {
-                        case "Rat":
-                            Rat r = new Rat(spawnX, spawnY);
-                            spawnedEnemies.add(r);
-                            gsm.addEntity(r);
-                            break;
-                        default:
-                            break;
+                    Enemy enemy = null;
+
+                    if (inBossRoom && spawnedCount == 0) {
+                        spawnX = currentRoom.getCenterX();
+                        spawnY = currentRoom.getCenterY();
+
+                        String bossType = bosses[level];
+                        enemy = createEnemy(bossType, spawnX, spawnY);
+                    } else {
+                        // Pick a random enemy to spawn out of the available in the list for the level
+                        String toSpawn = spawnableEnemiesAtLevel[level][(int) (Math.random() * (spawnableEnemiesAtLevel[level].length))];
+                        enemy = createEnemy(toSpawn, spawnX, spawnY);
                     }
-                    spawnedCount++;   
+
+                    if (enemy != null ) {
+                        spawnedCount++;   
+                        isSpawning = true;
+                        spawnedEnemies.add(enemy);
+                        gsm.addEntity(enemy);
+                        
+                    }
                 } catch (Exception e) {
                     System.out.println("Exception in spawn() method");
                 }
@@ -96,5 +121,19 @@ public class MobSpawner {
     public boolean isAllKilled(){
         return (getKilledCount() >= maxSpawned);
     }
+
+    public boolean isSpawning() {
+        return isSpawning;
+    }
     
+    private Enemy createEnemy(String name, int x, int y) {
+        switch (name) {
+            case "Rat":
+                return new Rat(x, y);
+            default:
+                System.out.println("Undetected enemy " + name );
+                return new Rat(x, y);
+        }
+    }
+
 }

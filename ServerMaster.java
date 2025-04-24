@@ -5,18 +5,58 @@ public class ServerMaster {
     private DungeonMap dungeonMap;
     private int userPlayerIndex;
     private Room currentRoom;
-    private MobSpawner mobSpawner;
     private static int gameLevel = 0; // TODO: INCREMENT WHEN DEFEAT BOSS
+    private static final int MAX_LEVEL = 7;
+
 
     public ServerMaster() {
         entities = new CopyOnWriteArrayList<>();
         userPlayerIndex = -1;
-        dungeonMap = new DungeonMap();
+        dungeonMap = new DungeonMap(gameLevel);
         dungeonMap.generateRooms(3);
-        currentRoom = dungeonMap.getStartRoom();
-        mobSpawner = new MobSpawner(gameLevel, this); 
+        currentRoom = dungeonMap.getStartRoom(); 
     }
 
+    /**
+     * Increments the static gameLevel field if it is less than MAX_LEVEL
+     */
+    public void incrementGameLevel(){
+        if (gameLevel < MAX_LEVEL) gameLevel++;
+    }
+
+    /**
+     * Creates a new dungeon and updates user player position
+     * in the new starting room.
+     */
+    public void generateNewDungeon(){
+        Player userPlayer = null;
+        
+        if (userPlayerIndex >= 0 && userPlayerIndex < entities.size()) { // Ensure the userPlayer is in entities
+            userPlayer = (Player) entities.get(userPlayerIndex);
+        } 
+
+        dungeonMap = new DungeonMap(gameLevel);
+        dungeonMap.generateRooms(3 + gameLevel);
+        currentRoom = dungeonMap.getStartRoom();
+
+        entities.clear(); // Safe to clear, already have reference to userPlayer
+
+        if (userPlayer != null) {
+            userPlayer.setWorldX(currentRoom.getCenterX());
+            userPlayer.setWorldX(currentRoom.getCenterX());
+            userPlayer.setCurrentRoom(currentRoom);
+            entities.add(userPlayer);
+            updateUserPlayerIndex(userPlayer.getClientId());
+        }
+        
+    }
+
+
+    public void handleSpawnersOnRoomChange(Room previous, Room next, Player player){
+        if (next.getMobSpawner() != null && next.getMobSpawner().isSpawning()) next.getMobSpawner().spawn();
+
+        if (next.isEndRoom() && next.getMobSpawner().isAllKilled()) incrementGameLevel();
+    }
     /**
      * Builds a string that is the serialized form of the map data.
      * 
@@ -148,6 +188,8 @@ public class ServerMaster {
             if (!(entity instanceof Player) && (entity != null)) entity.updateEntity(this);
         }
     }
+
+
 
     public DungeonMap getDungeonMap() {
         return dungeonMap;
