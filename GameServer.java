@@ -14,7 +14,7 @@ public class GameServer {
     private int clientNum = 1;
 
     public GameServer() {
-        gameStateManager = new ServerMaster();
+        gameStateManager = ServerMaster.getInstance();
         sockets = new ArrayList<>();
         sendAssetsScheduler = Executors.newSingleThreadScheduledExecutor();
 

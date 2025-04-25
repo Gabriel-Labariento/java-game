@@ -131,6 +131,18 @@ public class Room extends GameObject implements Tileable{
         }
     }
 
+    /**
+     * Closes all of the room's doors
+     */
+    public void closeDoors(){
+        // Safety first
+        if (doorsArrayList == null || doorsArrayList.size() <= 0) return;
+
+        for (Door d : doorsArrayList) {
+            d.setIsOpen(false);            
+        }
+    }
+
 
     public void assignDifficulty(int gameLevel, int distanceFromStart){
         if (isStartRoom) { difficulty = 0; return; }

@@ -4,10 +4,10 @@ import java.util.concurrent.*;
 
 public class MobSpawner {
     
-    int spawnX, spawnY; // Where the mob will spawn in the room, x = (5 => 40), y = (5 => 28) 
-    int level;
-    int difficulty;
-    boolean inBossRoom;
+    private int spawnX, spawnY; // Where the mob will spawn in the room, x = (5 => 40), y = (5 => 28) 
+    private int level;
+    private int difficulty;
+    private boolean inBossRoom;
     private int spawnRate; 
     private int spawnedCount;
     private int maxSpawned;
@@ -18,7 +18,7 @@ public class MobSpawner {
     private static final int LOWESTX = 5;
     private static final int HIGHESTY = 28;
     private static final int LOWESTY = 5;
-    private static final int INITIALSPAWNDELAY = 10;
+    private static final int INITIALSPAWNDELAY = 1;
     
     private static String[][] spawnableEnemiesAtLevel = {
         {"Rat"} // TODO: ADD OTHER ENEMIES
@@ -29,13 +29,12 @@ public class MobSpawner {
     };
 
     private ScheduledExecutorService spawnMobsScheduler;
-    private ServerMaster gsm;
 
 
-    public MobSpawner(int level, int difficulty, ServerMaster gsm){
+
+    public MobSpawner(int level, int difficulty){
         this.level = level;
         this.difficulty = difficulty;
-        this.gsm = gsm;
         spawnRate =  5; // Spawns one enemy per spawnRate seconds
         spawnMobsScheduler = Executors.newSingleThreadScheduledExecutor();
         
@@ -57,7 +56,8 @@ public class MobSpawner {
                     // Stop spawning if maxSpawned has been reached.
                     if (spawnedCount >= maxSpawned) return;
 
-                    Room currentRoom = gsm.getCurrentRoom();
+                    Room currentRoom = ServerMaster.getInstance().getCurrentRoom();
+                    System.out.println("Current room in server master is Room " + currentRoom.getRoomId());
 
                     // Don't spawn in the boss room. At least not yet
                     if (currentRoom.isEndRoom()) return;
@@ -80,12 +80,12 @@ public class MobSpawner {
                         enemy = createEnemy(toSpawn, spawnX, spawnY);
                     }
 
-                    if (enemy != null ) {
+                    if ( enemy != null ) {
                         spawnedCount++;   
                         isSpawning = true;
                         spawnedEnemies.add(enemy);
-                        gsm.addEntity(enemy);
-                        
+                        ServerMaster.getInstance().addEntity(enemy);
+                        System.out.println("Added enemy: " + enemy.getAssetData(false) );
                     }
                 } catch (Exception e) {
                     System.out.println("Exception in spawn() method");
@@ -134,6 +134,14 @@ public class MobSpawner {
                 System.out.println("Undetected enemy " + name );
                 return new Rat(x, y);
         }
+    }
+
+    public boolean isInBossRoom() {
+        return inBossRoom;
+    }
+
+    public void setInBossRoom(boolean inBossRoom) {
+        this.inBossRoom = inBossRoom;
     }
 
 }

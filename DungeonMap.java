@@ -12,6 +12,7 @@ public class DungeonMap {
 
     // Multiple constructors in the meantime while refactoring  
     public DungeonMap(){
+        rooms = new ArrayList<>();
         gameLevel = 0;
     }
 
@@ -86,14 +87,14 @@ public class DungeonMap {
             room.assignDifficulty(gameLevel, distance);
 
             if (!(room.isStartRoom())) {
-                MobSpawner spawner = new MobSpawner(gameLevel, room.getDifficulty(), gsm);
+                MobSpawner spawner = new MobSpawner(gameLevel, room.getDifficulty());
                 room.setMobSpawner(spawner);  // Delay spawning until player enters
             }
 
             // Handle boss room
             if (room.isEndRoom()) {
-                MobSpawner bossSpawner = new MobSpawner(gameLevel, 3, gsm);
-                bossSpawner.setBossRoom(true);
+                MobSpawner bossSpawner = new MobSpawner(gameLevel, 3);
+                bossSpawner.setInBossRoom(true);
                 room.setMobSpawner(bossSpawner);    
             }
         }
@@ -304,6 +305,7 @@ public class DungeonMap {
      */
     public DungeonMapDeserializeResult deserialize(String message){
         
+        // System.out.println("Received in deserialize(): " + message);
         // Clear data 
         rooms.clear();
         

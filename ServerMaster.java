@@ -8,13 +8,20 @@ public class ServerMaster {
     private static int gameLevel = 0; // TODO: INCREMENT WHEN DEFEAT BOSS
     private static final int MAX_LEVEL = 7;
 
+    private static ServerMaster singleInstance = null;
 
-    public ServerMaster() {
+    private ServerMaster(){
         entities = new CopyOnWriteArrayList<>();
         userPlayerIndex = -1;
         dungeonMap = new DungeonMap(gameLevel);
         dungeonMap.generateRooms(3);
         currentRoom = dungeonMap.getStartRoom(); 
+    }
+
+
+    public static synchronized ServerMaster getInstance() {
+        if (singleInstance == null) singleInstance = new ServerMaster();
+        return singleInstance;
     }
 
     /**
@@ -51,12 +58,6 @@ public class ServerMaster {
         
     }
 
-
-    public void handleSpawnersOnRoomChange(Room previous, Room next, Player player){
-        if (next.getMobSpawner() != null && next.getMobSpawner().isSpawning()) next.getMobSpawner().spawn();
-
-        if (next.isEndRoom() && next.getMobSpawner().isAllKilled()) incrementGameLevel();
-    }
     /**
      * Builds a string that is the serialized form of the map data.
      * 
@@ -141,6 +142,9 @@ public class ServerMaster {
             userPlayer.setWorldX(newX);
             userPlayer.setWorldY(newY);
             userPlayer.setCurrentRoom(newRoom);
+            currentRoom = newRoom;
+            handleSpawnersOnRoomChange(newRoom);
+            currentRoom.closeDoors();
 
             // Build String to be returned
             sb.append(NetworkProtocol.USER_PLAYER)
@@ -154,6 +158,11 @@ public class ServerMaster {
             return sb.toString();
     }
 
+    public void handleSpawnersOnRoomChange(Room next){
+        if (next.getMobSpawner() != null && (!next.getMobSpawner().isSpawning())) next.getMobSpawner().spawn();
+
+        if (next.isEndRoom() && next.getMobSpawner().isAllKilled()) incrementGameLevel();
+    }
 
     /**
      * Searches through the entities arrayList to look for a player object with the provided clientId

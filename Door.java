@@ -21,7 +21,7 @@ public class Door extends GameObject implements Tileable {
         width = GameCanvas.TILESIZE * WIDTH_TILES;
         tiles = new Tile[HEIGHT_TILES][WIDTH_TILES];
         populateTiles();
-        isOpen = false;
+        isOpen = true;
         this.direction = direction;
         this.roomA = roomA;
         this.roomB = roomB;
