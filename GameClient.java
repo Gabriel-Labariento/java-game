@@ -101,54 +101,67 @@ public class GameClient {
         // Dispose loaded assets
         clientMaster.getEntities().clear();
 
-        Boolean isLoadingClientId = true;
-        Boolean isLoadingY = false;
-        Boolean isLoadingEntity = false;
+        boolean isLoadingClientId = true;
+        boolean isLoadingY = false;
+        boolean isLoadingHP = false;
+        boolean isLoadingEntity = false;
 
         Character identifier = null;
-        String strX = "";
-        String strY = "";
-        String cid = "";
+        StringBuilder assetX = new StringBuilder();
+        StringBuilder assetY = new StringBuilder();
+        StringBuilder assetHitPoints = new StringBuilder();
+        StringBuilder cid = new StringBuilder();
 
         int length = str.length();
         for (int i = 0; i < length; i++){
             char parsedChar = str.charAt(i);
 
-            //str is always in the form of "{clientiD}{identifier}{x},{y}{userPlayer indicator}{roomAsset indicator}"
+            //str format: "{clientiD}{identifier}{x},{y}{hitPoints}{userPlayer indicator}{roomAsset indicator}"
             if (Character.isLetter(parsedChar)){
                 if (isLoadingClientId){
-                    clientId = Integer.parseInt( (String) cid);
+                    clientId = Integer.parseInt(cid.toString());
                     isLoadingClientId = false;
                 }    
 
                 //Create new entity from previous data as new identifier is reached
-                if (isLoadingEntity && identifier != null){					
-                    loadAsset(identifier, Integer.parseInt(strX), Integer.parseInt(strY));
-                    isLoadingY = false;
+                if (isLoadingEntity && identifier != null){
+
+                    //Account for number format error when no assetHP is loaded		
+                    String strAssetHP = assetHitPoints.toString();
+                    int intAssetHP = 0;	
+                    if (!strAssetHP.equals("")) intAssetHP = Integer.parseInt(strAssetHP);	
+
+                    loadAsset(identifier, Integer.parseInt(assetX.toString()), Integer.parseInt(assetY.toString()), 
+                    intAssetHP);
                 }
                 
                 identifier = parsedChar;
-                strX = "";
-                strY = "";
+                assetX.setLength(0);
+                assetY.setLength(0);
+                assetHitPoints.setLength(0);
                 isLoadingEntity = true;
                 isLoadingY = false;
+                isLoadingHP = false;
             }
             else if (isLoadingClientId)
                 //Parse starting values as clientId
-                cid += parsedChar;
+                cid.append(parsedChar);
             else {
                 switch (parsedChar) {
                     //Check if userplayer identifier
                     case '$':
                         try {
-                            clientMaster.setUserPlayer(new Player(clientId, Integer.parseInt(strX), Integer.parseInt(strY)));
+                            clientMaster.setUserPlayer(new Player(clientId, Integer.parseInt(assetX.toString()), 
+                            Integer.parseInt(assetY.toString())));
+                            clientMaster.getUserPlayer().setHitPoints(Integer.parseInt(assetHitPoints.toString()));
                         } catch (Exception e) {
                             System.out.println("Exception at parseEntityData() of GameClient");
                         }
                         isLoadingEntity = false;
                         identifier = null;
-                        strX = "";
-                        strY = "";
+                        assetX.setLength(0);
+                        assetY.setLength(0);
+                        assetHitPoints.setLength(0);
                         break;
 
                     //Check if currentRoom identifier
@@ -159,21 +172,34 @@ public class GameClient {
                     case ',':
                         isLoadingY = true;
                         break;
+                    //Check if hitPoints delimiter
+                    case '@':
+                        isLoadingHP = true;
+                        break;
                     default:
-                        //Load x and y values
-                        if(!isLoadingY)
-                            strX += parsedChar;
-                        else
-                            strY += parsedChar;
+                        //Load hitPoints if indicator is reached, else load x and y
+                        if(isLoadingHP)
+                            assetHitPoints.append(parsedChar);
+                        else {
+                            if(isLoadingY)
+                                assetY.append(parsedChar);
+                            else
+                                assetX.append(parsedChar);
+                        }
                         break;
                 }
-            }}
+            }
+        }
     }
 
-    public void loadAsset(char identifier, int x, int y){
+    public void loadAsset(char identifier, int x, int y, int hp){
         String name = idToName.get(identifier);
-        if(name.equals("Player"))
-            clientMaster.addEntity(new Player(0, x, y));
+        if(name.equals("Player")){
+            Player newPlayer = new Player(0, x, y);
+            newPlayer.setHitPoints(hp);
+            clientMaster.addEntity(newPlayer);
+        }
+            
         else if(name.equals("PlayerSlash"))
             clientMaster.addEntity(new PlayerSlash(0, x, y, 80, 80, 0, false, 0));
     }

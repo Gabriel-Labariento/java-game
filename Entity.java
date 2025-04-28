@@ -9,9 +9,8 @@ public abstract class Entity {
     public int exWorldY;
     public int width;
     public int height;
-    public double mass;
-    public double health;
-    public double damage;
+    public int hitPoints;
+    public int damage;
     public int clientId;
     public int[] hitBoxBounds;
     public int endTime;
@@ -33,13 +32,11 @@ public abstract class Entity {
         
         matchHitBoxBounds();
     }
-
-    // public void apply
     
     public void matchHitBoxBounds(){}
 
-    public void changeHealth(double change){
-        health += change;
+    public void setHitPoints(int h){
+        hitPoints = h;
     }
 
     public void setWorldX (int x){
@@ -82,12 +79,12 @@ public abstract class Entity {
         return identifier;
     }
 
-    public double getDamage(){
+    public int getDamage(){
         return damage;
     }
 
-    public double getHealth(){
-        return health;
+    public int getHitPoints(){
+        return hitPoints;
     }
 
     public int getWidth(){
@@ -100,10 +97,6 @@ public abstract class Entity {
 
     public int getSpeed(){
         return speed;
-    }
-
-    public double getMass(){
-        return mass;
     }
 }
     

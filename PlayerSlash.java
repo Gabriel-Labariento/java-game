@@ -4,14 +4,14 @@ import java.awt.geom.*;
 
 public class PlayerSlash extends Attack{
 
-    public PlayerSlash(int cid, int x, int y, int w, int h, double damage, boolean isFriendly, int speed){
+    public PlayerSlash(int cid, int x, int y, int w, int h, int damage, boolean isFriendly, int speed){
         clientId = cid;
         identifier = 'B';
         this.isFriendly = isFriendly;
         this.speed = speed;
         this.damage = damage;
-        //Temporary health allocation
-        health = 100;
+        //Temporary hitPoints allocation
+        hitPoints = 100;
         height = h;
         width = w;
         worldX = x;

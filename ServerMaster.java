@@ -38,9 +38,9 @@ public class ServerMaster {
         //Collision checking
         checkCollisions();
 
-        //Remove entities that are either depleted of health or isExpired
+        //Remove entities that are either depleted of HitPoints or isExpired
         entities.removeIf(entity -> (entity instanceof Attack attack) && (attack.getIsExpired()));
-        entities.removeIf(entity -> (entity.getHealth() <= 0));
+        entities.removeIf(entity -> (entity.getHitPoints() <= 0));
     }
 
     public void checkCollisions(){
@@ -78,29 +78,30 @@ public class ServerMaster {
         //If entity is an attack and is friendly and if the second entity is an enemy, then the enemy takes damage.
         if (e1 instanceof Attack attack && ((!attack.getIsFriendly() && e2 instanceof Player) 
             || (attack.getIsFriendly() && e2 instanceof Enemy)))
-            e2.changeHealth(-e1.getDamage());
+            e2.setHitPoints(e2.getHitPoints()-e1.getDamage());
 
         else if (e2 instanceof Attack attack && ((!attack.getIsFriendly() && e1 instanceof Player) 
             || (attack.getIsFriendly() && e1 instanceof Enemy)))
-            e1.changeHealth(-e2.getDamage());
+            e1.setHitPoints(e1.getHitPoints()-e2.getDamage());
 
-        //PLAYER-PLAYER/ENEMY COLLISION HANDLING
+        //PLAYER/ENEMY COLLISION HANDLING
         //If player touches enemy, take damage and prevent overlap
         else if (e1 instanceof Player && e2 instanceof Enemy){
             preventOverlap(e1, e2, b1, b2);
-            e1.changeHealth(-e2.getDamage());
+            e1.setHitPoints(e1.getHitPoints()-e2.getDamage());
         }
 
         else if (e2 instanceof Player && e1 instanceof Enemy)
         {
             preventOverlap(e1, e2, b1, b2);
-            e2.changeHealth(-e1.getDamage());
+            e2.setHitPoints(e2.getHitPoints()-e1.getDamage());
         }
 
-        else if (e1 instanceof Player && e2 instanceof Player){
+        else if (e1 instanceof Player && e2 instanceof Player)
             preventOverlap(e1, e2, b1, b2);
-            System.out.println("corrected");
-        }
+        else if (e1 instanceof Enemy && e2 instanceof Enemy)
+            preventOverlap(e1, e2, b1, b2);
+        
 
     }
 
@@ -270,7 +271,7 @@ public class ServerMaster {
         //Temporary debouncing check
         if (playerAttack != null) return;
 
-        double attackDamage = originPlayer.getDamage();
+        int attackDamage = originPlayer.getDamage();
         int attackSpeed = originPlayer.getSpeed();
         int frameWidth = 720;
         int frameHeight = 540;

@@ -12,11 +12,10 @@ public class Player extends Entity{
         speed = 5;
         height = 50;
         width = 50;
-        health = 10;
+        hitPoints = 3;
         damage = 5;
         worldX = x;
         worldY = y;
-        mass = 1;
         matchHitBoxBounds();
     }
  
@@ -43,5 +42,10 @@ public class Player extends Entity{
         hitBoxBounds[1] = worldY + height;
         hitBoxBounds[2]= worldX;
         hitBoxBounds[3] = worldX + width;
+    }
+
+    @Override
+    public String getAssetData(){
+        return "" + identifier + worldX + ',' + worldY + '@' + hitPoints;
     }
 }
