@@ -71,67 +71,6 @@ public class ServerMaster {
         }   
     }
 
-
-    // //Use as if(checkRayRectCollision() && t < 1)
-    // public boolean checkRayRectCollision(int[] rayOriginPoint, int[] rayDirectionVector, Entity target, 
-    // int[] contactPoint, int[] contactNormal, double tHitNear){
-    //     int[] tNear = new int[2];
-    //     //Calculate for x and y separately
-    //     tNear[0] = (target.getWorldX() - rayOriginPoint[0]) / rayDirectionVector[0];
-    //     tNear[1] = (target.getWorldY() - rayOriginPoint[1]) / rayDirectionVector [1];
-
-    //     int[] tFar = new int[2];
-    //     //Calculate for x and y separately
-    //     tFar[0] = (target.getWorldX() + target.getWidth()- rayOriginPoint[0]) / rayDirectionVector[0];
-    //     tFar[1] = (target.getWorldY() + target.getHeight() - rayOriginPoint[1]) / rayDirectionVector [1];
-
-    //     //Check if there are intersections
-
-    //     if (tNear[0] > tFar[1] || tNear[1] > tFar[0]) return false;
-
-    //     int temp;
-    //     //Swap values depending on orientation of the ray
-    //     if (tNear[0] > tFar[0]){
-    //         temp = tNear[0];
-    //         tNear[0] = tFar[0];
-    //         tFar[0] = tNear[0];
-    //     }
-    //     if (tNear[1] > tFar[1]){
-    //         temp = tNear[1];
-    //         tNear[1] = tFar[1];
-    //         tFar[1] = tNear[1];
-    //     }
-
-    //     tHitNear = Integer.max(tNear[0], tNear[1]);
-    //     int tHitFar = Integer.min(tFar[0], tFar[1]);
-
-    //     contactPoint[0] = (int) (rayOriginPoint[0] + tHitNear * rayDirectionVector[0]);
-
-    //     if (tNear[0] > tNear[1]){
-    //         if(rayDirectionVector[0] < 0)
-    //             contactNormal[0] = 1;
-    //         else
-    //             contactNormal[0] = -1;
-
-    //         contactNormal[1] = 0;
-    //     }
-    //     else if (tNear[0] < tNear[1]){
-    //         if(rayDirectionVector[0] < 0)
-    //             contactNormal[1] = 1;
-    //         else
-    //             contactNormal[1] = -1;
-            
-    //         contactNormal[0] = 0;
-    //     }
-
-    //     return true;
-
-
-        //Does not account for collisions opposite the ray direction
-        //if (tHitFar < 0) return false;
-
-    // }
-
     public void resolveCollision(Entity e1, Entity e2, int[] b1, int[] b2){
 
         //ATTACK-PLAYER/ENEMY COLLISION HANDLING
@@ -259,10 +198,12 @@ public class ServerMaster {
         //Add a minimum overlap threshold in order to minimize constant correction
         double overlapThreshold = 5;
         if (overlap > overlapThreshold){
-            e1.setWorldX((int)(e1.getWorldX() - unitNormal[0] * overlap / 2));
-            e1.setWorldY((int)(e1.getWorldY() - unitNormal[1] * overlap / 2));
-            e2.setWorldX((int)(e2.getWorldX() + unitNormal[0] * overlap / 2));
-            e2.setWorldY((int)(e2.getWorldY() + unitNormal[1] * overlap / 2));
+            //Divide overlap by an arbitrary number to smooth out the visual resolution of the collision
+            double resolutionFactor = overlap / 8;
+            e1.setWorldX((int)(e1.getWorldX() - unitNormal[0] * resolutionFactor));
+            e1.setWorldY((int)(e1.getWorldY() - unitNormal[1] * resolutionFactor));
+            e2.setWorldX((int)(e2.getWorldX() + unitNormal[0] * resolutionFactor));
+            e2.setWorldY((int)(e2.getWorldY() + unitNormal[1] * resolutionFactor));
         }
 
         e1.matchHitBoxBounds();
