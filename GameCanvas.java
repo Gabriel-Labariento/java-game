@@ -21,7 +21,7 @@ public class GameCanvas extends JComponent {
         clientState = new ClientMaster();
         dataHandler = new GameClient(clientState);
         setPreferredSize(new Dimension(width, height));
-        tileManager = new TileManager(this);
+        tileManager = new TileManager();
     }
 
     @Override

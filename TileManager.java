@@ -3,14 +3,10 @@ import java.io.*;
 import javax.imageio.ImageIO;
 
 public final class TileManager {
-    private GameCanvas gc;
     public Tile[] tileImages;
-    private int[][] mapTileNum;
 
-    public TileManager(GameCanvas gc) {
-        this.gc = gc;
+    public TileManager() {
         tileImages = new Tile[24];
-        mapTileNum = null;
         setTileImages();
         // loadMap();
     }
@@ -148,17 +144,17 @@ public final class TileManager {
 
             // Open Door Top Left
             tile[20] = new Tile();
-            tile[20].image = ImageIO.read(getClass().getResourceAsStream("Tile Images\\tile16.png"));
+            tile[20].image = ImageIO.read(getClass().getResourceAsStream("Tile Images\\tile20.png"));
 
             // Open Door Top Right
             tile[21] = new Tile();
-            tile[21].image = ImageIO.read(getClass().getResourceAsStream("Tile Images\\tile17.png"));
+            tile[21].image = ImageIO.read(getClass().getResourceAsStream("Tile Images\\tile21.png"));
 
             // Open Door Bottom Left
             tile[22] = new Tile();
-            tile[22].image = ImageIO.read(getClass().getResourceAsStream("Tile Images\\tile18.png"));
+            tile[22].image = ImageIO.read(getClass().getResourceAsStream("Tile Images\\tile22.png"));
 
             // Open Door Bottom Right
             tile[23] = new Tile();
-            tile[23].image = ImageIO.read(getClass().getResourceAsStream("Tile Images\\tile19.png"));
+            tile[23].image = ImageIO.read(getClass().getResourceAsStream("Tile Images\\tile23.png"));
 */

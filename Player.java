@@ -3,8 +3,10 @@ import java.awt.Graphics2D;
 import java.awt.geom.*;
 
 public class Player extends Entity{
-    private int screenX;
-    private int screenY;
+    private static final int invincibilityDuration = 800;
+    private long invincibilityEnd;
+    private final int screenX;
+    private final int screenY;
 
     public Player(int cid, int x, int y){
         this.clientId = cid;
@@ -17,8 +19,10 @@ public class Player extends Entity{
         worldX = x;
         worldY = y;
         maxHealth = 50;
-        health = maxHealth;
+        hitPoints = maxHealth;
     }
+
+   
 
     @Override
     public void draw(Graphics2D g2d, int xOffset, int yOffset){
@@ -28,6 +32,9 @@ public class Player extends Entity{
     }
 
     public void update(char input){
+        prevWorldX = worldX;
+        prevWorldY = worldY;
+
         if(input == 'W') {
             if (isMoveInbound(0, -1 * speed)) worldY -= speed;
         }
@@ -40,9 +47,28 @@ public class Player extends Entity{
         if(input == 'D') {
             if (isMoveInbound(speed, 0)) worldX += speed;
         }
+        matchHitBoxBounds();
     }
 
-    
+    @Override
+    public void matchHitBoxBounds() {
+        hitBoxBounds = new int[4];
+        hitBoxBounds[0]= worldY;
+        hitBoxBounds[1] = worldY + height;
+        hitBoxBounds[2]= worldX;
+        hitBoxBounds[3] = worldX + width;
+    }
+
+    /**
+     * 
+     */
+    public void triggerInvincibility(){
+        invincibilityEnd = System.currentTimeMillis() + invincibilityDuration;
+    }
+
+    public boolean getIsInvincible(){
+        return System.currentTimeMillis() >= invincibilityEnd;
+    }
 
     /**
      * Builds a String storing room transition data in the form RC:clientId,newX,newY,destinationRoomId
@@ -132,7 +158,7 @@ public class Player extends Entity{
     /**
      * {@inheritDoc }
      * @param isUserPlayer true if the calling player is the user player, false otherwise
-     * @return a string in the possible forms: RC:clientId,newX,newY,destinationRoomId or clientId,newX,newY,currentRoomId 
+     * @return a string in the possible forms: RC:clifntId,newX,newY,destinationRoomId or clientId,newX,newY,currentRoomId 
      */
     @Override
     public String getAssetData(boolean isUserPlayer){

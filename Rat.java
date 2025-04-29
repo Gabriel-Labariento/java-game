@@ -16,9 +16,15 @@ public class Rat extends Enemy{
         worldX = x;
         worldY = y;
         maxHealth = 10;
-        health = maxHealth;
+        hitPoints = maxHealth;
         currentRoom = null;
         isIdle = true;
+    }
+
+    @Override
+    public void matchHitBoxBounds() {
+        // TODO Auto-generated method stub
+        
     }
 
     @Override

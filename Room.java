@@ -96,6 +96,12 @@ public class Room extends GameObject implements Tileable{
     }
 
     
+    @Override
+    public void matchHitBoxBounds() {
+        // TODO Auto-generated method stub
+        
+    }
+
     public int[][] loadLayoutFromFile() {
         int layout[][] = new int[HEIGHT_TILES][WIDTH_TILES];
         // Check what type of object it is. TODO: MAKE PRETTIER

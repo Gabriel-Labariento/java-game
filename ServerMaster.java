@@ -1,4 +1,5 @@
-import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.*;
+import java.util.*;
 
 public class ServerMaster {
     private CopyOnWriteArrayList<Entity> entities;
@@ -7,6 +8,9 @@ public class ServerMaster {
     private Room currentRoom;
     private static int gameLevel = 0; // TODO: INCREMENT WHEN DEFEAT BOSS
     private static final int MAX_LEVEL = 7;
+    private HashMap<Character, Integer> keyInputQueue;
+    private ArrayList<ClickInput> clickInputQueue;
+
 
     private static ServerMaster singleInstance = null;
 
@@ -15,7 +19,10 @@ public class ServerMaster {
         userPlayerIndex = -1;
         dungeonMap = new DungeonMap(gameLevel);
         dungeonMap.generateRooms(3);
-        currentRoom = dungeonMap.getStartRoom(); 
+        currentRoom = dungeonMap.getStartRoom();
+        //-----------------------------//
+        keyInputQueue = new HashMap<>();
+        clickInputQueue = new ArrayList<>();
     }
 
 
@@ -23,6 +30,201 @@ public class ServerMaster {
         if (singleInstance == null) singleInstance = new ServerMaster();
         return singleInstance;
     }
+
+    public void update(){
+         // Do not update the game at start of the gameserver (no entities yet)
+        if (entities.isEmpty()) return;
+
+        // Update objects accordingly to the inputs
+        processInputs();
+
+        checkCollisions();
+
+         // Remove entities that are either depleted of HitPoints or isExpired
+        entities.removeIf(entity -> (entity instanceof Attack attack) && (attack.getIsExpired()));
+        entities.removeIf(entity -> (entity.getHitPoints() <= 0));
+    }
+
+    // Checks for collisions between all objects inside the entity ArrayList
+    public void checkCollisions(){
+        //SORT, SWEEP, AND, PRUNE DETECTION
+
+        //Make a new arraylist containing all of the elements of entities
+        ArrayList<Entity> sortedEntities = new ArrayList<>(entities);
+
+        //Sort entities from the universal arraylist by their worldx values (left bounds)
+        Collections.sort(sortedEntities, Comparator.comparingInt(e -> e.getHitBoxBounds()[2]));
+
+        int size = sortedEntities.size();
+        for(int i = 0; i < size; i++){
+            Entity entity1 = sortedEntities.get(i);
+            int[] b1 = entity1.getHitBoxBounds();
+            
+            // Get the entity at the next index
+            for(int j = (i+1); j < size; j++){
+                Entity entity2 = sortedEntities.get(j);
+                int[] b2 = entity2.getHitBoxBounds();
+                
+                //Skip detection if the second entity starts after the first ends on the x-axis
+                if(b2[2]>b1[3]) break;
+
+                //Check for collisions in the top, bottom, left, right of entity1 against entity2
+                if (b1[0] < b2[1] && b1[1] > b2[0] && b1[2] < b2[3] && b1[3] > b2[2]){
+                    resolveCollision(entity1, entity2, b1, b2);
+                }
+            }
+        }   
+    }
+
+
+    public void resolveCollision(Entity e1, Entity e2, int[] b1, int[] b2){
+
+        // ATTACK-PLAYER/ENEMY COLLISION HANDLING
+        // If entity is an attack and is not friendly and if the second entity is a player, then the player takes damage.
+        // If entity is an attack and is friendly and if the second entity is an enemy, then the enemy takes damage.
+        
+        if (e1 instanceof Attack attack && ((!attack.getIsFriendly() && e2 instanceof Player) 
+            || (attack.getIsFriendly() && e2 instanceof Enemy)))
+            e2.setHitPoints(e2.getHitPoints()-e1.getDamage());
+
+        else if (e2 instanceof Attack attack && ((!attack.getIsFriendly() && e1 instanceof Player) 
+            || (attack.getIsFriendly() && e1 instanceof Enemy)))
+            e1.setHitPoints(e1.getHitPoints()-e2.getDamage());
+
+        //PLAYER/ENEMY COLLISION HANDLING
+        //If player touches enemy, take damage and prevent overlap
+        else if (e1 instanceof Player && e2 instanceof Enemy){
+            preventOverlap(e1, e2, b1, b2);
+            e1.setHitPoints(e1.getHitPoints()- e2.getDamage());
+        }
+
+        else if (e2 instanceof Player && e1 instanceof Enemy)
+        {
+            preventOverlap(e1, e2, b1, b2);
+            e2.setHitPoints(e2.getHitPoints()-e1.getDamage());
+        }
+
+        else if (e1 instanceof Player && e2 instanceof Player)
+            preventOverlap(e1, e2, b1, b2);
+        else if (e1 instanceof Enemy && e2 instanceof Enemy)
+            preventOverlap(e1, e2, b1, b2);
+        
+
+    }
+
+    private void preventOverlap(Entity e1, Entity e2, int[] b1, int[] b2){
+
+        //Get the position vectors of both entities
+        int[] positionVector1 = new int[2];
+        positionVector1[0] = e1.getWorldX() + e1.getWidth()/2;
+        positionVector1[1] = e1.getWorldY() + e1.getHeight()/2;
+
+        int[] positionVector2 = new int[2];
+        positionVector2[0] = e2.getWorldX() + e2.getWidth()/2;
+        positionVector2[1] = e2.getWorldY() + e2.getHeight()/2;
+
+        //Find the unit normal and unit tangent vectors
+        int[] normalVector = new int[2];
+        normalVector[0] = positionVector2[0] - positionVector1[0];
+        normalVector[1] = positionVector2[1] - positionVector1[1];
+
+        double normalVectorMagnitude = Math.sqrt((normalVector[0]*normalVector[0]) + (normalVector[1]*normalVector[1]));
+        double[] unitNormal = new double[2];
+        unitNormal[0] = normalVector[0]/normalVectorMagnitude;
+        unitNormal[1] = normalVector[1]/normalVectorMagnitude;
+
+        //Get the overlaps on both axes
+        double overlapX = Math.min(b1[3], b2[3]) - Math.max(b1[2], b2[2]);
+        double overlapY = Math.min(b1[1], b2[1]) - Math.max(b1[0], b2[0]);
+
+        //Get the dot product of the overlaps and their respective unit normals
+        double overlap = overlapX * Math.abs(unitNormal[0]) + overlapY * Math.abs(unitNormal[1]);
+
+        //Add a minimum overlap threshold in order to minimize constant correction
+        double overlapThreshold = 5;
+        if (overlap > overlapThreshold){
+            //Divide overlap by an arbitrary number to smooth out the visual resolution of the collision
+            double resolutionFactor = overlap / 8;
+            e1.setWorldX((int)(e1.getWorldX() - unitNormal[0] * resolutionFactor));
+            e1.setWorldY((int)(e1.getWorldY() - unitNormal[1] * resolutionFactor));
+            e2.setWorldX((int)(e2.getWorldX() + unitNormal[0] * resolutionFactor));
+            e2.setWorldY((int)(e2.getWorldY() + unitNormal[1] * resolutionFactor));
+        }
+
+        e1.matchHitBoxBounds();
+        e2.matchHitBoxBounds();
+
+    }
+
+    private void processInputs(){
+        keyInputQueue.forEach((key, cid) ->{
+            Player player = (Player) getPlayerFromClientId(cid);
+            player.update(key);
+            // player.setVelocity();
+        });
+        keyInputQueue.clear();
+
+        clickInputQueue.forEach((clickInput) -> {processClickInput(clickInput.x, clickInput.y, clickInput.cid);});
+        clickInputQueue.clear();
+    }
+
+    public void loadKeyInput(char input, int cid){
+        keyInputQueue.put(input, cid);
+    }
+
+    public void loadClickInput(int x, int y, int cid){
+        clickInputQueue.add(new ClickInput(x, y, cid));
+    }
+
+    public void processClickInput(int clickX, int clickY, int cid){
+        
+        Player originPlayer = (Player) getPlayerFromClientId(cid);
+        Attack playerAttack = (Attack) getAttackFromClientId(cid);
+
+        //Temporary debouncing check
+        if (playerAttack != null) return;
+
+        double attackDamage = originPlayer.getDamage();
+        int attackSpeed = originPlayer.getSpeed();
+        int frameWidth = 720;
+        int frameHeight = 540;
+        int centerX = frameWidth/2;
+        int centerY = frameHeight/2;
+
+        //Get a point a set distance away from the center of the screen in the direction of the click
+        int vectorX = clickX - centerX;
+        int vectorY = clickY - centerY;  
+        int distance = 50;
+        double normalizedVector = Math.sqrt((vectorX*vectorX)+(vectorY*vectorY));
+
+        //Avoids 0/0 division edge case
+        if (normalizedVector == 0) normalizedVector = 1; 
+        double normalizedX = vectorX/normalizedVector;
+        double normalizedY = vectorY/normalizedVector;
+        int attackScreenX = (int) (centerX + distance*normalizedX);
+        int attackScreenY = (int) (centerY + distance*normalizedY);
+
+        int playerScreenX = frameWidth/2 - originPlayer.getWidth()/2;
+        int playerScreenY = frameHeight/2 - originPlayer.getHeight()/2;
+
+        int worldX = (originPlayer.getWorldX() - playerScreenX) + attackScreenX;
+        int worldY = (originPlayer.getWorldY() - playerScreenY) + attackScreenY;
+
+        //TODO: If originPlayer is of different type, instantiate another type of attack
+        int attackWidth;
+        int attackHeight;
+        if(true){
+            attackWidth = 80;
+            attackHeight = 80;
+            playerAttack = new PlayerSlash(cid, worldX-attackWidth/2, worldY - attackHeight/2, 
+            attackWidth, attackHeight, attackDamage, true, attackSpeed);
+        } //else {}//
+        
+        entities.add(playerAttack);
+                
+    }
+
+
 
     /**
      * Increments the static gameLevel field if it is less than MAX_LEVEL
@@ -232,4 +434,22 @@ public class ServerMaster {
     public int getGameLevel() {
         return gameLevel;
     }
+
+    public Entity getAttackFromClientId(int cid){
+        for (Entity entity : entities) {
+            if (entity instanceof Attack && entity.getClientId() == cid) return entity;
+        }
+        return null;
+    }
+
+    // Stores the x and y coordinates, as well as the client id of the click input.
+    private static class ClickInput{
+        private int x, y, cid;
+
+        public ClickInput(int x, int y, int cid){
+            this.x = x;
+            this.y = y;
+            this.cid = cid;
+        }
+    } 
 }

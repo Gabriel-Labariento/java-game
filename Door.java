@@ -8,6 +8,8 @@ public class Door extends GameObject implements Tileable {
     private Room roomA, roomB; // The door only appears on roomA, but is connected to another door in roomB 
     private boolean isOpen;
     
+    
+
     private static int doorCount = 0;
     private static final int[][] CLOSED_DOOR_LAYOUT = {{16,17}, {18,19}};
     private static final int[][] OPEN_DOOR_LAYOUT = {{20,21}, {22,23}};
@@ -37,6 +39,13 @@ public class Door extends GameObject implements Tileable {
         return (current == roomA) ? roomB : roomA;
     }
 
+    @Override
+    public void matchHitBoxBounds() {
+        // TODO Auto-generated method stub
+        
+    }
+
+    
     /**
      * Returns a string containing the door data
      * @return a string with the format D:doorId,x,y,direction,roomAId,roomBId

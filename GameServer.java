@@ -68,7 +68,7 @@ public class GameServer {
         public ConnectedPlayer(Socket sck, int n){
             clientSocket = sck;
             cid = n;
-            gameStateManager.addEntity((new Player(cid, 300, 300)));
+            gameStateManager.addEntity((new Player(cid, gameStateManager.getCurrentRoom().getCenterX(), gameStateManager.getCurrentRoom().getCenterY())));
             try {
                 dataIn = new DataInputStream(clientSocket.getInputStream());
                 dataOut = new DataOutputStream(clientSocket.getOutputStream());

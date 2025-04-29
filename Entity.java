@@ -2,12 +2,13 @@ import java.awt.Graphics2D;
 
 public abstract class Entity extends GameObject {
     protected char identifier;
+    protected int prevWorldX;
+    protected int prevWorldY;
     protected int speed;
     protected double maxHealth;
-    protected double health;
+    protected double hitPoints;
     protected double damage;
     protected int clientId;
-    int[][] hitBoxBounds;
     Room currentRoom; 
 
     public void draw(Graphics2D g2d, int xOffset, int yOffset){}
@@ -43,21 +44,9 @@ public abstract class Entity extends GameObject {
      * @return true if the entity is dead, false otherwise.
      */
     public boolean isDead(){
-        return (health <= 0);
+        return (hitPoints <= 0);
     }
 
-    // FOR TRANSFER
-    // public byte[] getByteData(){
-    //     ByteBuffer buffer = ByteBuffer.allocate(40);
-    //     buffer.putInt(identifier);
-    //     buffer.putInt(worldX);
-    //     buffer.putInt(worldY);
-    //     buffer.putInt(width);
-    //     buffer.putInt(height);
-    //     buffer.putDouble(health);
-    //     buffer.putDouble(attack);
-    //     return buffer.array();
-    // }
 
     public Room getCurrentRoom() {
         return currentRoom;
@@ -73,6 +62,30 @@ public abstract class Entity extends GameObject {
 
     public void setWorldY(int worldY) {
         this.worldY = worldY;
+    }
+
+    public int getPrevWorldX() {
+        return prevWorldX;
+    }
+
+    public int getPrevWorldY() {
+        return prevWorldY;
+    }
+
+    public int getSpeed() {
+        return speed;
+    }
+
+    public double getHitPoints() {
+        return hitPoints;
+    }
+
+    public double getDamage() {
+        return damage;
+    }
+
+    public void setHitPoints(double hP) {
+        hitPoints = hP;
     }
 
 }

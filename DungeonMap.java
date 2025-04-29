@@ -161,16 +161,10 @@ public class DungeonMap {
     private void createRoomsNoConnections(int numRooms) {
         int x = 0;
         int y = 0;
-        int distance = 100; // Rooms will never collide unless roomSize > 100
 
         // Create the rooms, no connections yet
         for (int i = 0; i < numRooms; i++) {
             Room r = new Room(i, x, y);
-
-            // Separate the room by 100px to never collide
-            x += distance;
-            y += distance;
-
             rooms.add(r);
         }
     }

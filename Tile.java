@@ -9,6 +9,13 @@ public class Tile extends GameObject{
 
     public BufferedImage defaultFloorImage;
 
+
+    @Override
+    public void matchHitBoxBounds() {
+        // TODO Auto-generated method stub
+        
+    }
+
     // private int x, y;
     // public static final int SIZE = 16;
 
