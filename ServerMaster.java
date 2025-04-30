@@ -1,5 +1,5 @@
-import java.util.concurrent.*;
 import java.util.*;
+import java.util.concurrent.*;
 
 public class ServerMaster {
     private CopyOnWriteArrayList<Entity> entities;
@@ -8,7 +8,7 @@ public class ServerMaster {
     private Room currentRoom;
     private static int gameLevel = 0; // TODO: INCREMENT WHEN DEFEAT BOSS
     private static final int MAX_LEVEL = 7;
-    private HashMap<Character, Integer> keyInputQueue;
+    private ConcurrentHashMap<Character, Integer> keyInputQueue;
     private ArrayList<ClickInput> clickInputQueue;
 
 
@@ -21,7 +21,7 @@ public class ServerMaster {
         dungeonMap.generateRooms(3);
         currentRoom = dungeonMap.getStartRoom();
         //-----------------------------//
-        keyInputQueue = new HashMap<>();
+        keyInputQueue = new ConcurrentHashMap<>();
         clickInputQueue = new ArrayList<>();
     }
 
@@ -32,7 +32,8 @@ public class ServerMaster {
     }
 
     public void update(){
-         // Do not update the game at start of the gameserver (no entities yet)
+        // Do not update the game at start of the gameserver (no entities yet)
+        //  System.out.println("Entities array size: " + entities.size());
         if (entities.isEmpty()) return;
 
         // Update objects accordingly to the inputs
@@ -48,32 +49,71 @@ public class ServerMaster {
     // Checks for collisions between all objects inside the entity ArrayList
     public void checkCollisions(){
         //SORT, SWEEP, AND, PRUNE DETECTION
+        try {
+            //Make a new arraylist containing all of the elements of entities
+            ArrayList<Entity> sortedEntities = new ArrayList<>(entities);
 
-        //Make a new arraylist containing all of the elements of entities
-        ArrayList<Entity> sortedEntities = new ArrayList<>(entities);
-
-        //Sort entities from the universal arraylist by their worldx values (left bounds)
-        Collections.sort(sortedEntities, Comparator.comparingInt(e -> e.getHitBoxBounds()[2]));
-
-        int size = sortedEntities.size();
-        for(int i = 0; i < size; i++){
-            Entity entity1 = sortedEntities.get(i);
-            int[] b1 = entity1.getHitBoxBounds();
-            
-            // Get the entity at the next index
-            for(int j = (i+1); j < size; j++){
-                Entity entity2 = sortedEntities.get(j);
-                int[] b2 = entity2.getHitBoxBounds();
+            //Sort entities from the universal arraylist by their worldx values (left bounds)
+            Collections.sort(sortedEntities, Comparator.comparingInt(e -> e.getHitBoxBounds()[2]));
+            // System.out.println("Number of entities in sortedEntities " + sortedEntities.size());
+            int size = sortedEntities.size();
+            for(int i = 0; i < size; i++){
+                Entity entity1 = sortedEntities.get(i);
+                int[] b1 = entity1.getHitBoxBounds();
+                // int[] b1 = null;
+                // try {
+                //     b1 = entity1.getHitBoxBounds();
+                //     // System.out.println("B1 Hitbox bounds: " + Arrays.toString(b1));
+                // } catch (Exception e) {
+                //     System.err.println("Erorr getting hitbox for " + entity1.getClass() + ": " + e.getMessage() );
+                //     continue;
+                // }
                 
-                //Skip detection if the second entity starts after the first ends on the x-axis
-                if(b2[2]>b1[3]) break;
+                // Get the entity at the next index
+                for(int j = (i+1); j < size; j++){
+                    Entity entity2 = sortedEntities.get(j);
+                    if (entity2 == null) {
+                        System.out.println("entity 2 is null in sortedEntities");
+                        continue;
+                    }
 
-                //Check for collisions in the top, bottom, left, right of entity1 against entity2
-                if (b1[0] < b2[1] && b1[1] > b2[0] && b1[2] < b2[3] && b1[3] > b2[2]){
-                    resolveCollision(entity1, entity2, b1, b2);
+                    if (entity1 instanceof Player && entity2 instanceof Attack ||
+                        entity2 instanceof Player && entity1 instanceof Attack) {
+                            Player player = entity1 instanceof Player ? (Player) entity1 : (Player) entity2;
+                            Attack attack = entity1 instanceof Attack ? (Attack) entity1 : (Attack) entity2;
+                        
+                            if (attack.getClientId() == player.getClientId()) continue; // don't process attack is from the player
+                        }
+
+                    int[] b2 = entity2.getHitBoxBounds();
+
+
+
+
+                    // int[] b2 = null;
+                    // try {
+                    //     b2 = entity2.getHitBoxBounds();
+                    //     System.out.println("B2 Hitbox bounds: " + Arrays.toString(b2));
+                    // } catch (Exception e) {
+                    //     System.err.println("Erorr getting hitbox for " + entity2.getClass() + ": " + e.getMessage() );
+                    //     e.printStackTrace();
+                    //     continue;
+                    // }
+
+                    
+                    //Skip detection if the second entity starts after the first ends on the x-axis
+                    if(b2[2]>b1[3]) break;
+
+                    //Check for collisions in the top, bottom, left, right of entity1 against entity2
+                    if (b1[0] < b2[1] && b1[1] > b2[0] && b1[2] < b2[3] && b1[3] > b2[2]){
+                        resolveCollision(entity1, entity2, b1, b2);
+                    }
                 }
-            }
-        }   
+            }   
+        } catch (Exception e) {
+            System.err.println("Exception in check collisions: " + e);
+        }
+        
     }
 
 
@@ -158,9 +198,10 @@ public class ServerMaster {
 
     private void processInputs(){
         keyInputQueue.forEach((key, cid) ->{
-            Player player = (Player) getPlayerFromClientId(cid);
-            player.update(key);
+            System.out.println("Processing input: " + key + "," + cid);
+            ((Player) getPlayerFromClientId(cid)).update(key);
             // player.setVelocity();
+           
         });
         keyInputQueue.clear();
 
@@ -170,6 +211,8 @@ public class ServerMaster {
 
     public void loadKeyInput(char input, int cid){
         keyInputQueue.put(input, cid);
+        // System.out.println("Key: " + input);
+        // System.out.println("cid: " + cid);
     }
 
     public void loadClickInput(int x, int y, int cid){
@@ -177,12 +220,13 @@ public class ServerMaster {
     }
 
     public void processClickInput(int clickX, int clickY, int cid){
-        
+        // System.out.println("Processing clickc input for player: " + cid);
+
         Player originPlayer = (Player) getPlayerFromClientId(cid);
         Attack playerAttack = (Attack) getAttackFromClientId(cid);
 
         //Temporary debouncing check
-        if (playerAttack != null) return;
+        // if (playerAttack != null) return;
 
         double attackDamage = originPlayer.getDamage();
         int attackSpeed = originPlayer.getSpeed();
@@ -213,15 +257,16 @@ public class ServerMaster {
         //TODO: If originPlayer is of different type, instantiate another type of attack
         int attackWidth;
         int attackHeight;
-        if(true){
-            attackWidth = 80;
-            attackHeight = 80;
+        if (true){
+            attackWidth = 40;
+            attackHeight = 40;
             playerAttack = new PlayerSlash(cid, worldX-attackWidth/2, worldY - attackHeight/2, 
             attackWidth, attackHeight, attackDamage, true, attackSpeed);
+            playerAttack.matchHitBoxBounds();
+            playerAttack.setCurrentRoom(originPlayer.getCurrentRoom());
         } //else {}//
-        
-        entities.add(playerAttack);
-                
+        entities.add(playerAttack); 
+        System.out.println("Created PlayerSlash: " + playerAttack.getId() + " at (" + playerAttack.getWorldX() + ", " + playerAttack.getWorldX() + ")");
     }
 
 
@@ -308,7 +353,7 @@ public class ServerMaster {
                 .append(NetworkProtocol.DELIMITER);
             } else if (!(entity instanceof  Player)) {
                 // NPCs ex. E:B,id,x,y,currentRoomId| => Rat with id at currentRoomId (x,y)
-                if (entity == null) break;
+                if (entity == null) continue;
                 sb.append(NetworkProtocol.ENTITY)
                 .append(entity.getAssetData(false));  
             } 
@@ -337,13 +382,15 @@ public class ServerMaster {
             int clientId = Integer.parseInt(dataParts[0].substring((NetworkProtocol.ROOM_CHANGE).length()));
             int newX = Integer.parseInt(dataParts[1]);
             int newY = Integer.parseInt(dataParts[2]);
-            int newRoomId = Integer.parseInt(dataParts[3]);
+            double hp = Double.parseDouble(dataParts[3]);
+            int newRoomId = Integer.parseInt(dataParts[4]);
 
             // Use the data to set relevant fields
             Room newRoom = dungeonMap.getRoomFromId(newRoomId);
             userPlayer.setWorldX(newX);
             userPlayer.setWorldY(newY);
             userPlayer.setCurrentRoom(newRoom);
+            userPlayer.setHitPoints(hp);
             currentRoom = newRoom;
             handleSpawnersOnRoomChange(newRoom);
             currentRoom.closeDoors();
@@ -353,6 +400,7 @@ public class ServerMaster {
             .append(clientId).append(NetworkProtocol.SUB_DELIMITER)
             .append(newX).append(NetworkProtocol.SUB_DELIMITER)
             .append(newY).append(NetworkProtocol.SUB_DELIMITER)
+            .append(hp).append(NetworkProtocol.SUB_DELIMITER)
             .append(newRoomId).append(NetworkProtocol.DELIMITER);
 
             // System.out.println("String returned by handleRoomTransition: " + sb.toString());
@@ -444,7 +492,7 @@ public class ServerMaster {
 
     // Stores the x and y coordinates, as well as the client id of the click input.
     private static class ClickInput{
-        private int x, y, cid;
+        public int x, y, cid;
 
         public ClickInput(int x, int y, int cid){
             this.x = x;

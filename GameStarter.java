@@ -10,7 +10,3 @@ public class GameStarter {
 
     }
 }
-
-// Don't delete yet: used for testing map serialization.
-// GameStateManager gsm = new GameStateManager(3);
-//         System.out.println(gsm.getMapData());

@@ -1,5 +1,6 @@
 public abstract class Attack extends Entity{
     public int duration;
+    private int id;
     public long expirationTime;
     public boolean isExpired;
     public boolean isFriendly;
@@ -19,5 +20,13 @@ public abstract class Attack extends Entity{
 
     public boolean getIsFriendly(){
         return isFriendly;
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
     }
 }

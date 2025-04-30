@@ -110,6 +110,10 @@ public abstract class GameObject {
     }
 
     public int[] getHitBoxBounds() {
+        if (hitBoxBounds == null) {
+            System.err.println("hit box bounds is null for object");
+            return new int[] {worldY, worldY + height, worldX, worldX + width};
+        }
         return hitBoxBounds;
     }
 

@@ -4,8 +4,7 @@ import javax.swing.*;
 
 public class GameCanvas extends JComponent {
     public static final int TILESIZE = 16;
-    private static final int GAMELOOPINTERVAL = 16;
-    private static final int FPS = 60;
+    private static final int REFRESHINTERVAL = 16;
     private int width, height;
     private GameClient dataHandler;
     private ClientMaster clientState;
@@ -80,7 +79,7 @@ public class GameCanvas extends JComponent {
     public void startRenderLoop(){
         //Since putting Thread.sleep in a loop as necessary for this Loop is bad, use ScheduledExecutorService instead
         final Runnable renderLoop = this::repaint;
-        renderLoopScheduler.scheduleAtFixedRate(renderLoop, 0, ((long)1000/FPS), TimeUnit.MILLISECONDS);
+        renderLoopScheduler.scheduleAtFixedRate(renderLoop, 0, REFRESHINTERVAL, TimeUnit.MILLISECONDS);
     }
 
     public ClientMaster getClientState() {

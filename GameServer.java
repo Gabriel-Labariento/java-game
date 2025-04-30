@@ -1,32 +1,74 @@
 import java.io.*;
 import java.net.*;
 import java.util.*;
+import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.Executors;
+import java.util.concurrent.LinkedBlockingDeque;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 public class GameServer {
     private static final int GAMELOOPINTERVAL = 16;
+    private static final int TICKSPERSECOND = 60;
     private ServerSocket ss;
     private ArrayList<Socket> sockets;
     private ServerMaster gameStateManager;
+    private ArrayList<ConnectedPlayer> connectedPlayers;
+    private ScheduledExecutorService gameLoopScheduler;
     private ScheduledExecutorService sendAssetsScheduler;
-    private int clientNum = 1;
+    private int clientNum;
+    private int port;
+
+    public int getPort() {
+        return port;
+    }
 
     public GameServer() {
+        clientNum = 1;
         gameStateManager = ServerMaster.getInstance();
         sockets = new ArrayList<>();
+        connectedPlayers = new ArrayList<>();
+        gameLoopScheduler = Executors.newSingleThreadScheduledExecutor();
         sendAssetsScheduler = Executors.newSingleThreadScheduledExecutor();
+        port = 5000;
+        while (true) { 
+            try { ss = new ServerSocket(port); } 
+            catch (IOException ex) { System.out.println("IOException from GameServer constructor"); }
+    
+            if (ss != null) {
+                System.out.println("Routed to port " + port);
+                break;
+            } 
 
-        try {
-            ss = new ServerSocket(7000);
-            System.out.println("Server started on port 7000");
-        } catch (IOException ex) 
-        {
-            System.out.println("IOException from GameServer constructor");
+            port++;
         }
+        
         System.out.println("GAMESERVER HAS BEEN CREATED.");
     }
+
+    public void startGameLoop(){
+        final Runnable gameLoop = new Runnable(){
+            @Override
+            public void run(){
+                try {
+                    gameStateManager.update();    
+                    // System.out.println("called update on gsm");
+                } catch (Exception e) {
+                    System.err.println("Exception in game loop update():" + e);
+                }
+                
+
+                if (!connectedPlayers.isEmpty()){
+                    for (ConnectedPlayer cp : connectedPlayers) {
+                        String data = gameStateManager.getAssetsData(cp.cid);
+                        cp.promptAssetsThread(data);
+                    }
+                }
+            }
+        };
+        gameLoopScheduler.scheduleAtFixedRate(gameLoop, 0, Math.round(1000/TICKSPERSECOND), TimeUnit.MILLISECONDS);
+    }
+
 
     public void closeSocketsOnShutdown(){
         Runtime.getRuntime().addShutdownHook( new Thread(() -> {
@@ -63,11 +105,15 @@ public class GameServer {
         private Socket clientSocket;
         private DataInputStream dataIn;
         private DataOutputStream dataOut;
+        //For halting operations within a thread
+        private BlockingQueue<String> sendQueue;
         private int cid;
     
         public ConnectedPlayer(Socket sck, int n){
             clientSocket = sck;
             cid = n;
+            sendQueue = new LinkedBlockingDeque<>();
+            
             gameStateManager.addEntity((new Player(cid, gameStateManager.getCurrentRoom().getCenterX(), gameStateManager.getCurrentRoom().getCenterY())));
             try {
                 dataIn = new DataInputStream(clientSocket.getInputStream());
@@ -104,6 +150,10 @@ public class GameServer {
             sendAssetsScheduler.scheduleAtFixedRate(sendAssetsData, 0, GAMELOOPINTERVAL, TimeUnit.MILLISECONDS);
         }
 
+        public void promptAssetsThread(String data){
+            sendQueue.offer(data);
+        }
+
         /**
          * Sends the serialized map data by converting it to a byte array
          */
@@ -133,8 +183,8 @@ public class GameServer {
             } catch (IOException e) {
                 System.out.println("IOException from sendEntitiesData() method");
             }
-            
         }
+        
 
         private void startInputsThread(){
             Thread getInputsThread = new Thread(){
@@ -148,53 +198,77 @@ public class GameServer {
                             byte[] buffer = new byte[byteLength];
                             dataIn.readFully(buffer);
                             str = new String(buffer, "UTF-8");
-
                         } catch (IOException ex){
                             System.out.println("IOEception from getInputsData()");
+                            break;
                         }
-
-                        int length = str.length();
-                        boolean isLoadingY = false;
-                        String x = "";
-                        String y = "";
-
-                        for(int i = 0; i < length; i++){
-                            char parsedChar = str.charAt(i);
-                            
-                            if(!Character.isLetter(parsedChar)){
-                                //Delimiter for x and y
-                                if(parsedChar == ','){
-                                    isLoadingY = true;
-                                    continue;
-                                }
-                                    
-                                //Check if loading char to either x or y strings
-                                if (isLoadingY){
-                                    y += parsedChar;
-                                    //Check if last char in the parseable string
-                                    if(i == length - 1){
-                                        isLoadingY = false;
-                                        System.out.println("Mouse click at " + x + "," + y); //Replace with action handler
-                                    }
-                                }
-                                else
-                                    x += parsedChar;
-                            
-                            }
-                            else {
-                                ((Player) gameStateManager.getPlayerFromClientId(cid)).update(parsedChar);
+                        String[] inputStrParts = str.split("\\|");
+                        System.out.println(str);
+                        System.out.println("Input string: " + str);
+                        for (String part : inputStrParts) {
+                            // System.out.println(part);    
+                            if (part.isEmpty()) continue;
+                            else if (part.startsWith(NetworkProtocol.CLICK)){
+                                System.out.println(part);
+                                String[] coors = part.split(NetworkProtocol.SUB_DELIMITER);
+                                int x = Integer.parseInt(coors[0].substring(NetworkProtocol.CLICK.length()));
+                                int y = Integer.parseInt(coors[1]);
+                                System.out.println("CLick at " + x + "," + y);
+                                gameStateManager.loadClickInput(x, y, cid); 
+                            } else {
+                                // System.out.println(part);
+                                char parsedChar = part.toCharArray()[0];
+                                // System.out.println("Parsed char: " + parsedChar); 
+                                gameStateManager.loadKeyInput(parsedChar, cid);
                             }
                         }
                     }
-                }
-            };
-            getInputsThread.start();
-        } 
+
+            //             int length = str.length();
+            //             boolean isLoadingY = false;
+            //             String x = "";
+            //             String y = "";
+            //             System.out.println(str);
+
+            //             for(int i = 0; i < length; i++){
+            //                 char parsedChar = str.charAt(i);
+                            
+            //                 if(!Character.isLetter(parsedChar)){
+            //                     //Delimiter for x and y
+            //                     if(parsedChar == ','){
+            //                         isLoadingY = true;
+            //                         continue;   
+            //                     }
+                                    
+            //                     //Check if loading char to either x or y strings
+            //                     if (isLoadingY)
+            //                         y += parsedChar;                        
+            //                     else
+            //                         x += parsedChar;
+            //                 }
+            //                 else{
+            //                     gameStateManager.loadKeyInput(parsedChar, cid);
+            //                 }
+                                
+            //             }
+            //             if(!x.isEmpty() && !y.isEmpty()){
+            //                 gameStateManager.loadClickInput(Integer.parseInt(x), Integer.parseInt(y), cid); 
+            //             }   
+            //         }
+
+            //     }
+            // };
+            } 
+         };
+         getInputsThread.start();
     }
+}
+
   
     // When GameServer is run, the main method instantiates a new 
     public static void main(String[] args) {
         GameServer cs = new GameServer();
+        cs.startGameLoop();
         cs.closeSocketsOnShutdown();
         cs.waitForConnections();
     }

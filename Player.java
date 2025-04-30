@@ -71,7 +71,7 @@ public class Player extends Entity{
     }
 
     /**
-     * Builds a String storing room transition data in the form RC:clientId,newX,newY,destinationRoomId
+     * Builds a String storing room transition data in the form RC:clientId,newX,newY,hp,destinationRoomId
      * @param room the room to transition to
      */
     private String getRoomTransitionData(Door origin, Room next) {
@@ -85,6 +85,7 @@ public class Player extends Entity{
         .append(clientId).append(NetworkProtocol.SUB_DELIMITER)
         .append(newX).append(NetworkProtocol.SUB_DELIMITER)
         .append(newY).append(NetworkProtocol.SUB_DELIMITER)
+        .append(hitPoints).append(NetworkProtocol.SUB_DELIMITER)
         .append(next.getRoomId());
 
         return sb.toString();
@@ -168,10 +169,11 @@ public class Player extends Entity{
         if ( isUserPlayer && d != null) { // Only send room transition data for the user player
             return getRoomTransitionData(d, d.getOtherRoom(currentRoom)); // return a different string upon room change
         } else {
-            // String format: clientId,x,y,roomId
+            // String format: clientId,x,y,hp,roomId
             sb.append(clientId).append(NetworkProtocol.SUB_DELIMITER)
             .append(worldX).append(NetworkProtocol.SUB_DELIMITER)
             .append(worldY).append(NetworkProtocol.SUB_DELIMITER)
+            .append(hitPoints).append(NetworkProtocol.SUB_DELIMITER)
             .append(currentRoom.getRoomId()).append(NetworkProtocol.DELIMITER);
         }
 

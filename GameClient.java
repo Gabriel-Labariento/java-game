@@ -5,6 +5,7 @@ import java.util.*;
 import java.util.concurrent.*;
 
 public class GameClient {
+    public static final int TRANSFERINTERVAL = 16;
     private ClientMaster clientState;
     private Socket theSocket;
     private DataInputStream dataIn;
@@ -15,14 +16,16 @@ public class GameClient {
     private HashMap<String, Boolean> keyMap;
     private int clickedX;
     private int clickedY;
-
+    private ScheduledExecutorService sendInputsScheduler;
 
     public GameClient(ClientMaster clientState){
         this.clientState = clientState;
+        sendInputsScheduler = Executors.newSingleThreadScheduledExecutor();
 
         idToName = new HashMap<>();
         idToName.put('P', "Player");
-        idToName.put('B', "Rat");
+        idToName.put('B', "PlayerSlash");
+        idToName.put('S', "PlayerSlash");
 
         keyMap = new HashMap<>();
         keyMap.put("W", false);
@@ -52,10 +55,10 @@ public class GameClient {
 
             System.out.println("Please input the port number: ");
             // int portNum = Integer.parseInt(console.nextLine());
-            int portNum = 7000;
+            
 
             System.out.println("ATTEMPTING TO CONNECT TO SERVER...");
-            theSocket = new Socket(ipAddress, portNum);
+            theSocket = new Socket(ipAddress, 5000);
             
             //Disable Nagle's buffering algorithm: basically reduces latency
             theSocket.setTcpNoDelay(true);
@@ -90,7 +93,7 @@ public class GameClient {
                         } else {
                             synchronized (clientState.getEntities()) { // Synchronize entities arraylist to remove flickering
                                 clientState.getEntities().clear();
-                                parseAssetsData(receivedMessage);
+                                parseEntitiesData(receivedMessage);
                             }
                         }
                     } catch (IOException ex){
@@ -104,7 +107,7 @@ public class GameClient {
      * Parses a serialized string expected to be in the form ClientId|P:playerX,playerY|E:entity1X,entity1Y,entity2x,entity2Y...|
      * @param message a serialized string in the form ClientId|P:playerX,playerY|E:entity1X,entity1Y,entity2x,entity2Y...|
      */
-    private void parseAssetsData(String message){
+    private void parseEntitiesData(String message){
 
         String[] messageParts = message.split("\\" + NetworkProtocol.DELIMITER); // Have to use \\ to escape. Turns out "|" is special for java
         this.clientId = Integer.parseInt(messageParts[0]);
@@ -117,13 +120,15 @@ public class GameClient {
                 int playerId = Integer.parseInt(playerData[0]);
                 int playerX = Integer.parseInt(playerData[1]);
                 int playerY = Integer.parseInt(playerData[2]);
-                int playerRoomId = Integer.parseInt(playerData[3]);
+                double playerHealth = Double.parseDouble(playerData[3]);
+                int playerRoomId = Integer.parseInt(playerData[4]);
         
                 // System.out.println(" user Player loaded");
                 try {
                     Room currentRoom = clientState.getRoomById(playerRoomId);
                     Player player = new Player(playerId, playerX, playerY);
                     player.setCurrentRoom(currentRoom);
+                    player.setHitPoints(playerHealth);
                     clientState.setUserPlayer(player);
                     clientState.setCurrentRoom(currentRoom);
                         
@@ -135,27 +140,29 @@ public class GameClient {
                 System.out.println("Other player data: " + part);
 
                 // Don't load if not in the same room as the client
-                int otherRoomId = Integer.parseInt(otherPlayerData[3]);
+                int otherRoomId = Integer.parseInt(otherPlayerData[4]);
                 if (otherRoomId != clientState.getCurrentRoom().getRoomId()) continue;
 
                 int otherId = Integer.parseInt(otherPlayerData[0]);
                 int x = Integer.parseInt(otherPlayerData[1]);
                 int y = Integer.parseInt(otherPlayerData[2]);
+                double hp = Double.parseDouble(otherPlayerData[3]);
                 
                 
                 // Only load the player if it is not the user player and it is in the same room
                 if ( (otherId != clientId) && (otherRoomId == clientState.getCurrentRoom().getRoomId()) ) {
                     Player other = new Player(otherId, x, y);
                     other.setCurrentRoom(clientState.getRoomById(otherRoomId));
+                    other.setHitPoints(hp);
                     clientState.addEntity(other);
                 } 
             } else if (part.startsWith(NetworkProtocol.ENTITY)) {
-                // System.out.println("Whole entity string: " + part);
+                System.out.println("Whole entity string: " + part);
                 String[] entityData = part.substring(NetworkProtocol.ENTITY.length()).split(NetworkProtocol.SUB_DELIMITER);
                 
-                for (String string : entityData) {
-                    // System.out.println("Entity string: " + string);
-                }
+                // for (String string : entityData) {
+                //     // System.out.println("Entity string: " + string);
+                // }
                 // Don't load if not in the same room as the client.
                 int roomId = Integer.parseInt(entityData[4]);
                 if (!(roomId == clientState.getCurrentRoom().getRoomId())) continue;
@@ -164,10 +171,11 @@ public class GameClient {
                 int id = Integer.parseInt(entityData[1]);
                 int x = Integer.parseInt(entityData[2]);
                 int y = Integer.parseInt(entityData[3]);
-                loadEntity(identifier, id, x, y, roomId);
+                synchronized (clientState.getEntities()) {
+                    loadEntity(identifier, id, x, y, roomId);    
+                }
             }
-            
-
+        
         }
         
     }
@@ -186,18 +194,28 @@ public class GameClient {
 
     public void loadEntity(char identifier, int id, int x, int y, int roomId){
         String name = idToName.get(identifier);
-        if (name == null) System.out.println("Name not found in loadEntity()");
-        else if(name.equals("Rat")) {
-            Rat r = new Rat(x, y);
-            r.setId(id);
-            r.setCurrentRoom(clientState.getRoomById(roomId));
-            clientState.addEntity(r);
-        };
+        System.out.println("Loading entity " + identifier + " " + name + "at " + x + ", " + y);
+        if (name == null) System.out.println("Warning: unknown identity identifier " + identifier);
+        switch (name) {
+            case "Rat":
+                Rat r = new Rat(x, y);
+                r.setId(id);
+                r.setCurrentRoom(clientState.getRoomById(roomId));
+                clientState.addEntity(r);
+                break;
+            case "PlayerSlash":
+                PlayerSlash ps = new PlayerSlash(clientId, x, y, 40, 40, 0, false, roomId);
+                ps.setId(id);
+                ps.matchHitBoxBounds();
+                clientState.addEntity(ps);
+                System.out.println("Added playerSlash to client entities");
+                break;
+            default:
+                break;
+        }
     }
 
     public void startInputsThread(ScheduledExecutorService sendInputsScheduler){
-        final int GAMELOOPINTERVAL = 16;
-
         final Runnable sendInputsData = new Runnable(){
             @Override
             public void run() {
@@ -215,25 +233,27 @@ public class GameClient {
                     }   
             }
         };
-        sendInputsScheduler.scheduleAtFixedRate(sendInputsData, 0, GAMELOOPINTERVAL, TimeUnit.MILLISECONDS);
+        sendInputsScheduler.scheduleAtFixedRate(sendInputsData, 0, TRANSFERINTERVAL, TimeUnit.MILLISECONDS);
     }
 
     public String getInputsData(){
-        String str = "";
-        if(keyMap.get("W"))
-            str += "W";
-        if(keyMap.get("A"))
-            str += "A";
-        if(keyMap.get("S"))
-            str += "S";
-        if(keyMap.get("D"))
-            str += "D";
+        StringBuilder str = new StringBuilder();
+
+        if(keyMap.get("W")) str.append("W");
+        if(keyMap.get("A")) str.append("A");
+        if(keyMap.get("S")) str.append("S");
+        if(keyMap.get("D")) str.append("D");
+
         if(clickedX != 0 && clickedY != 0){
-            str += clickedX + "," + clickedY;
+            str.append(NetworkProtocol.DELIMITER);
+            str.append(NetworkProtocol.CLICK);
+            str.append(clickedX);
+            str.append(",");
+            str.append(clickedY);
             clickedX = 0;
             clickedY = 0;
         }
-        return str;
+        return str.toString();
     }
 
     public void keyInput(String input, Boolean isPressed){

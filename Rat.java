@@ -5,7 +5,6 @@ import java.awt.geom.Rectangle2D;
 public class Rat extends Enemy{
     public static int ratCount = 0;
     private int id;
-    private boolean isIdle;
 
     public Rat(int x, int y) {
         id = ratCount++;
@@ -18,7 +17,6 @@ public class Rat extends Enemy{
         maxHealth = 10;
         hitPoints = maxHealth;
         currentRoom = null;
-        isIdle = true;
     }
 
     @Override
