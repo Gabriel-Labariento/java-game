@@ -41,9 +41,14 @@ public class ServerMaster {
 
         checkCollisions();
 
+        // updateEntities();
+
          // Remove entities that are either depleted of HitPoints or isExpired
         entities.removeIf(entity -> (entity instanceof Attack attack) && (attack.getIsExpired()));
         entities.removeIf(entity -> (entity.getHitPoints() <= 0));
+
+        
+        
     }
 
     // Checks for collisions between all objects inside the entity ArrayList
@@ -258,8 +263,8 @@ public class ServerMaster {
         int attackWidth;
         int attackHeight;
         if (true){
-            attackWidth = 40;
-            attackHeight = 40;
+            attackWidth = originPlayer.getWidth() * 2;
+            attackHeight = originPlayer.getWidth() * 2;
             playerAttack = new PlayerSlash(cid, worldX-attackWidth/2, worldY - attackHeight/2, 
             attackWidth, attackHeight, attackDamage, true, attackSpeed);
             playerAttack.matchHitBoxBounds();
@@ -447,8 +452,6 @@ public class ServerMaster {
             if (!(entity instanceof Player) && (entity != null)) entity.updateEntity(this);
         }
     }
-
-
 
     public DungeonMap getDungeonMap() {
         return dungeonMap;

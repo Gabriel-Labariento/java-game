@@ -10,10 +10,6 @@ public abstract class Attack extends Entity{
         expirationTime = System.currentTimeMillis() + duration;
     }
 
-    public void setOwner(Entity entity, int offsetX, int offsetY){
-        
-    }
-
     public boolean getIsExpired(){
         return System.currentTimeMillis() >= expirationTime;
     }

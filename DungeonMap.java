@@ -10,12 +10,13 @@ public class DungeonMap {
         this.gameLevel = gameLevel;
     }
 
-    // Multiple constructors in the meantime while refactoring  
+    // TODO: Multiple constructors in the meantime while refactoring  
     public DungeonMap(){
         rooms = new ArrayList<>();
         gameLevel = 0;
     }
 
+    
 
     /**
      * Generates a certain number of rooms (numRooms <= 3). Connects them and calls pickStartAndEndRooms() and populateAllRoomsDoorsArrayList()
@@ -165,6 +166,7 @@ public class DungeonMap {
         // Create the rooms, no connections yet
         for (int i = 0; i < numRooms; i++) {
             Room r = new Room(i, x, y);
+            r.matchHitBoxBounds();
             rooms.add(r);
         }
     }
@@ -303,20 +305,16 @@ public class DungeonMap {
         // Clear data 
         rooms.clear();
         
-        int roomCount;
-        
         // Helper utils
         HashMap<Integer, Room> mapIdToRoom = new HashMap<>();
         ArrayList<DoorDataHolder> doorDataList = new ArrayList<>();
-        Room startRoom = null;
+        startRoom = null;
 
         String[] messageParts = message.split("\\" + NetworkProtocol.DELIMITER); // Split at "|"
         
         // Part 1: Deserialize Rooms and Doors
         for (String part : messageParts) {
-            if (part.startsWith(NetworkProtocol.MAP_DATA)) {
-                roomCount = Integer.parseInt(part.substring(NetworkProtocol.MAP_DATA.length()));
-            } else if (part.startsWith(NetworkProtocol.ROOM )){
+            if (part.startsWith(NetworkProtocol.ROOM )){
                 // Parse roomData
                 deserializeRooms(part.substring(NetworkProtocol.ROOM.length()), mapIdToRoom);
             } else if (part.startsWith(NetworkProtocol.DOOR)) {
@@ -362,6 +360,7 @@ public class DungeonMap {
         r.setIsStartRoom(isStart);
         r.setIsEndRoom(isEnd);
         mapIdToRoom.put(roomId, r);
+        r.matchHitBoxBounds();
         rooms.add(r);
     }
 
@@ -419,8 +418,8 @@ public class DungeonMap {
      * DoorDataHolder, a new Door object can be made.
      */
     private class DoorDataHolder{
-        private int id, x, y, roomAId, roomBId;
-        private String direction;
+        private final int id, x, y, roomAId, roomBId;
+        private final String direction;
 
         public DoorDataHolder(int id, int x, int y, String direction, int roomAId, int roomBId) {
             this.id = id;

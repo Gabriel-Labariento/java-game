@@ -6,14 +6,14 @@ import java.util.concurrent.*;
 
 public class GameClient {
     public static final int TRANSFERINTERVAL = 16;
-    private ClientMaster clientState;
+    private final ClientMaster clientState;
     private Socket theSocket;
     private DataInputStream dataIn;
     private DataOutputStream dataOut;
     private Scanner console;
     private int clientId;
-    private HashMap<Character, String> idToName;
-    private HashMap<String, Boolean> keyMap;
+    private final HashMap<Character, String> idToName;
+    private final HashMap<String, Boolean> keyMap;
     private int clickedX;
     private int clickedY;
     private ScheduledExecutorService sendInputsScheduler;
@@ -24,7 +24,7 @@ public class GameClient {
 
         idToName = new HashMap<>();
         idToName.put('P', "Player");
-        idToName.put('B', "PlayerSlash");
+        idToName.put('B', "Rat");
         idToName.put('S', "PlayerSlash");
 
         keyMap = new HashMap<>();
@@ -69,7 +69,6 @@ public class GameClient {
 
             startAssetsThread();
             startInputsThread(sendInputsScheduler);
-            // startRenderLoop();
 
         } catch (IOException ex) {
             System.out.println("IOException from connectToServer() method");
@@ -171,9 +170,8 @@ public class GameClient {
                 int id = Integer.parseInt(entityData[1]);
                 int x = Integer.parseInt(entityData[2]);
                 int y = Integer.parseInt(entityData[3]);
-                synchronized (clientState.getEntities()) {
-                    loadEntity(identifier, id, x, y, roomId);    
-                }
+                loadEntity(identifier, id, x, y, roomId);    
+                
             }
         
         }
@@ -194,25 +192,29 @@ public class GameClient {
 
     public void loadEntity(char identifier, int id, int x, int y, int roomId){
         String name = idToName.get(identifier);
-        System.out.println("Loading entity " + identifier + " " + name + "at " + x + ", " + y);
-        if (name == null) System.out.println("Warning: unknown identity identifier " + identifier);
-        switch (name) {
-            case "Rat":
-                Rat r = new Rat(x, y);
-                r.setId(id);
-                r.setCurrentRoom(clientState.getRoomById(roomId));
-                clientState.addEntity(r);
-                break;
-            case "PlayerSlash":
-                PlayerSlash ps = new PlayerSlash(clientId, x, y, 40, 40, 0, false, roomId);
-                ps.setId(id);
-                ps.matchHitBoxBounds();
-                clientState.addEntity(ps);
-                System.out.println("Added playerSlash to client entities");
-                break;
-            default:
-                break;
-        }
+        // System.out.println("Loading entity " + identifier + " " + name + "at " + x + ", " + y);
+        if (name == null) {
+            System.out.println("Warning: unknown identity identifier " + identifier);
+        } else {
+            switch (name) {
+                case "Rat":
+                    Rat r = new Rat(x, y);
+                    r.setId(id);
+                    r.setCurrentRoom(clientState.getRoomById(roomId));
+                    clientState.addEntity(r);
+                    // System.out.println("Added rat to client entities");
+                    break;
+                case "PlayerSlash":
+                    PlayerSlash ps = new PlayerSlash(clientId, x, y, 32, 32, 0, false, roomId);
+                    ps.setId(id);
+                    ps.matchHitBoxBounds();
+                    clientState.addEntity(ps);
+                    // System.out.println("Added playerSlash to client entities");
+                    break;
+                default:
+                    break;
+            }
+    }
     }
 
     public void startInputsThread(ScheduledExecutorService sendInputsScheduler){

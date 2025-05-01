@@ -39,6 +39,7 @@ public class Room extends GameObject implements Tileable{
         doorsArrayList = new ArrayList<>();
         tiles = new Tile[HEIGHT_TILES][WIDTH_TILES];
         populateTiles();
+        matchHitBoxBounds();
     }
 
     /**
@@ -98,8 +99,11 @@ public class Room extends GameObject implements Tileable{
     
     @Override
     public void matchHitBoxBounds() {
-        // TODO Auto-generated method stub
-        
+        hitBoxBounds = new int[4];
+        hitBoxBounds[0]= worldY;
+        hitBoxBounds[1] = worldY + height;
+        hitBoxBounds[2]= worldX;
+        hitBoxBounds[3] = worldX + width;
     }
 
     public int[][] loadLayoutFromFile() {

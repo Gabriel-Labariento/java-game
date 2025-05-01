@@ -4,12 +4,13 @@
     import java.awt.geom.*;
 
     public class PlayerSlash extends Attack{
-        private static int slashCount = -1000000000; // To hold more
+        private static int slashCount = Integer.MIN_VALUE; // To hold more
         private int id;
 
         public PlayerSlash(int cid, int x, int y, int w, int h, double damage, boolean isFriendly, int speed){
             id = slashCount++;
             clientId = cid;
+            owner = ServerMaster.getInstance().getPlayerFromClientId(cid);
             identifier = NetworkProtocol.SLASH.toCharArray()[0];
             this.isFriendly = isFriendly;
             this.speed = speed;

@@ -1,7 +1,7 @@
 import java.util.*;
 
 public class DungeonMapDeserializeResult {
-    private Room startRoom;
+    private final Room startRoom;
     private HashMap<Integer, Room> allRooms = new HashMap<>();
 
     public DungeonMapDeserializeResult(Room startRoom, HashMap<Integer, Room> allRooms){

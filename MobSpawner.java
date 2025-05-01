@@ -13,6 +13,7 @@ public class MobSpawner {
     private int maxSpawned;
     private ArrayList<Enemy> spawnedEnemies; 
     private boolean isSpawning;
+    private ScheduledExecutorService spawnMobsScheduler;
 
     private static final int HIGHESTX = 40;
     private static final int LOWESTX = 5;
@@ -20,30 +21,25 @@ public class MobSpawner {
     private static final int LOWESTY = 5;
     private static final int INITIALSPAWNDELAY = 1;
     
-    private static String[][] spawnableEnemiesAtLevel = {
-        {"Rat"} // TODO: ADD OTHER ENEMIES
+    private static String[][] spawnableEnemiesAtLevel = { // TODO: ADD OTHER ENEMIES
+        {"Rat"}
     };
 
-    private static String[] bosses = {
-        "RatKing" // TODO: ADD OTHER BOSSES
+    private static String[] bosses = { // TODO: ADD OTHER BOSSES
+        "RatKing" 
     };
 
-    private ScheduledExecutorService spawnMobsScheduler;
-
-
-
+    
     public MobSpawner(int level, int difficulty){
         this.level = level;
         this.difficulty = difficulty;
-        spawnRate =  5; // Spawns one enemy per spawnRate seconds
         spawnMobsScheduler = Executors.newSingleThreadScheduledExecutor();
         
-        spawnRate = Math.max(2, 5 - (level / 2 - difficulty));
-        maxSpawned = (difficulty == 3) ? 1 : (3 + level + difficulty);
-
+        spawnRate = Math.max(2, 5 - (level / 2 - difficulty)); // Spawns 2 if > (5 - (level / 2) - difficulty)  
+        maxSpawned = (difficulty == 3) ? 1 : (3 + level + difficulty); // Spawns only one enemy in boss room, otherwise spawns at least 3
+        
         spawnedEnemies = new ArrayList<>();
         spawnedCount = 0;
-        maxSpawned = 5;
         isSpawning = false;
     }
 

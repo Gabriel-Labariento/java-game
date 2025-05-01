@@ -1,35 +1,5 @@
 public abstract class Enemy extends Entity {
 
-    private double[] calculateRepulsionForce(Entity other) {
-        final int repulsionFactor = 32;
-
-        int dx = getCenterX() - other.getCenterX();
-        int dy = getCenterY() - other.getCenterY();
-        int distanceSquared = dx * dx + dy * dy;
-        double distance = Math.sqrt(distanceSquared);
-
-
-        // Avoid division by zero and extremely strong forces at small distances
-        if (distance < 1e-5) {
-            return new double[] {0,0};
-        } 
-
-        int forceMagnitude = repulsionFactor / distanceSquared;
-
-        double x = (dx / distance) * forceMagnitude;
-        double y = (dy / distance) * forceMagnitude;
-
-        double[] repulsionForce = {x,y};
-        return repulsionForce; 
-    }
-
-    // TODO: FIGURE OUT HOW TO MAKE ENEMIES NOT COLLIDE WITH EACH OTHER
-    public void moveAwayFromOtherEntity(Entity other) {
-        double[] repulsionForce = calculateRepulsionForce(other);
-        worldX += repulsionForce[0];
-        worldY += repulsionForce[1];
-    }
-
     // Right now, simple logic that scans if the distance between the player and the entity is <= scanRadius.
     // Pursues if yes. Does not yet consider obstacles.
     public Player scanForPlayer(ServerMaster gsm){
@@ -55,6 +25,10 @@ public abstract class Enemy extends Entity {
         return closestPlayer;
     }
 
+    /**
+     * Moves the enemy depending on where the pursued player is
+     * @param player the player to be pursued
+     */
     public void pursuePlayer(Player player) {
         if (player.getCenterX() > getCenterX()) worldX += speed;
         else if (player.getCenterX() < getCenterX()) worldX -= speed;
@@ -62,6 +36,36 @@ public abstract class Enemy extends Entity {
         if (player.getCenterY() > getCenterY()) worldY += speed;
         else if (player.getCenterY() < getCenterY()) worldY -= speed;
     }
+
+    // private double[] calculateRepulsionForce(Entity other) {
+    //     final int repulsionFactor = 32;
+
+    //     int dx = getCenterX() - other.getCenterX();
+    //     int dy = getCenterY() - other.getCenterY();
+    //     int distanceSquared = dx * dx + dy * dy;
+    //     double distance = Math.sqrt(distanceSquared);
+
+
+    //     // Avoid division by zero and extremely strong forces at small distances
+    //     if (distance < 1e-5) {
+    //         return new double[] {0,0};
+    //     } 
+
+    //     int forceMagnitude = repulsionFactor / distanceSquared;
+
+    //     double x = (dx / distance) * forceMagnitude;
+    //     double y = (dy / distance) * forceMagnitude;
+
+    //     double[] repulsionForce = {x,y};
+    //     return repulsionForce; 
+    // }
+
+    // // TODO: FIGURE OUT HOW TO MAKE ENEMIES NOT COLLIDE WITH EACH OTHER
+    // public void moveAwayFromOtherEntity(Entity other) {
+    //     double[] repulsionForce = calculateRepulsionForce(other);
+    //     worldX += repulsionForce[0];
+    //     worldY += repulsionForce[1];
+    // }
 
     
 }

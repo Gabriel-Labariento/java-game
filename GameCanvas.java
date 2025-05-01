@@ -5,12 +5,12 @@ import javax.swing.*;
 public class GameCanvas extends JComponent {
     public static final int TILESIZE = 16;
     private static final int REFRESHINTERVAL = 16;
-    private int width, height;
-    private GameClient dataHandler;
+    private final int width, height;
+    private final GameClient dataHandler;
     private ClientMaster clientState;
     private ScheduledExecutorService renderLoopScheduler;
     private ScheduledExecutorService sendInputsScheduler;
-    private TileManager tileManager;
+    private final TileManager tileManager;
 
     public GameCanvas(int width, int height){
         this.width = width;
@@ -57,19 +57,16 @@ public class GameCanvas extends JComponent {
         // Draw room doors
         for (Door door : currentRoom.getDoorsArrayList()) {
             door.draw(g2d, cameraX, cameraY);
-            // tileManager.drawTiledObject(g2d, door, cameraX, cameraY);
         }
 
         // Draw enemies, projectiles, other players
         synchronized (clientState.getEntities()) {
             for (Entity entity : clientState.getEntities())
-            entity.draw(g2d, entity.getWorldX() - userPlayer.getWorldX() + screenX, entity.getWorldY()- userPlayer.getWorldY() + screenY);    
+            entity.draw(g2d, entity.getWorldX() - (cameraX), entity.getWorldY() - (cameraY));    
         }
         
         //Draw current user's player
-        userPlayer.draw(g2d, screenX, screenY); //CHANGE 50 BY ACTUAL ASSET SIZE
-
-        
+        userPlayer.draw(g2d, screenX, screenY); //CHANGE 50 BY ACTUAL ASSET SIZE        
     }
 
     public GameClient getDataHandler(){

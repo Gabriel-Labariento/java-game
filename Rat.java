@@ -21,8 +21,11 @@ public class Rat extends Enemy{
 
     @Override
     public void matchHitBoxBounds() {
-        // TODO Auto-generated method stub
-        
+        hitBoxBounds = new int[4];
+        hitBoxBounds[0]= worldY;
+        hitBoxBounds[1] = worldY + height;
+        hitBoxBounds[2]= worldX;
+        hitBoxBounds[3] = worldX + width;
     }
 
     @Override
@@ -51,14 +54,9 @@ public class Rat extends Enemy{
         // TODO: ENEMY AI LOGIC
 
         Player pursued = scanForPlayer(gsm);
-        if (pursued != null) pursuePlayer(pursued);
-
-        for (Entity e : gsm.getEntities()) {
-            if (e == this) continue;
-            if (e instanceof Player) continue;
-            if (isColliding(e)) moveAwayFromOtherEntity(e);
-        }
+        if (pursued != null) pursuePlayer(pursued);  
         
+        matchHitBoxBounds();
     }
 
     public int getId() {

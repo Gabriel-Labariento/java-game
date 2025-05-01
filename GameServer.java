@@ -19,10 +19,6 @@ public class GameServer {
     private int clientNum;
     private int port;
 
-    public int getPort() {
-        return port;
-    }
-
     public GameServer() {
         clientNum = 1;
         gameStateManager = ServerMaster.getInstance();
@@ -98,7 +94,11 @@ public class GameServer {
             }        
             } catch (IOException ex) {
                 System.out.println("IOException from waitForConnection() method.");
-        }
+        }    
+    }
+    
+    public int getPort() {
+        return port;
     }
 
     private class ConnectedPlayer {
@@ -113,7 +113,6 @@ public class GameServer {
             clientSocket = sck;
             cid = n;
             sendQueue = new LinkedBlockingDeque<>();
-            
             gameStateManager.addEntity((new Player(cid, gameStateManager.getCurrentRoom().getCenterX(), gameStateManager.getCurrentRoom().getCenterY())));
             try {
                 dataIn = new DataInputStream(clientSocket.getInputStream());
@@ -192,7 +191,7 @@ public class GameServer {
                 @Override
                 public void run(){
                     while (true){
-                        String str = "";
+                        String str;
                         try {
                             int byteLength = dataIn.readInt();
                             byte[] buffer = new byte[byteLength];
@@ -202,12 +201,14 @@ public class GameServer {
                             System.out.println("IOEception from getInputsData()");
                             break;
                         }
+
                         String[] inputStrParts = str.split("\\|");
-                        System.out.println(str);
-                        System.out.println("Input string: " + str);
+                        // System.out.println(str);
+                        // System.out.println("Input string: " + str);
+
                         for (String part : inputStrParts) {
-                            // System.out.println(part);    
-                            if (part.isEmpty()) continue;
+                            System.out.println(part);    
+                            if (part.isEmpty()) {}
                             else if (part.startsWith(NetworkProtocol.CLICK)){
                                 System.out.println(part);
                                 String[] coors = part.split(NetworkProtocol.SUB_DELIMITER);
@@ -223,46 +224,11 @@ public class GameServer {
                             }
                         }
                     }
-
-            //             int length = str.length();
-            //             boolean isLoadingY = false;
-            //             String x = "";
-            //             String y = "";
-            //             System.out.println(str);
-
-            //             for(int i = 0; i < length; i++){
-            //                 char parsedChar = str.charAt(i);
-                            
-            //                 if(!Character.isLetter(parsedChar)){
-            //                     //Delimiter for x and y
-            //                     if(parsedChar == ','){
-            //                         isLoadingY = true;
-            //                         continue;   
-            //                     }
-                                    
-            //                     //Check if loading char to either x or y strings
-            //                     if (isLoadingY)
-            //                         y += parsedChar;                        
-            //                     else
-            //                         x += parsedChar;
-            //                 }
-            //                 else{
-            //                     gameStateManager.loadKeyInput(parsedChar, cid);
-            //                 }
-                                
-            //             }
-            //             if(!x.isEmpty() && !y.isEmpty()){
-            //                 gameStateManager.loadClickInput(Integer.parseInt(x), Integer.parseInt(y), cid); 
-            //             }   
-            //         }
-
-            //     }
-            // };
-            } 
-         };
-         getInputsThread.start();
+                } 
+             };
+            getInputsThread.start();
+        }
     }
-}
 
   
     // When GameServer is run, the main method instantiates a new 
