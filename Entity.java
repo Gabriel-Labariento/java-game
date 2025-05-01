@@ -39,6 +39,20 @@ public abstract class Entity extends GameObject {
              );
     }
 
+    public void setPosition(int x, int y) {
+        int[] roomBounds = currentRoom.getHitBoxBounds();
+
+        if (y < roomBounds[0]) y = roomBounds[0];           // Top Boundary
+        if (y + height > roomBounds[1]) y = roomBounds[1] - height;  // Bottom Boundary
+        if (x < roomBounds[2]) x = roomBounds[2];           // Left Boundary
+        if (x + width > roomBounds[3]) x = roomBounds[3] - width;   // Right Boundary
+    
+        worldX = x;
+        worldY = y;
+
+        matchHitBoxBounds();
+    }
+
     /**
      * Checks whether an entity is dead or alive based on its health.
      * @return true if the entity is dead, false otherwise.

@@ -90,22 +90,7 @@ public class ServerMaster {
                             if (attack.getClientId() == player.getClientId()) continue; // don't process attack is from the player
                         }
 
-                    int[] b2 = entity2.getHitBoxBounds();
-
-
-
-
-                    // int[] b2 = null;
-                    // try {
-                    //     b2 = entity2.getHitBoxBounds();
-                    //     System.out.println("B2 Hitbox bounds: " + Arrays.toString(b2));
-                    // } catch (Exception e) {
-                    //     System.err.println("Erorr getting hitbox for " + entity2.getClass() + ": " + e.getMessage() );
-                    //     e.printStackTrace();
-                    //     continue;
-                    // }
-
-                    
+                    int[] b2 = entity2.getHitBoxBounds();                    
                     //Skip detection if the second entity starts after the first ends on the x-axis
                     if(b2[2]>b1[3]) break;
 
@@ -116,7 +101,7 @@ public class ServerMaster {
                 }
             }   
         } catch (Exception e) {
-            System.err.println("Exception in check collisions: " + e);
+            System.err.println("Exception in checkCollisions(): " + e);
         }
         
     }
@@ -153,8 +138,6 @@ public class ServerMaster {
             preventOverlap(e1, e2, b1, b2);
         else if (e1 instanceof Enemy && e2 instanceof Enemy)
             preventOverlap(e1, e2, b1, b2);
-        
-
     }
 
     private void preventOverlap(Entity e1, Entity e2, int[] b1, int[] b2){
@@ -190,10 +173,15 @@ public class ServerMaster {
         if (overlap > overlapThreshold){
             //Divide overlap by an arbitrary number to smooth out the visual resolution of the collision
             double resolutionFactor = overlap / 8;
-            e1.setWorldX((int)(e1.getWorldX() - unitNormal[0] * resolutionFactor));
-            e1.setWorldY((int)(e1.getWorldY() - unitNormal[1] * resolutionFactor));
-            e2.setWorldX((int)(e2.getWorldX() + unitNormal[0] * resolutionFactor));
-            e2.setWorldY((int)(e2.getWorldY() + unitNormal[1] * resolutionFactor));
+            int e1X = (int) (e1.getWorldX() - unitNormal[0] * resolutionFactor);
+            int e1Y = (int)(e1.getWorldY() - unitNormal[1] * resolutionFactor);
+            int e2X = (int)(e2.getWorldX() + unitNormal[0] * resolutionFactor);
+            int e2Y = (int)(e2.getWorldY() + unitNormal[1] * resolutionFactor);
+
+            // Change made: Used setposition to account for room bounds
+            e1.setPosition(e1X, e1Y); 
+            e2.setPosition(e2X, e2Y);
+            
         }
 
         e1.matchHitBoxBounds();

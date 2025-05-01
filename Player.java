@@ -35,8 +35,6 @@ public class Player extends Entity{
         int nextX = worldX;
         int nextY = worldY;
 
-        int[] roomBounds = currentRoom.getHitBoxBounds();
-
         if(input == 'W') {
             if (isMoveInbound(0, -1 * speed)) nextY -= speed;
         }
@@ -50,14 +48,8 @@ public class Player extends Entity{
             if (isMoveInbound(speed, 0)) nextX += speed;
         }
 
-        if (nextY < roomBounds[0]) nextY = roomBounds[0];           // Top Boundary
-        if (nextY + height > roomBounds[1]) nextY = roomBounds[1];  // Bottom Boundary
-        if (nextX < roomBounds[2]) nextX = roomBounds[2];           // Left Boundary
-        if (nextX + width > roomBounds[3]) nextX = roomBounds[3];   // Right Boundary
-
-        worldX = nextX;
-        worldY = nextY;
-
+        setPosition(nextX, nextY);
+       
         matchHitBoxBounds();
     }
 
