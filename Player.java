@@ -1,3 +1,223 @@
-public class Player {
+import java.awt.Color;
+import java.awt.Graphics2D;
+import java.awt.geom.*;
+
+public class Player extends Entity{
+    private static final int invincibilityDuration = 800;
+    private static final int revivalDuration = 5000;
+    private static final int coolDownDuration = 1000;
+    private long invincibilityEnd;
+    private long coolDownEnd;
+    private final int screenX;
+    private final int screenY;
+    private boolean isDown;
+    private boolean isReviving;
+    private long revivalTime;
+
+    public Player(int cid, int x, int y){
+        this.clientId = cid;
+        this.identifier = NetworkProtocol.PLAYER.toCharArray()[0];
+        speed = 5;
+        height = 16;
+        width = 16;
+        screenX = 720/2 - width/2;
+        screenY = 540/2 - height/2;
+        worldX = x;
+        worldY = y;
+        maxHealth = 50;
+        hitPoints = maxHealth;
+        damage = 5;
+        isDown = false;
+    }
+
+    @Override
+    public void draw(Graphics2D g2d, int xOffset, int yOffset){
+        Rectangle2D.Double sprite = new Rectangle2D.Double(xOffset, yOffset, width, height);
+        g2d.setColor(Color.GREEN);
+        g2d.fill(sprite);
+    }
+
+    public void setIsDown(boolean b){
+        isDown = b;
+    }
+
+    public boolean getIsDown(){
+        return isDown;
+    }
+
+    public void triggerCoolDown(){
+        coolDownEnd = System.currentTimeMillis() + coolDownDuration;
+    }
+
+    public boolean getIsOnCoolDown(){
+        return System.currentTimeMillis() < coolDownEnd;
+    }
+
+    public void triggerRevival(){
+       revivalTime = System.currentTimeMillis() + revivalDuration;  
+    }
+
+    public void setIsReviving(boolean b){
+        isReviving = b;
+    }
+
+    public boolean getIsReviving(){
+        return isReviving;
+    }
+
+    public boolean getIsRevived(){
+        return System.currentTimeMillis() >= revivalTime;
+    }
+
+    public void update(char input){
+        prevWorldX = worldX;
+        prevWorldY = worldY;
+
+        if(input == 'W') {
+            if (isMoveInbound(0, -1 * speed)) worldY -= speed;
+        }
+        if(input == 'A') {
+            if (isMoveInbound(-1 * speed, 0)) worldX -= speed;
+        }
+        if(input == 'S') {
+            if (isMoveInbound(0, speed)) worldY += speed;
+        }
+        if(input == 'D') {
+            if (isMoveInbound(speed, 0)) worldX += speed;
+        }
+        matchHitBoxBounds();
+    }
+
+    @Override
+    public void matchHitBoxBounds() {
+        hitBoxBounds = new int[4];
+        hitBoxBounds[0]= worldY;
+        hitBoxBounds[1] = worldY + height;
+        hitBoxBounds[2]= worldX;
+        hitBoxBounds[3] = worldX + width;
+    }
+
+    /**
+     * 
+     */
+    public void triggerInvincibility(){
+        invincibilityEnd = System.currentTimeMillis() + invincibilityDuration;
+    }
+
+    public boolean getIsInvincible(){
+        return System.currentTimeMillis() >= invincibilityEnd;
+    }
+
+    /**
+     * Builds a String storing room transition data in the form RC:clientId,newX,newY,hp,destinationRoomId
+     * @param room the room to transition to
+     */
+    private String getRoomTransitionData(Door origin, Room next) {
+        StringBuilder sb = new StringBuilder();
+        
+        int[] newCoors = getNewPositionAfterRoomTransition(origin, next);
+        int newX = newCoors[0];
+        int newY = newCoors[1];
+
+        sb.append(NetworkProtocol.ROOM_CHANGE)
+        .append(clientId).append(NetworkProtocol.SUB_DELIMITER)
+        .append(newX).append(NetworkProtocol.SUB_DELIMITER)
+        .append(newY).append(NetworkProtocol.SUB_DELIMITER)
+        .append(hitPoints).append(NetworkProtocol.SUB_DELIMITER)
+        .append(next.getRoomId());
+
+        return sb.toString();
+    }
+
+    /**
+     * Gets the new position of the player in the new room after using a door.
+     * @param origin the door in the previous room where the player came from
+     * @param next the room the player is going to
+     * @return an int array with the new position of the player in the next room, index 0 as the x position and index 1 as the y position
+     */
+    private int[] getNewPositionAfterRoomTransition(Door origin, Room next){
+        int[] newCoordinates = new int[2];
+
+        String otherDoorDirection = getOppositeDirection(origin.getDirection());
+
+        Door otherDoor = null;
+
+        for (Door d : next.getDoorsArrayList()) {
+            if (d.getDirection().equals(otherDoorDirection)) otherDoor = d;    
+        }
+
+        if (otherDoor == null) {
+            System.out.println("Could not find corresponding door in getNewPositionAfterRoomTransition()");
+            return null;
+        }
+
+        int offset = height;
+
+        switch (otherDoorDirection) {
+            case "T":
+                newCoordinates[0] = next.getWorldX() + (next.getWidth() / 2) - origin.getHeight();
+                newCoordinates[1] = next.getWorldY() + origin.getHeight() + offset;
+                break;
+            case "B":
+                newCoordinates[0] = next.getWorldX() + (next.getWidth() / 2) - origin.getWidth();
+                newCoordinates[1] = next.getWorldY() + next.getHeight() - (origin.getHeight() + offset);
+                break;
+            case "L":
+                newCoordinates[0] = next.getWorldX() + origin.getWidth() + offset;
+                newCoordinates[1] = next.getWorldY() + (next.getHeight() / 2) - origin.getHeight();
+                break;
+            case "R":
+                newCoordinates[0] = next.getWorldX() + next.getWidth() - (origin.getWidth() + offset);
+                newCoordinates[1] = next.getWorldY() + (next.getHeight() / 2) - origin.getHeight();
+                break;
+            default:
+                throw new AssertionError("Assertion in getNewPositionAfterRoomTransition");
+        }
+
+        return newCoordinates;
+    }
+
+    /**
+     * Checks if a player is colliding with any door in the currentRoom and returns that door if the door is open
+     * @return the door the player is colliding with
+     */
+    private Door getCollidingDoor(){
+        for (Door d : currentRoom.getDoorsArrayList()) {
+            if (isColliding(d) && (d.isOpen())) return d;
+        }
+        return null;
+    }
+
+    public int[] getScreenPos() {
+        int[] screenPos = {screenX, screenY};
+        return screenPos;
+    }
     
+
+    /**
+     * {@inheritDoc }
+     * @param isUserPlayer true if the calling player is the user player, false otherwise
+     * @return a string in the possible forms: RC:clifntId,newX,newY,destinationRoomId or clientId,newX,newY,currentRoomId 
+     */
+    @Override
+    public String getAssetData(boolean isUserPlayer){
+        StringBuilder sb = new StringBuilder();
+
+        Door d = getCollidingDoor();
+        if ( isUserPlayer && d != null) { // Only send room transition data for the user player
+            return getRoomTransitionData(d, d.getOtherRoom(currentRoom)); // return a different string upon room change
+        } else {
+            // String format: clientId,x,y,hp,roomId
+            sb.append(clientId).append(NetworkProtocol.SUB_DELIMITER)
+            .append(worldX).append(NetworkProtocol.SUB_DELIMITER)
+            .append(worldY).append(NetworkProtocol.SUB_DELIMITER)
+            .append(hitPoints).append(NetworkProtocol.SUB_DELIMITER)
+            .append(currentRoom.getRoomId()).append(NetworkProtocol.DELIMITER);
+        }
+
+        return sb.toString();
+    };
+
+    @Override
+    public void updateEntity(ServerMaster gsm) {}
 }
