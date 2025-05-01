@@ -37,35 +37,6 @@ public abstract class Enemy extends Entity {
         else if (player.getCenterY() < getCenterY()) worldY -= speed;
     }
 
-    // private double[] calculateRepulsionForce(Entity other) {
-    //     final int repulsionFactor = 32;
-
-    //     int dx = getCenterX() - other.getCenterX();
-    //     int dy = getCenterY() - other.getCenterY();
-    //     int distanceSquared = dx * dx + dy * dy;
-    //     double distance = Math.sqrt(distanceSquared);
-
-
-    //     // Avoid division by zero and extremely strong forces at small distances
-    //     if (distance < 1e-5) {
-    //         return new double[] {0,0};
-    //     } 
-
-    //     int forceMagnitude = repulsionFactor / distanceSquared;
-
-    //     double x = (dx / distance) * forceMagnitude;
-    //     double y = (dy / distance) * forceMagnitude;
-
-    //     double[] repulsionForce = {x,y};
-    //     return repulsionForce; 
-    // }
-
-    // // TODO: FIGURE OUT HOW TO MAKE ENEMIES NOT COLLIDE WITH EACH OTHER
-    // public void moveAwayFromOtherEntity(Entity other) {
-    //     double[] repulsionForce = calculateRepulsionForce(other);
-    //     worldX += repulsionForce[0];
-    //     worldY += repulsionForce[1];
-    // }
 
     
 }

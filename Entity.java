@@ -61,6 +61,13 @@ public abstract class Entity extends GameObject {
         return (hitPoints <= 0);
     }
 
+    public void takeDamageFromEntity(Entity attacker){
+        hitPoints -= attacker.getDamage();
+    }
+
+   
+
+
 
     public Room getCurrentRoom() {
         return currentRoom;
@@ -100,6 +107,10 @@ public abstract class Entity extends GameObject {
 
     public void setHitPoints(double hP) {
         hitPoints = hP;
+    }
+
+    public void setSpeed(int speed) {
+        this.speed = speed;
     }
 
 }

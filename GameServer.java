@@ -205,7 +205,6 @@ public class GameServer {
                         // System.out.println("Input string: " + str);
 
                         for (String part : inputStrParts) {
-                            System.out.println(part);    
                             if (part.isEmpty()) {}
                             else if (part.startsWith(NetworkProtocol.CLICK)){
                                 System.out.println(part);

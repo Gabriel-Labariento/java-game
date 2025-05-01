@@ -117,6 +117,11 @@ public abstract class GameObject {
         return hitBoxBounds;
     }
 
-    
+    public int[] getPositionVector(){
+        int[] positionVector = new int[2];
+        positionVector[0] = worldX + width / 2;
+        positionVector[1] = worldY + height / 2;
 
+        return positionVector;
+    }
 }

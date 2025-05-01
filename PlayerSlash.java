@@ -23,7 +23,7 @@
             worldY = y;
 
             //For checking attack duration
-            duration = 400;
+            duration = 50;
             setExpirationTime(duration);
 
             matchHitBoxBounds();
@@ -69,4 +69,6 @@
             } 
             matchHitBoxBounds();
         }
+
+        
     }

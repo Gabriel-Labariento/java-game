@@ -103,24 +103,30 @@ public class ServerMaster {
         // If entity is an attack and is friendly and if the second entity is an enemy, then the enemy takes damage.
         
         if (e1 instanceof Attack attack && ((!attack.getIsFriendly() && e2 instanceof Player) 
-            || (attack.getIsFriendly() && e2 instanceof Enemy)))
-            e2.setHitPoints(e2.getHitPoints()-e1.getDamage());
-
+            || (attack.getIsFriendly() && e2 instanceof Enemy))) {
+                System.out.println("Collision between " + e1.getClass() + " and " + e2.getClass());
+                e2.takeDamageFromEntity(e1);
+                applyKnockBack(e2, attack);
+            } 
+                
         else if (e2 instanceof Attack attack && ((!attack.getIsFriendly() && e1 instanceof Player) 
-            || (attack.getIsFriendly() && e1 instanceof Enemy)))
-            e1.setHitPoints(e1.getHitPoints()-e2.getDamage());
-
+            || (attack.getIsFriendly() && e1 instanceof Enemy))) {
+                System.out.println("Collision between " + e1.getClass() + " and " + e2.getClass());
+                e1.takeDamageFromEntity(e2);
+                applyKnockBack(e1, attack);
+            }
+            
         //PLAYER/ENEMY COLLISION HANDLING
         //If player touches enemy, take damage and prevent overlap
         else if (e1 instanceof Player && e2 instanceof Enemy){
             preventOverlap(e1, e2, b1, b2);
-            e1.setHitPoints(e1.getHitPoints()- e2.getDamage());
+            e1.takeDamageFromEntity(e2);
         }
 
         else if (e2 instanceof Player && e1 instanceof Enemy)
         {
             preventOverlap(e1, e2, b1, b2);
-            e2.setHitPoints(e2.getHitPoints()-e1.getDamage());
+            e1.takeDamageFromEntity(e2);
         }
 
         else if (e1 instanceof Player && e2 instanceof Player)
@@ -132,23 +138,14 @@ public class ServerMaster {
     private void preventOverlap(Entity e1, Entity e2, int[] b1, int[] b2){
 
         //Get the position vectors of both entities
-        int[] positionVector1 = new int[2];
-        positionVector1[0] = e1.getWorldX() + e1.getWidth()/2;
-        positionVector1[1] = e1.getWorldY() + e1.getHeight()/2;
-
-        int[] positionVector2 = new int[2];
-        positionVector2[0] = e2.getWorldX() + e2.getWidth()/2;
-        positionVector2[1] = e2.getWorldY() + e2.getHeight()/2;
+        int[] positionVector1 = e1.getPositionVector();
+        int[] positionVector2 = e2.getPositionVector();
 
         //Find the unit normal and unit tangent vectors
-        int[] normalVector = new int[2];
-        normalVector[0] = positionVector2[0] - positionVector1[0];
-        normalVector[1] = positionVector2[1] - positionVector1[1];
+        int[] normalVector = getNormalVector(positionVector1, positionVector2);
 
         double normalVectorMagnitude = Math.sqrt((normalVector[0]*normalVector[0]) + (normalVector[1]*normalVector[1]));
-        double[] unitNormal = new double[2];
-        unitNormal[0] = normalVector[0]/normalVectorMagnitude;
-        unitNormal[1] = normalVector[1]/normalVectorMagnitude;
+        double[] unitNormal = getUnitNormal(normalVector, normalVectorMagnitude);
 
         //Get the overlaps on both axes
         double overlapX = Math.min(b1[3], b2[3]) - Math.max(b1[2], b2[2]);
@@ -178,9 +175,44 @@ public class ServerMaster {
 
     }
 
+    private void applyKnockBack(Entity e, Attack a) {
+        System.out.println("Applying knockback to enemy: " + e.getClass());
+
+        int[] entityPosition = e.getPositionVector();
+        int[] attackPosition = a.getOwner().getPositionVector();
+
+        int[] normalVector = getNormalVector(entityPosition, attackPosition);
+
+        double normalVectorMagnitude = Math.sqrt((normalVector[0]*normalVector[0]) + (normalVector[1]*normalVector[1]));
+        double[] unitNormal = getUnitNormal(normalVector, normalVectorMagnitude);
+
+        int knockBackStrength = 5;
+        int newX = (int) (e. getWorldX() - unitNormal[0] * knockBackStrength);
+        int newY = (int)(e.getWorldY() - unitNormal[1] * knockBackStrength);
+
+        e.setPosition(newX, newY);
+        e.matchHitBoxBounds();
+    }
+
+    private int[] getNormalVector(int[] v1, int[] v2){
+        int[] normalVector = new int[2];
+        normalVector[0] = v2[0] - v1[0];
+        normalVector[1] = v2[1] - v1[1];
+
+        return normalVector;
+    }
+
+    private double[] getUnitNormal(int[] normalVector, double normalVectorMagnitude) {
+        double[] unitNormal = new double[2];
+        unitNormal[0] = normalVector[0] / normalVectorMagnitude;
+        unitNormal[1] = normalVector[1] / normalVectorMagnitude;
+
+        return unitNormal;
+    }
+
     private void processInputs(){
         keyInputQueue.forEach((key, cid) ->{
-            System.out.println("Processing input: " + key + "," + cid);
+            // System.out.println("Processing input: " + key + "," + cid);
             ((Player) getPlayerFromClientId(cid)).update(key);
             // player.setVelocity();
            
@@ -214,13 +246,13 @@ public class ServerMaster {
         int attackSpeed = originPlayer.getSpeed();
         int frameWidth = 720;
         int frameHeight = 540;
-        int centerX = frameWidth/2;
-        int centerY = frameHeight/2;
+        int centerX = frameWidth / 2;
+        int centerY = frameHeight / 2;
 
         //Get a point a set distance away from the center of the screen in the direction of the click
         int vectorX = clickX - centerX;
         int vectorY = clickY - centerY;  
-        int distance = 50;
+        int distance = originPlayer.getWidth(); // distance from player to slash 
         double normalizedVector = Math.sqrt((vectorX*vectorX)+(vectorY*vectorY));
 
         //Avoids 0/0 division edge case

@@ -1,10 +1,13 @@
-import java.awt.Color;
 import java.awt.Graphics2D;
-import java.awt.geom.Rectangle2D;
+import java.awt.image.BufferedImage;
+import java.io.IOException;
+import java.io.InputStream;
+import javax.imageio.ImageIO;
 
 public class Rat extends Enemy{
     public static int ratCount = 0;
     private int id;
+    private BufferedImage sprite;
 
     public Rat(int x, int y) {
         id = ratCount++;
@@ -17,6 +20,7 @@ public class Rat extends Enemy{
         maxHealth = 10;
         hitPoints = maxHealth;
         currentRoom = null;
+        setImage();
     }
 
     @Override
@@ -30,9 +34,8 @@ public class Rat extends Enemy{
 
     @Override
     public void draw(Graphics2D g2d, int xOffset, int yOffset){
-        Rectangle2D.Double sprite = new Rectangle2D.Double(xOffset, yOffset, width, height);
-        g2d.setColor(Color.RED);
-        g2d.fill(sprite);
+        // Rectangle2D.Double sprite = new Rectangle2D.Double(xOffset, yOffset, width, height);
+        g2d.drawImage(sprite, xOffset, yOffset, width, height, null);
     }
 
     @Override
@@ -58,6 +61,16 @@ public class Rat extends Enemy{
         
         matchHitBoxBounds();
     }
+    
+    private void setImage() {
+        try {
+            String path = "Sprites\\rat_sprite_0.png";
+            InputStream is = getClass().getResourceAsStream(path);
+            sprite = ImageIO.read(is);
+        } catch (IOException e) {
+            System.out.println("IOException in setImage of " + getClass() + getId());
+        }
+    }
 
     public int getId() {
         return id;
@@ -66,4 +79,6 @@ public class Rat extends Enemy{
     public void setId(int id) {
         this.id = id;
     }
+
+
 }
