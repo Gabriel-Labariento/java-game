@@ -60,28 +60,17 @@ public class ServerMaster {
 
             //Sort entities from the universal arraylist by their worldx values (left bounds)
             Collections.sort(sortedEntities, Comparator.comparingInt(e -> e.getHitBoxBounds()[2]));
+
             // System.out.println("Number of entities in sortedEntities " + sortedEntities.size());
             int size = sortedEntities.size();
             for(int i = 0; i < size; i++){
                 Entity entity1 = sortedEntities.get(i);
                 int[] b1 = entity1.getHitBoxBounds();
-                // int[] b1 = null;
-                // try {
-                //     b1 = entity1.getHitBoxBounds();
-                //     // System.out.println("B1 Hitbox bounds: " + Arrays.toString(b1));
-                // } catch (Exception e) {
-                //     System.err.println("Erorr getting hitbox for " + entity1.getClass() + ": " + e.getMessage() );
-                //     continue;
-                // }
                 
                 // Get the entity at the next index
                 for(int j = (i+1); j < size; j++){
                     Entity entity2 = sortedEntities.get(j);
-                    if (entity2 == null) {
-                        System.out.println("entity 2 is null in sortedEntities");
-                        continue;
-                    }
-
+                    
                     if (entity1 instanceof Player && entity2 instanceof Attack ||
                         entity2 instanceof Player && entity1 instanceof Attack) {
                             Player player = entity1 instanceof Player ? (Player) entity1 : (Player) entity2;
@@ -169,10 +158,10 @@ public class ServerMaster {
         double overlap = overlapX * Math.abs(unitNormal[0]) + overlapY * Math.abs(unitNormal[1]);
 
         //Add a minimum overlap threshold in order to minimize constant correction
-        double overlapThreshold = 5;
+        double overlapThreshold = 5; // CHANGE MADE: OVERLAP TRESSHOLD SET TO 5
         if (overlap > overlapThreshold){
             //Divide overlap by an arbitrary number to smooth out the visual resolution of the collision
-            double resolutionFactor = overlap / 8;
+            double resolutionFactor = overlap / 4;
             int e1X = (int) (e1.getWorldX() - unitNormal[0] * resolutionFactor);
             int e1Y = (int)(e1.getWorldY() - unitNormal[1] * resolutionFactor);
             int e2X = (int)(e2.getWorldX() + unitNormal[0] * resolutionFactor);

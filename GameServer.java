@@ -48,12 +48,10 @@ public class GameServer {
             public void run(){
                 try {
                     gameStateManager.update();    
-                    // System.out.println("called update on gsm");
                 } catch (Exception e) {
                     System.err.println("Exception in game loop update():" + e);
                 }
                 
-
                 if (!connectedPlayers.isEmpty()){
                     for (ConnectedPlayer cp : connectedPlayers) {
                         String data = gameStateManager.getAssetsData(cp.cid);
