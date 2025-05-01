@@ -1,6 +1,9 @@
 import java.awt.Graphics2D;
 
 public abstract class Entity extends GameObject {
+    protected static final int INVINCIBILITY_DURATION = 800;
+    protected long invincibilityEnd;
+
     protected char identifier;
     protected int prevWorldX;
     protected int prevWorldY;
@@ -62,12 +65,21 @@ public abstract class Entity extends GameObject {
     }
 
     public void takeDamageFromEntity(Entity attacker){
+        if (getIsInvincible()) return;
+        System.out.println(getClass() + " takes damage from " + attacker.getClass() + " hp now " + (hitPoints - attacker.getDamage()) );
         hitPoints -= attacker.getDamage();
     }
+    
+    /**
+     * 
+     */
+    public void triggerInvincibility(){
+        invincibilityEnd = System.currentTimeMillis() + Entity.INVINCIBILITY_DURATION;
+    }
 
-   
-
-
+    public boolean getIsInvincible(){
+        return System.currentTimeMillis() >= invincibilityEnd;
+    }
 
     public Room getCurrentRoom() {
         return currentRoom;

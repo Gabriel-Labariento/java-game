@@ -205,7 +205,7 @@ public class GameClient {
                     // System.out.println("Added rat to client entities");
                     break;
                 case "PlayerSlash":
-                    PlayerSlash ps = new PlayerSlash(clientId, x, y, 32, 32, 0, true, roomId);
+                    PlayerSlash ps = new PlayerSlash(clientId, x, y, 32, 32, true, roomId);
                     ps.setId(id);
                     ps.matchHitBoxBounds();
                     clientState.addEntity(ps);

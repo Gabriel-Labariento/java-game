@@ -105,6 +105,7 @@ public class ServerMaster {
         if (e1 instanceof Attack attack && ((!attack.getIsFriendly() && e2 instanceof Player) 
             || (attack.getIsFriendly() && e2 instanceof Enemy))) {
                 System.out.println("Collision between " + e1.getClass() + " and " + e2.getClass());
+                e2.triggerInvincibility();
                 e2.takeDamageFromEntity(e1);
                 applyKnockBack(e2, attack);
             } 
@@ -112,6 +113,7 @@ public class ServerMaster {
         else if (e2 instanceof Attack attack && ((!attack.getIsFriendly() && e1 instanceof Player) 
             || (attack.getIsFriendly() && e1 instanceof Enemy))) {
                 System.out.println("Collision between " + e1.getClass() + " and " + e2.getClass());
+                e2.triggerInvincibility();
                 e1.takeDamageFromEntity(e2);
                 applyKnockBack(e1, attack);
             }
@@ -275,15 +277,13 @@ public class ServerMaster {
             attackWidth = originPlayer.getWidth() * 2;
             attackHeight = originPlayer.getWidth() * 2;
             playerAttack = new PlayerSlash(cid, worldX-attackWidth/2, worldY - attackHeight/2, 
-            attackWidth, attackHeight, attackDamage, true, attackSpeed);
+            attackWidth, attackHeight, true, attackSpeed);
             playerAttack.matchHitBoxBounds();
             playerAttack.setCurrentRoom(originPlayer.getCurrentRoom());
         } //else {}//
         entities.add(playerAttack); 
         System.out.println("Created PlayerSlash: " + playerAttack.getId() + " at (" + playerAttack.getWorldX() + ", " + playerAttack.getWorldX() + ")");
     }
-
-
 
     /**
      * Increments the static gameLevel field if it is less than MAX_LEVEL

@@ -3,8 +3,6 @@ import java.awt.Graphics2D;
 import java.awt.geom.*;
 
 public class Player extends Entity{
-    private static final int invincibilityDuration = 800;
-    private long invincibilityEnd;
     private final int screenX;
     private final int screenY;
 
@@ -21,8 +19,6 @@ public class Player extends Entity{
         maxHealth = 50;
         hitPoints = maxHealth;
     }
-
-   
 
     @Override
     public void draw(Graphics2D g2d, int xOffset, int yOffset){
@@ -62,16 +58,7 @@ public class Player extends Entity{
         hitBoxBounds[3] = worldX + width;
     }
 
-    /**
-     * 
-     */
-    public void triggerInvincibility(){
-        invincibilityEnd = System.currentTimeMillis() + invincibilityDuration;
-    }
-
-    public boolean getIsInvincible(){
-        return System.currentTimeMillis() >= invincibilityEnd;
-    }
+    
 
     /**
      * Builds a String storing room transition data in the form RC:clientId,newX,newY,hp,destinationRoomId

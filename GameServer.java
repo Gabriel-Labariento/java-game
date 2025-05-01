@@ -8,7 +8,7 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 public class GameServer {
-    private static final int GAMELOOPINTERVAL = 16;
+    public static final int GAMELOOPINTERVAL = 16;
     private static final int TICKSPERSECOND = 60;
     private ServerSocket ss;
     private ArrayList<Socket> sockets;

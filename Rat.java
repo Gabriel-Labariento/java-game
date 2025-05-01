@@ -55,7 +55,7 @@ public class Rat extends Enemy{
     @Override
     public void updateEntity(ServerMaster gsm){
         // TODO: ENEMY AI LOGIC
-
+        
         Player pursued = scanForPlayer(gsm);
         if (pursued != null) pursuePlayer(pursued);  
         

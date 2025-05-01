@@ -7,14 +7,14 @@
         private static int slashCount = Integer.MIN_VALUE; // To hold more
         private int id;
 
-        public PlayerSlash(int cid, int x, int y, int w, int h, double damage, boolean isFriendly, int speed){
+        public PlayerSlash(int cid, int x, int y, int w, int h, boolean isFriendly, int speed){
             id = slashCount++;
             clientId = cid;
             owner = ServerMaster.getInstance().getPlayerFromClientId(cid);
             identifier = NetworkProtocol.SLASH.toCharArray()[0];
             this.isFriendly = isFriendly;
             this.speed = speed;
-            this.damage = damage;
+            damage = 2;
             //Temporary hitPoints allocation
             hitPoints = 100;
             height = h;
@@ -23,7 +23,7 @@
             worldY = y;
 
             //For checking attack duration
-            duration = 50;
+            duration = GameServer.GAMELOOPINTERVAL * 2; // 2 frames
             setExpirationTime(duration);
 
             matchHitBoxBounds();

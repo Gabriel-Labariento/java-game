@@ -1,4 +1,5 @@
 public abstract class Enemy extends Entity {
+    
 
     // Right now, simple logic that scans if the distance between the player and the entity is <= scanRadius.
     // Pursues if yes. Does not yet consider obstacles.
