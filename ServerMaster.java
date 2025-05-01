@@ -41,14 +41,10 @@ public class ServerMaster {
 
         checkCollisions();
 
-        // updateEntities();
-
-         // Remove entities that are either depleted of HitPoints or isExpired
+        // Remove entities that are either depleted of HitPoints or isExpired
         entities.removeIf(entity -> (entity instanceof Attack attack) && (attack.getIsExpired()));
         entities.removeIf(entity -> (entity.getHitPoints() <= 0));
-
-        
-        
+    
     }
 
     // Checks for collisions between all objects inside the entity ArrayList
@@ -407,7 +403,7 @@ public class ServerMaster {
             userPlayer.setHitPoints(hp);
             currentRoom = newRoom;
             handleSpawnersOnRoomChange(newRoom);
-            currentRoom.closeDoors();
+            if (!currentRoom.isCleared()) currentRoom.closeDoors();
 
             // Build String to be returned
             sb.append(NetworkProtocol.USER_PLAYER)
@@ -423,7 +419,10 @@ public class ServerMaster {
     }
 
     public void handleSpawnersOnRoomChange(Room next){
-        if (next.getMobSpawner() != null && (!next.getMobSpawner().isSpawning())) next.getMobSpawner().spawn();
+        if  (next.getMobSpawner() != null &&        // MobSpawner exists
+            (!next.getMobSpawner().isSpawning()) && // MobSpawner is not spawning
+            (!next.isCleared())                     // Room has not been cleared
+            ) next.getMobSpawner().spawn();         // then spawn
 
         if (next.isEndRoom() && next.getMobSpawner().isAllKilled()) incrementGameLevel();
     }

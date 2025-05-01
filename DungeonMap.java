@@ -359,6 +359,8 @@ public class DungeonMap {
         Room r = new Room(roomId, roomX, roomY);
         r.setIsStartRoom(isStart);
         r.setIsEndRoom(isEnd);
+        if (isStart) r.setIsCleared(true); 
+        else r.setIsCleared(false);
         mapIdToRoom.put(roomId, r);
         r.matchHitBoxBounds();
         rooms.add(r);

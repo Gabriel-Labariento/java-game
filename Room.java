@@ -8,7 +8,7 @@ public class Room extends GameObject implements Tileable{
     public static final int HEIGHT_TILES = 33;
     private int roomId;
     private int difficulty; // 0 => 3, easiest to hardest
-    private boolean isStartRoom, isEndRoom;
+    private boolean isStartRoom, isEndRoom, isCleared;
     private MobSpawner mobSpawner;
   
     private ArrayList<Room> connections;
@@ -400,6 +400,14 @@ public class Room extends GameObject implements Tileable{
 
     public void setDifficulty(int difficulty) {
         this.difficulty = difficulty;
+    }
+
+    public boolean isCleared() {
+        return isCleared;
+    }
+
+    public void setIsCleared(boolean isCleared) {
+        this.isCleared = isCleared;
     }
     
 

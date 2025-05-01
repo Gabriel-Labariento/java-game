@@ -126,6 +126,8 @@ public class MobSpawner {
         switch (name) {
             case "Rat":
                 return new Rat(x, y);
+            case "RatKing":
+                return new RatKing(x, y);
             default:
                 System.out.println("Undetected enemy " + name );
                 return new Rat(x, y);

@@ -160,6 +160,7 @@ public class Player extends Entity{
             return getRoomTransitionData(d, d.getOtherRoom(currentRoom)); // return a different string upon room change
         } else {
             // String format: clientId,x,y,hp,roomId
+            // sb.append(identifier).append(NetworkProtocol.SUB_DELIMITER)
             sb.append(clientId).append(NetworkProtocol.SUB_DELIMITER)
             .append(worldX).append(NetworkProtocol.SUB_DELIMITER)
             .append(worldY).append(NetworkProtocol.SUB_DELIMITER)
