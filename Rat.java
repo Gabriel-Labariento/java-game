@@ -8,11 +8,16 @@ public class Rat extends Enemy{
     public static int ratCount = 0;
     private int id;
     private BufferedImage sprite;
+    private static final int IDLE_DURATION = 400;
+    private static final int ATTACK_DURATION = 150;
+    private int jumpSpeed = 2;
+    private int baseSpeed = 1;
+    private long lastStateChangeTime = 0;
 
     public Rat(int x, int y) {
         id = ratCount++;
         identifier = NetworkProtocol.RAT.toCharArray()[0];
-        speed = 1;
+        speed = baseSpeed;
         height = 16;
         width = 16;
         worldX = x;
@@ -55,13 +60,64 @@ public class Rat extends Enemy{
     @Override
     public void updateEntity(ServerMaster gsm){
         // TODO: ENEMY AI LOGIC
+        long now = System.currentTimeMillis();
         
         Player pursued = scanForPlayer(gsm);
-        if (pursued != null) pursuePlayer(pursued);  
+        if (pursued == null) return;
+
+        // Set distance parameters
+        double distance = getDistanceBetween(this, pursued);
+        final double ATTACK_RANGE = GameCanvas.TILESIZE * 2; // 2 tiles away
         
+        switch (currentState) {
+            case IDLE:
+                // TODO: RANDOM MOVEMENT
+                if (now - lastStateChangeTime > IDLE_DURATION) {
+                    currentState = State.PURSUE;
+                    lastStateChangeTime = now;
+                }
+                break;
+
+            case PURSUE:
+                pursuePlayer(pursued);
+                if (distance <= ATTACK_RANGE) {
+                    currentState = State.ATTACK;
+                    lastStateChangeTime = now;
+                } 
+                break;
+
+            case ATTACK:
+                if (now - lastStateChangeTime > ATTACK_DURATION) { 
+                    attackPlayer(pursued);
+                    currentState = State.IDLE;
+                    lastStateChangeTime = now;
+                } 
+                break;
+            default:
+                throw new AssertionError();
+        }
+
         matchHitBoxBounds();
     }
     
+    private void attackPlayer(Player player) {
+        int dx = player.getCenterX() - getCenterX();
+        int dy = player.getCenterY() - getCenterY();
+
+        double distance = getDistanceBetween(this, player);
+
+        if (distance != 0) {
+            double unitX = dx / distance;
+            double unitY = dy / distance;
+
+            double smoothFactor = 0.5;
+            int newX = (int) (worldX + unitX * GameCanvas.TILESIZE * jumpSpeed * smoothFactor);
+            int newY = (int) (worldY + unitY * GameCanvas.TILESIZE * jumpSpeed * smoothFactor);
+            
+            setPosition(newX, newY);
+        }
+    }
+
     private void setImage() {
         try {
             String path = "Sprites\\rat_sprite_0.png";

@@ -3,8 +3,16 @@ import java.awt.Graphics2D;
 import java.awt.geom.*;
 
 public class Player extends Entity{
+    private static final int INVINCIBILITY_DURATION = 800;
+    private static final int REVIVAL_DURATION = 5000;
+    private static final int COOLDOWN_DURATION = 1000;
+    private long invincibilityEnd;
+    private long coolDownEnd;
     private final int screenX;
     private final int screenY;
+    private boolean isDown;
+    private boolean isReviving;
+    private long revivalTime;
 
     public Player(int cid, int x, int y){
         this.clientId = cid;
@@ -17,7 +25,9 @@ public class Player extends Entity{
         worldX = x;
         worldY = y;
         maxHealth = 50;
+        damage = 5;
         hitPoints = maxHealth;
+        isDown = false;
     }
 
     @Override
@@ -59,7 +69,6 @@ public class Player extends Entity{
     }
 
     
-
     /**
      * Builds a String storing room transition data in the form RC:clientId,newX,newY,hp,destinationRoomId
      * @param room the room to transition to
@@ -145,7 +154,6 @@ public class Player extends Entity{
         return screenPos;
     }
     
-
     /**
      * {@inheritDoc }
      * @param isUserPlayer true if the calling player is the user player, false otherwise
@@ -171,9 +179,38 @@ public class Player extends Entity{
         return sb.toString();
     };
 
-    @Override
-    public void updateEntity(ServerMaster gsm) {
-        System.out.println("For player, use update() instead of updateEntity().");
-        // TODO: IMPROVE THIS IF HAVE
+    public void setIsDown(boolean b){
+        isDown = b;
     }
+
+    public boolean getIsDown(){
+        return isDown;
+    }
+
+    public void triggerCoolDown(){
+        coolDownEnd = System.currentTimeMillis() + COOLDOWN_DURATION;
+    }
+
+    public boolean getIsOnCoolDown(){
+        return System.currentTimeMillis() < coolDownEnd;
+    }
+
+    public void triggerRevival(){
+       revivalTime = System.currentTimeMillis() + REVIVAL_DURATION;  
+    }
+
+    public void setIsReviving(boolean b){
+        isReviving = b;
+    }
+
+    public boolean getIsReviving(){
+        return isReviving;
+    }
+
+    public boolean getIsRevived(){
+        return System.currentTimeMillis() >= revivalTime;
+    }
+
+    @Override
+    public void updateEntity(ServerMaster gsm) {}
 }

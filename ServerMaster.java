@@ -9,7 +9,10 @@ public class ServerMaster {
     private static int gameLevel = 0; // TODO: INCREMENT WHEN DEFEAT BOSS
     private static final int MAX_LEVEL = 7;
     private ConcurrentHashMap<Character, Integer> keyInputQueue;
+    private ConcurrentHashMap<Integer, Integer> availableRevives;
     private ArrayList<ClickInput> clickInputQueue;
+    private int playerNum;
+    private int downedPlayersNum;
 
 
     private static ServerMaster singleInstance = null;
@@ -22,6 +25,7 @@ public class ServerMaster {
         currentRoom = dungeonMap.getStartRoom();
         //-----------------------------//
         keyInputQueue = new ConcurrentHashMap<>();
+        availableRevives = new ConcurrentHashMap<>();
         clickInputQueue = new ArrayList<>();
     }
 
@@ -42,9 +46,65 @@ public class ServerMaster {
         checkCollisions();
 
         // Remove entities that are either depleted of HitPoints or isExpired
-        entities.removeIf(entity -> (entity instanceof Attack attack) && (attack.getIsExpired()));
-        entities.removeIf(entity -> (entity.getHitPoints() <= 0));
-    
+        updateEntities();
+    }
+
+    public void updateEntities(){
+        //Check on and resolve the end of life properties of each entity
+        for (Entity entity:entities){
+            if(entity instanceof Player player && player.getHitPoints() <=0){
+                //DOWNING AND REVIVAL MECHANICS
+                //If the player has not yet been recorded as being downed, set them as such
+                if (!player.getIsDown()){
+                    player.setIsDown(true);
+
+                    //If no players are left, activate end game sequence
+                    downedPlayersNum++;
+                    if (downedPlayersNum == playerNum){
+                        System.out.println("GAME OVER");
+                    }
+                }
+
+                //Search through list of available revives to see if the player can be revived
+                boolean isInContact = false;
+                for (int i:availableRevives.values()){
+                    
+                    if (i == player.getClientId()){
+                        //If the player has not yet been recorded as reviving, set them as such
+                        if (!player.getIsReviving()){
+                            player.triggerRevival();
+                            player.setIsReviving(true);
+                        }
+
+                        isInContact = true;
+                        break;
+                    } 
+                }
+
+                //If the other player has moved away from the downed player
+                if(!isInContact){
+                    player.setIsReviving(false);
+                    //Insert UI indicators
+                }
+
+                //After the revivaltime and without the living player moving away, revive the downed player with one health
+                if(player.getIsReviving() && player.getIsRevived()){
+                    player.setHitPoints(1);
+                    player.setIsDown(false);
+                    //Insert revival animation
+                }
+            }
+            else if (entity instanceof Attack attack && attack.getIsExpired()){
+                entities.remove(entity);
+            }
+            else if (entity instanceof Enemy enemy && enemy.getHitPoints() <= 0){
+                //Trigger death animation;
+                entities.remove(entity);
+            }
+            entity.updateEntity(this);
+        }
+        //Reset list to track available revives per frame
+        availableRevives.clear();
     }
 
     // Checks for collisions between all objects inside the entity ArrayList
@@ -95,43 +155,57 @@ public class ServerMaster {
     public void resolveCollision(Entity e1, Entity e2, int[] b1, int[] b2){
 
         // ATTACK-PLAYER/ENEMY COLLISION HANDLING
-        // If entity is an attack and is not friendly and if the second entity is a player, then the player takes damage.
-        // If entity is an attack and is friendly and if the second entity is an enemy, then the enemy takes damage.
-        
-        if (e1 instanceof Attack attack && ((!attack.getIsFriendly() && e2 instanceof Player) 
-            || (attack.getIsFriendly() && e2 instanceof Enemy))) {
-                System.out.println("Collision between " + e1.getClass() + " and " + e2.getClass());
-                e2.triggerInvincibility();
-                e2.takeDamageFromEntity(e1);
-                applyKnockBack(e2, attack);
-            } 
+        if (e1 instanceof Attack attack && !attack.getIsFriendly() && e2 instanceof Player player){
+            damagePlayer(player, attack);
+            applyKnockBack(player, attack);
+        }
                 
-        else if (e2 instanceof Attack attack && ((!attack.getIsFriendly() && e1 instanceof Player) 
-            || (attack.getIsFriendly() && e1 instanceof Enemy))) {
-                System.out.println("Collision between " + e1.getClass() + " and " + e2.getClass());
-                e2.triggerInvincibility();
-                e1.takeDamageFromEntity(e2);
-                applyKnockBack(e1, attack);
-            }
+        else if (e2 instanceof Attack attack && !attack.getIsFriendly() && e1 instanceof Player player){
+            damagePlayer(player, attack);
+            applyKnockBack(player, attack);
+        }
+
+        else if (e1 instanceof Attack attack && attack.getIsFriendly() && e2 instanceof Enemy enemy){
+            damageEnemy(enemy, attack);
+            applyKnockBack(enemy, attack);
+        }
+            
+        else if (e2 instanceof Attack attack && attack.getIsFriendly() && e1 instanceof Enemy enemy){
+            damageEnemy(enemy, attack);
+            applyKnockBack(enemy, attack);
+        }
             
         //PLAYER/ENEMY COLLISION HANDLING
         //If player touches enemy, take damage and prevent overlap
-        else if (e1 instanceof Player && e2 instanceof Enemy){
-            preventOverlap(e1, e2, b1, b2);
-            e1.takeDamageFromEntity(e2);
+        //PLAYER/ENEMY COLLISION HANDLING
+        else if (e1 instanceof Player player && e2 instanceof Enemy enemy && player.getIsInvincible()){
+            preventOverlap(player, enemy, b1, b2);
+            player.setHitPoints(player.getHitPoints()- enemy.getDamage());
+            player.triggerInvincibility();
         }
 
-        else if (e2 instanceof Player && e1 instanceof Enemy)
-        {
-            preventOverlap(e1, e2, b1, b2);
-            e1.takeDamageFromEntity(e2);
+        else if (e2 instanceof Player player && e1 instanceof Enemy enemy && player.getIsInvincible()){
+            player.setHitPoints(player.getHitPoints()- enemy.getDamage());
+            player.triggerInvincibility();
         }
 
-        else if (e1 instanceof Player && e2 instanceof Player)
-            preventOverlap(e1, e2, b1, b2);
         else if (e1 instanceof Enemy && e2 instanceof Enemy)
             preventOverlap(e1, e2, b1, b2);
+
+        else if (e1 instanceof Player p1 && e2 instanceof Player p2){
+            //Collision detection for revival system
+            int cid1 = p1.getClientId();
+            int cid2 = p2.getClientId();
+
+            //Check if living player is already in the availableRevives list to avoid duplicates
+            if(!p1.getIsDown() && p2.getIsDown() && availableRevives.get(cid1) == null)
+                availableRevives.put(cid1, cid2);
+            else if (!p2.getIsDown() && p1.getIsDown() && availableRevives.get(cid2) == null)
+                availableRevives.put(cid2, cid1);
+        }
     }
+
+
 
     private void preventOverlap(Entity e1, Entity e2, int[] b1, int[] b2){
 
@@ -173,6 +247,25 @@ public class ServerMaster {
 
     }
 
+    private void damagePlayer(Player player, Attack attack){
+        //Debouncing condition
+        if(player.getIsInvincible()){
+            player.takeDamageFromEntity(attack);
+            player.triggerInvincibility();
+        }
+
+    }
+
+    //Enemy can only take one instance of damage per attack
+    private void damageEnemy(Enemy enemy, Attack attack){
+        int id = attack.getId();
+        //Debouncing condition
+        if(enemy.validateAttack(id)){
+            enemy.takeDamageFromEntity(attack);
+            enemy.loadAttack(id);
+        }
+    }
+
     private void applyKnockBack(Entity e, Attack a) {
         System.out.println("Applying knockback to enemy: " + e.getClass());
 
@@ -184,7 +277,7 @@ public class ServerMaster {
         double normalVectorMagnitude = Math.sqrt((normalVector[0]*normalVector[0]) + (normalVector[1]*normalVector[1]));
         double[] unitNormal = getUnitNormal(normalVector, normalVectorMagnitude);
 
-        int knockBackStrength = 5;
+        int knockBackStrength = 12;
         int newX = (int) (e. getWorldX() - unitNormal[0] * knockBackStrength);
         int newY = (int)(e.getWorldY() - unitNormal[1] * knockBackStrength);
 
@@ -450,15 +543,6 @@ public class ServerMaster {
 
     public void updateUserPlayerIndex(int cid) {
         userPlayerIndex = entities.indexOf(getPlayerFromClientId(cid));
-    }
-
-    /**
-     * Calls the update method of all non-player entities. 
-     */
-    public void updateEntities() {
-        for (Entity entity : entities) {
-            if (!(entity instanceof Player) && (entity != null)) entity.updateEntity(this);
-        }
     }
 
     public DungeonMap getDungeonMap() {

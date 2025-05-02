@@ -124,4 +124,11 @@ public abstract class GameObject {
 
         return positionVector;
     }
+
+    public double getDistanceBetween(GameObject a, GameObject b){
+        return Math.sqrt(
+                    (Math.pow(a.getCenterX() - b.getCenterX(), 2) + 
+                    Math.pow(a.getCenterY() - b.getCenterY(), 2))
+                );
+    } 
 }
