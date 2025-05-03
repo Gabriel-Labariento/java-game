@@ -377,7 +377,6 @@ public class DungeonMap {
         int doorId = Integer.parseInt(doorData[0]);
         int doorX = Integer.parseInt(doorData[1]);
         int doorY = Integer.parseInt(doorData[2]);
-        // System.out.println("Door Y: " + doorY);
         String doorDirection = doorData[3];
         int roomAID = Integer.parseInt(doorData[4]);
         int roomBID = Integer.parseInt(doorData[5]);

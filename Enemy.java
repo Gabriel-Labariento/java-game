@@ -16,6 +16,7 @@ public abstract class Enemy extends Entity {
     }
 
     public boolean validateAttack(int id){
+        
         return !attacksTakenById.contains(id);
     }
 
@@ -28,8 +29,9 @@ public abstract class Enemy extends Entity {
 
         for (Entity e : gsm.getEntities()) {
             if (e instanceof Player player) {
+                if (player.getCurrentRoom() != getCurrentRoom()) continue;
                 // Get the center distance between the player and the entity
-                double distance = getDistanceBetween(e, player);
+                double distance = getSquaredDistanceBetween(e, player);
                 
                 if ( (distance <= scanRadius) && (distance < minDistance)) {
                     closestPlayer = player;
@@ -52,10 +54,9 @@ public abstract class Enemy extends Entity {
 
         if (player.getCenterY() > getCenterY()) worldY += speed;
         else if (player.getCenterY() < getCenterY()) worldY -= speed;
-
     }
 
-    public void circlePlayer(Player player) {
+    public void circlePlayer(Player player, boolean clockwise) {
         int dx = player.getCenterX() - getCenterX();
         int dy = player.getCenterY() - getCenterY();
 
@@ -64,8 +65,6 @@ public abstract class Enemy extends Entity {
         if (distance != 0) {
             double unitX = dx / distance;
             double unitY = dy / distance;
-
-            boolean clockwise = true;
 
             double perpendicularX = clockwise ? -1 * unitY : unitY;
             double perpendicularY = clockwise ? unitX : -1 * unitX;

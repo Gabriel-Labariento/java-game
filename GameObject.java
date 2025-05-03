@@ -28,7 +28,7 @@ public abstract class GameObject {
      * @return integer value of the object's center x coordinate
      */
     public int getCenterX() {
-        return ( (int) ((worldX + width) / 2));
+        return (int) (worldX + width / 2);
     }
 
     /**
@@ -36,7 +36,7 @@ public abstract class GameObject {
      * @return integer value of the object's center y coordinate
      */
     public int getCenterY() {
-        return ( (int) ((worldY + height) / 2));
+        return (int) (worldY + height / 2);
     }
 
     /**
@@ -111,7 +111,7 @@ public abstract class GameObject {
 
     public int[] getHitBoxBounds() {
         if (hitBoxBounds == null) {
-            System.err.println("WARNING: hit box bounds is null for object: " + getClass());
+            // System.err.println("WARNING: hit box bounds is null for object: " + getClass());
             return new int[] {worldY, worldY + height, worldX, worldX + width};
         }
         return hitBoxBounds;
@@ -131,4 +131,10 @@ public abstract class GameObject {
                     Math.pow(a.getCenterY() - b.getCenterY(), 2))
                 );
     } 
+
+    public double getSquaredDistanceBetween(GameObject a, GameObject b) {
+        int dx = a.getCenterX() - b.getCenterX();
+        int dy = a.getCenterY() - b.getCenterY();
+        return dx * dx + dy * dy;
+    }
 }

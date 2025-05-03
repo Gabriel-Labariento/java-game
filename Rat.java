@@ -8,10 +8,10 @@ public class Rat extends Enemy{
     private int id;
     private BufferedImage[] sprites;
     private static final int IDLE_DURATION = 400;
-    private static final int ATTACK_DURATION = 150;
+    private static final int ATTACK_DURATION = 300;
     private long lastSpriteUpdate = 0;
     private static final int SPRITE_FRAME_DURATION = 200;
-    private int jumpSpeed = 2;
+    private static final int ATTACK_RANGE = GameCanvas.TILESIZE * 2; // tiles away
     private int baseSpeed = 1;
     private long lastStateChangeTime = 0;
     private int currSprite;
@@ -26,6 +26,7 @@ public class Rat extends Enemy{
         worldY = y;
         maxHealth = 10;
         hitPoints = maxHealth;
+        damage = 1;
         currentRoom = null;
         currSprite = 0;
         setSprites();
@@ -63,19 +64,25 @@ public class Rat extends Enemy{
     public void updateEntity(ServerMaster gsm){
         // TODO: ENEMY AI LOGIC
         long now = System.currentTimeMillis();
+    
+        Player pursued = scanForPlayer(gsm);
+
+        if (pursued == null) return;
 
         if (now - lastSpriteUpdate > SPRITE_FRAME_DURATION) {
-            currSprite++;
-            if (currSprite > 2) currSprite = 0;
+            if (worldX > pursued.getWorldX()) {
+                currSprite++;
+                if (currSprite > 2) currSprite = 0;
+            } else {
+                currSprite++;
+                if (currSprite < 3 || currSprite > 5) currSprite = 3;
+            }
             lastSpriteUpdate = now;
         }
-        
-        Player pursued = scanForPlayer(gsm);
-        if (pursued == null) return;
+
 
         // Set distance parameters
         double distance = getDistanceBetween(this, pursued);
-        final double ATTACK_RANGE = GameCanvas.TILESIZE * 3; // 2 tiles away
         
         switch (currentState) {
             case IDLE:
@@ -117,8 +124,8 @@ public class Rat extends Enemy{
             double unitX = dx / distance;
             double unitY = dy / distance;
 
-            int newX = (int) (worldX + unitX * GameCanvas.TILESIZE * jumpSpeed);
-            int newY = (int) (worldY + unitY * GameCanvas.TILESIZE * jumpSpeed);
+            int newX = (int) (worldX + unitX * speed * ATTACK_RANGE);
+            int newY = (int) (worldY + unitY * speed * ATTACK_RANGE);
             
             setPosition(newX, newY);
         }
@@ -129,7 +136,10 @@ public class Rat extends Enemy{
             BufferedImage left0 = ImageIO.read(getClass().getResourceAsStream("Sprites\\Rat\\sprite_rat_left0.png"));
             BufferedImage left1 = ImageIO.read(getClass().getResourceAsStream("Sprites\\Rat\\sprite_rat_left1.png"));
             BufferedImage left2 = ImageIO.read(getClass().getResourceAsStream("Sprites\\Rat\\sprite_rat_left2.png"));
-            sprites = new BufferedImage[] {left0, left1, left2};
+            BufferedImage right0 = ImageIO.read(getClass().getResourceAsStream("Sprites\\Rat\\sprite_rat_right0.png"));
+            BufferedImage right1 = ImageIO.read(getClass().getResourceAsStream("Sprites\\Rat\\sprite_rat_right1.png"));
+            BufferedImage right2 = ImageIO.read(getClass().getResourceAsStream("Sprites\\Rat\\sprite_rat_right2.png"));
+            sprites = new BufferedImage[] {left0, left1, left2, right0, right1, right2};
 
         } catch (IOException e) {
             System.out.println("IOException in setImage of " + getClass() + getId());

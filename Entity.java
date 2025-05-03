@@ -66,8 +66,8 @@ public abstract class Entity extends GameObject {
 
     public void takeDamageFromEntity(Entity attacker){
         if (getIsInvincible()) return;
-        System.out.println(getClass() + " takes damage from " + attacker.getClass() + " hp now " + (hitPoints - attacker.getDamage()) );
         hitPoints -= attacker.getDamage();
+        System.out.println(getClass() + " takes damage from " + attacker.getClass() + " hp now " + (hitPoints) );
     }
     
     /**
@@ -78,7 +78,7 @@ public abstract class Entity extends GameObject {
     }
 
     public boolean getIsInvincible(){
-        return System.currentTimeMillis() >= invincibilityEnd;
+        return System.currentTimeMillis() < invincibilityEnd;
     }
 
     public Room getCurrentRoom() {

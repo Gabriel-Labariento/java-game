@@ -111,7 +111,9 @@ public class GameServer {
             clientSocket = sck;
             cid = n;
             sendQueue = new LinkedBlockingDeque<>();
-            gameStateManager.addEntity((new Player(cid, gameStateManager.getCurrentRoom().getCenterX(), gameStateManager.getCurrentRoom().getCenterY())));
+            Player newPlayer = new Player(cid, gameStateManager.getCurrentRoom().getCenterX(), gameStateManager.getCurrentRoom().getCenterY());
+            gameStateManager.addEntity(newPlayer);
+            gameStateManager.addPlayer(newPlayer);
             try {
                 dataIn = new DataInputStream(clientSocket.getInputStream());
                 dataOut = new DataOutputStream(clientSocket.getOutputStream());
