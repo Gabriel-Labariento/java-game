@@ -140,7 +140,6 @@ public class GameServer {
                         mapDataSent = true;
                         System.out.println("Map Data Sent");
                     }
-                    gameStateManager.updateEntities();
                     sendEntitiesData();   
                 }
             };

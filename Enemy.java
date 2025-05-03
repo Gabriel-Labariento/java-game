@@ -22,7 +22,7 @@ public abstract class Enemy extends Entity {
     // Right now, simple logic that scans if the distance between the player and the entity is <= scanRadius.
     // Pursues if yes. Does not yet consider obstacles.
     public Player scanForPlayer(ServerMaster gsm){
-        final int scanRadius = 96;
+        final int scanRadius = GameCanvas.TILESIZE * 5; // 5 tile scan radius
         Player closestPlayer = null;
         double minDistance = Double.MAX_VALUE;
 

@@ -40,12 +40,12 @@ public class GameCanvas extends JComponent {
         g2d.setColor(Color.BLACK);
         g2d.fillRect(0, 0, width, height);
 
-        int scaleFactor = 1;
+        double scaleFactor = 1.1;
         g2d.scale(scaleFactor, scaleFactor );
         Player userPlayer = clientState.getUserPlayer();
         
-        int screenX = (720/ (2 * scaleFactor) - userPlayer.getWidth() / (2 * scaleFactor));
-        int screenY = (540/ (2 * scaleFactor) - userPlayer.getHeight() / (2 * scaleFactor));
+        int screenX = (int) (720/ (2 * scaleFactor) - userPlayer.getWidth() / (2 * scaleFactor));
+        int screenY = (int) (540/ (2 * scaleFactor) - userPlayer.getHeight() / (2 * scaleFactor));
 
         int cameraX = userPlayer.getWorldX() - screenX;
         int cameraY = userPlayer.getWorldY() - screenY;

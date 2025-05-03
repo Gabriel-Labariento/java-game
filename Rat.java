@@ -1,18 +1,20 @@
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
-import java.io.InputStream;
 import javax.imageio.ImageIO;
 
 public class Rat extends Enemy{
     public static int ratCount = 0;
     private int id;
-    private BufferedImage sprite;
+    private BufferedImage[] sprites;
     private static final int IDLE_DURATION = 400;
     private static final int ATTACK_DURATION = 150;
+    private long lastSpriteUpdate = 0;
+    private static final int SPRITE_FRAME_DURATION = 200;
     private int jumpSpeed = 2;
     private int baseSpeed = 1;
     private long lastStateChangeTime = 0;
+    private int currSprite;
 
     public Rat(int x, int y) {
         id = ratCount++;
@@ -25,7 +27,8 @@ public class Rat extends Enemy{
         maxHealth = 10;
         hitPoints = maxHealth;
         currentRoom = null;
-        setImage();
+        currSprite = 0;
+        setSprites();
     }
 
     @Override
@@ -39,21 +42,20 @@ public class Rat extends Enemy{
 
     @Override
     public void draw(Graphics2D g2d, int xOffset, int yOffset){
-        // Rectangle2D.Double sprite = new Rectangle2D.Double(xOffset, yOffset, width, height);
-        g2d.drawImage(sprite, xOffset, yOffset, width, height, null);
+        g2d.drawImage(sprites[currSprite], xOffset, yOffset, width, height, null);
     }
 
     @Override
     public String getAssetData(boolean isUserPlayer) {
         StringBuilder sb = new StringBuilder();
         // System.out.println("In getAssetData of Rat, identifier is " + identifier);
-        // String format: B,id,x,y,currentRoomId|
+        // String format: B,id,x,y,currentRoomId,sprite|
         sb.append(identifier).append(NetworkProtocol.SUB_DELIMITER)
         .append(id).append(NetworkProtocol.SUB_DELIMITER)
         .append(worldX).append(NetworkProtocol.SUB_DELIMITER)
         .append(worldY).append(NetworkProtocol.SUB_DELIMITER)
-        .append(currentRoom.getRoomId()).append(NetworkProtocol.DELIMITER);
-
+        .append(currentRoom.getRoomId()).append(NetworkProtocol.SUB_DELIMITER)
+        .append(currSprite).append(NetworkProtocol.DELIMITER);
         return sb.toString();
     }
 
@@ -61,13 +63,19 @@ public class Rat extends Enemy{
     public void updateEntity(ServerMaster gsm){
         // TODO: ENEMY AI LOGIC
         long now = System.currentTimeMillis();
+
+        if (now - lastSpriteUpdate > SPRITE_FRAME_DURATION) {
+            currSprite++;
+            if (currSprite > 2) currSprite = 0;
+            lastSpriteUpdate = now;
+        }
         
         Player pursued = scanForPlayer(gsm);
         if (pursued == null) return;
 
         // Set distance parameters
         double distance = getDistanceBetween(this, pursued);
-        final double ATTACK_RANGE = GameCanvas.TILESIZE * 2; // 2 tiles away
+        final double ATTACK_RANGE = GameCanvas.TILESIZE * 3; // 2 tiles away
         
         switch (currentState) {
             case IDLE:
@@ -83,12 +91,12 @@ public class Rat extends Enemy{
                 if (distance <= ATTACK_RANGE) {
                     currentState = State.ATTACK;
                     lastStateChangeTime = now;
-                } 
+                }
                 break;
 
             case ATTACK:
                 if (now - lastStateChangeTime > ATTACK_DURATION) { 
-                    attackPlayer(pursued);
+                    attackPlayer(pursued, distance);
                     currentState = State.IDLE;
                     lastStateChangeTime = now;
                 } 
@@ -98,31 +106,31 @@ public class Rat extends Enemy{
         }
 
         matchHitBoxBounds();
+        
     }
     
-    private void attackPlayer(Player player) {
+    private void attackPlayer(Player player, double distance) { // Pass the distance to not compute again
         int dx = player.getCenterX() - getCenterX();
         int dy = player.getCenterY() - getCenterY();
-
-        double distance = getDistanceBetween(this, player);
 
         if (distance != 0) {
             double unitX = dx / distance;
             double unitY = dy / distance;
 
-            double smoothFactor = 0.5;
-            int newX = (int) (worldX + unitX * GameCanvas.TILESIZE * jumpSpeed * smoothFactor);
-            int newY = (int) (worldY + unitY * GameCanvas.TILESIZE * jumpSpeed * smoothFactor);
+            int newX = (int) (worldX + unitX * GameCanvas.TILESIZE * jumpSpeed);
+            int newY = (int) (worldY + unitY * GameCanvas.TILESIZE * jumpSpeed);
             
             setPosition(newX, newY);
         }
     }
 
-    private void setImage() {
+    private void setSprites() {
         try {
-            String path = "Sprites\\rat_sprite_0.png";
-            InputStream is = getClass().getResourceAsStream(path);
-            sprite = ImageIO.read(is);
+            BufferedImage left0 = ImageIO.read(getClass().getResourceAsStream("Sprites\\Rat\\sprite_rat_left0.png"));
+            BufferedImage left1 = ImageIO.read(getClass().getResourceAsStream("Sprites\\Rat\\sprite_rat_left1.png"));
+            BufferedImage left2 = ImageIO.read(getClass().getResourceAsStream("Sprites\\Rat\\sprite_rat_left2.png"));
+            sprites = new BufferedImage[] {left0, left1, left2};
+
         } catch (IOException e) {
             System.out.println("IOException in setImage of " + getClass() + getId());
         }
@@ -134,6 +142,14 @@ public class Rat extends Enemy{
 
     public void setId(int id) {
         this.id = id;
+    }
+
+    public int getCurrSprite() {
+        return currSprite;
+    }
+
+    public void setCurrSprite(int currSprite) {
+        this.currSprite = currSprite;
     }
 
 

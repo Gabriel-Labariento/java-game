@@ -156,21 +156,36 @@ public class GameClient {
                     clientState.addEntity(other);
                 } 
             } else if (part.startsWith(NetworkProtocol.ENTITY)) {
-                System.out.println("Whole entity string: " + part);
+
+                // System.out.println("Whole entity string: " + part);
                 String[] entityData = part.substring(NetworkProtocol.ENTITY.length()).split(NetworkProtocol.SUB_DELIMITER);
                 
+                if (entityData.length >= 6) {
+                    int roomId = Integer.parseInt(entityData[4]);
+                    if (!(roomId == clientState.getCurrentRoom().getRoomId())) continue;
+                    
+                    char identifier = entityData[0].toCharArray()[0];
+                    int id = Integer.parseInt(entityData[1]);
+                    int x = Integer.parseInt(entityData[2]);
+                    int y = Integer.parseInt(entityData[3]);
+                    int sprite = Integer.parseInt(entityData[5]);
+                    loadEntity(identifier, id, x, y, roomId, sprite);
+                }
                 // for (String string : entityData) {
                 //     // System.out.println("Entity string: " + string);
                 // }
                 // Don't load if not in the same room as the client.
-                int roomId = Integer.parseInt(entityData[4]);
-                if (!(roomId == clientState.getCurrentRoom().getRoomId())) continue;
-                
-                char identifier = entityData[0].toCharArray()[0];
-                int id = Integer.parseInt(entityData[1]);
-                int x = Integer.parseInt(entityData[2]);
-                int y = Integer.parseInt(entityData[3]);
-                loadEntity(identifier, id, x, y, roomId);    
+                else {
+                    int roomId = Integer.parseInt(entityData[4]);
+                    if (!(roomId == clientState.getCurrentRoom().getRoomId())) continue;
+                    
+                    char identifier = entityData[0].toCharArray()[0];
+                    int id = Integer.parseInt(entityData[1]);
+                    int x = Integer.parseInt(entityData[2]);
+                    int y = Integer.parseInt(entityData[3]);
+                    loadEntity(identifier, id, x, y, roomId, 0); // TODO: TEMPORARY 0 SPRITE   
+                }
+                 
                 
             }
         
@@ -190,7 +205,7 @@ public class GameClient {
     }
 
 
-    public void loadEntity(char identifier, int id, int x, int y, int roomId){
+    public void loadEntity(char identifier, int id, int x, int y, int roomId, int sprite){
         String name = idToName.get(identifier);
         // System.out.println("Loading entity " + identifier + " " + name + "at " + x + ", " + y);
         if (name == null) {
@@ -201,6 +216,7 @@ public class GameClient {
                     Rat r = new Rat(x, y);
                     r.setId(id);
                     r.setCurrentRoom(clientState.getRoomById(roomId));
+                    r.setCurrSprite(sprite);
                     clientState.addEntity(r);
                     // System.out.println("Added rat to client entities");
                     break;

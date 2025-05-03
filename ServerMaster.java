@@ -49,9 +49,13 @@ public class ServerMaster {
         updateEntities();
     }
 
+
     public void updateEntities(){
         //Check on and resolve the end of life properties of each entity
         for (Entity entity:entities){
+
+            entity.updateEntity(this);
+            
             if(entity instanceof Player player && player.getHitPoints() <=0){
                 //DOWNING AND REVIVAL MECHANICS
                 //If the player has not yet been recorded as being downed, set them as such
@@ -101,7 +105,6 @@ public class ServerMaster {
                 //Trigger death animation;
                 entities.remove(entity);
             }
-            entity.updateEntity(this);
         }
         //Reset list to track available revives per frame
         availableRevives.clear();
