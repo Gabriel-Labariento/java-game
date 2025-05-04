@@ -36,7 +36,7 @@ public class MobSpawner {
         spawnMobsScheduler = Executors.newSingleThreadScheduledExecutor();
         
         spawnRate = Math.max(2, 5 - (level / 2 - difficulty)); // Spawns 2 if > (5 - (level / 2) - difficulty)  
-        maxSpawned = (difficulty == 3) ? 1 : (3 + level); // Spawns only one enemy in boss room, otherwise spawns at least 3 TODO: CHANGE MAXSPAWNED
+        maxSpawned = (difficulty == 3) ? 1 : (3); // Spawns only one enemy in boss room, otherwise spawns at least 3 TODO: CHANGE MAXSPAWNED
         
         spawnedEnemies = new ArrayList<>();
         spawnedCount = 0;
@@ -84,7 +84,7 @@ public class MobSpawner {
                         System.out.println("Added enemy: " + enemy.getAssetData(false) );
                     }
                 } catch (Exception e) {
-                    System.out.println("Exception in spawn() method");
+                    System.out.println("Exception in spawn() method" + e);
                 }
             }            
         };

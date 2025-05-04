@@ -116,20 +116,6 @@ public class Rat extends Enemy{
         
     }
     
-    private void attackPlayer(Player player, double distance) { // Pass the distance to not compute again
-        int dx = player.getCenterX() - getCenterX();
-        int dy = player.getCenterY() - getCenterY();
-
-        if (distance != 0) {
-            double unitX = dx / distance;
-            double unitY = dy / distance;
-
-            int newX = (int) (worldX + unitX * speed * ATTACK_RANGE);
-            int newY = (int) (worldY + unitY * speed * ATTACK_RANGE);
-            
-            setPosition(newX, newY);
-        }
-    }
 
     private void setSprites() {
         try {

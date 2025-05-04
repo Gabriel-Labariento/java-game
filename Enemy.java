@@ -6,6 +6,7 @@ public abstract class Enemy extends Entity {
     protected ArrayList<Integer> attacksTakenById;
     protected enum State { IDLE, PURSUE, ATTACK, CIRCLE, DODGE } ; 
     protected State currentState = State.IDLE;
+    protected int ATTACK_RANGE = GameCanvas.TILESIZE * 3;
 
     public Enemy(){
         attacksTakenById = new ArrayList<>();
@@ -74,6 +75,21 @@ public abstract class Enemy extends Entity {
 
             setPosition(newX, newY);
             matchHitBoxBounds();
+        }
+    }
+
+    public void attackPlayer(Player player, double distance) { // Pass the distance to not compute again
+        int dx = player.getCenterX() - getCenterX();
+        int dy = player.getCenterY() - getCenterY();
+
+        if (distance != 0) {
+            double unitX = dx / distance;
+            double unitY = dy / distance;
+
+            int newX = (int) (worldX + unitX * speed * ATTACK_RANGE);
+            int newY = (int) (worldY + unitY * speed * ATTACK_RANGE);
+            
+            setPosition(newX, newY);
         }
     }
 

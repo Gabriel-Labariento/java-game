@@ -16,11 +16,10 @@ public class GameClient {
     private final HashMap<String, Boolean> keyMap;
     private int clickedX;
     private int clickedY;
-    private ScheduledExecutorService sendInputsScheduler;
 
     public GameClient(ClientMaster clientState){
         this.clientState = clientState;
-        sendInputsScheduler = Executors.newSingleThreadScheduledExecutor();
+        Executors.newSingleThreadScheduledExecutor();
 
         idToName = new HashMap<>();
         idToName.put('P', "Player");
@@ -136,7 +135,7 @@ public class GameClient {
                 } 
             } else if (part.startsWith(NetworkProtocol.PLAYER)) {
                 String[] otherPlayerData = part.substring(NetworkProtocol.PLAYER.length()).split(NetworkProtocol.SUB_DELIMITER);
-                System.out.println("Other player data: " + part);
+                // System.out.println("Other player data: " + part);
 
                 // Don't load if not in the same room as the client
                 int otherRoomId = Integer.parseInt(otherPlayerData[4]);

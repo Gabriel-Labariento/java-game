@@ -3,6 +3,7 @@ import java.util.concurrent.*;
 
 public class ServerMaster {
     private CopyOnWriteArrayList<Entity> entities;
+    // private ArrayList<Entity> entities;
     private CopyOnWriteArrayList<Player> players;
     private DungeonMap dungeonMap;
     private int userPlayerIndex;
@@ -37,7 +38,7 @@ public class ServerMaster {
         return singleInstance;
     }
 
-    public void update(){
+    public  void update(){
         // Do not update the game at start of the gameserver (no entities yet)
         //  System.out.println("Entities array size: " + entities.size());
         if (entities.isEmpty()) return;
@@ -124,7 +125,7 @@ public class ServerMaster {
      * Loops through the entities arraylist and checks for collisions between objects
      * through their hitboxbounds.
      */
-    public void checkCollisions(){
+    public  void checkCollisions(){
         //SORT, SWEEP, AND, PRUNE DETECTION
         try {
             //Make a new arraylist containing all of the elements of entities

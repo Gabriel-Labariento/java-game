@@ -6,10 +6,6 @@ public class ClientMaster {
     private HashMap <Integer, Room> allRooms;
     private Room currentRoom;
     private CopyOnWriteArrayList<Entity> entities;
-    private CopyOnWriteArrayList<Player> players;
-    private CopyOnWriteArrayList<Enemy> enemies;
-    private CopyOnWriteArrayList<Attack> attacks;
-
 
     public ClientMaster(){
         userPlayer = null;

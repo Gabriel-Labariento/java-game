@@ -1,27 +1,35 @@
 import java.awt.Graphics2D;
-import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
-import java.io.InputStream;
 import javax.imageio.ImageIO;
 
 public class RatKing extends Enemy{
     public static int ratKingId = 0;
     private int id;
-    private BufferedImage sprite;
+    private BufferedImage[] sprites;
+    private static final int IDLE_DURATION = 400;
+    private static final int ATTACK_DURATION = 300;
+    private long lastSpriteUpdate = 0;
+    private static final int SPRITE_FRAME_DURATION = 200;
+    // private static final int ATTACK_RANGE = GameCanvas.TILESIZE * 2; // tiles away
+    private int baseSpeed = 1;
+    private long lastStateChangeTime = 0;
+    private int currSprite;
 
     public RatKing(int x, int y) {
         id = ratKingId++;
         identifier = NetworkProtocol.RAT_KING.toCharArray()[0];
         speed = 1;
-        height = 16;
-        width = 16;
+        height = 48;
+        width = 48;
         worldX = x;
         worldY = y;
         maxHealth = 50;
         hitPoints = maxHealth;
+        damage = 10;
         currentRoom = null;
-        setImage();
+        currSprite = 0;
+        setSprites();
     }
 
     @Override
@@ -36,10 +44,7 @@ public class RatKing extends Enemy{
     @Override
     public void draw(Graphics2D g2d, int xOffset, int yOffset){
         // Rectangle2D.Double sprite = new Rectangle2D.Double(xOffset, yOffset, width, height);
-        AffineTransform reset = g2d.getTransform();
-        g2d.scale(4, 4);
-        g2d.drawImage(sprite, xOffset, yOffset, width, height, null);
-        g2d.setTransform(reset);
+        g2d.drawImage(sprites[currSprite], xOffset, yOffset, width, height, null);
     }
 
     @Override
@@ -51,7 +56,8 @@ public class RatKing extends Enemy{
         .append(id).append(NetworkProtocol.SUB_DELIMITER)
         .append(worldX).append(NetworkProtocol.SUB_DELIMITER)
         .append(worldY).append(NetworkProtocol.SUB_DELIMITER)
-        .append(currentRoom.getRoomId()).append(NetworkProtocol.DELIMITER);
+        .append(currentRoom.getRoomId()).append(NetworkProtocol.SUB_DELIMITER)
+        .append(currSprite).append(NetworkProtocol.DELIMITER);
 
         return sb.toString();
     }
@@ -60,17 +66,69 @@ public class RatKing extends Enemy{
     public void updateEntity(ServerMaster gsm){
         // TODO: ENEMY AI LOGIC
         
+        // TODO: ENEMY AI LOGIC
+        long now = System.currentTimeMillis();
+    
         Player pursued = scanForPlayer(gsm);
-        if (pursued != null) pursuePlayer(pursued);  
+
+        if (pursued == null) return;
+
+        if (now - lastSpriteUpdate > SPRITE_FRAME_DURATION) {
+            if (worldX > pursued.getWorldX()) {
+                currSprite++;
+                if (currSprite > 2) currSprite = 0;
+            } else {
+                currSprite++;
+                if (currSprite < 3 || currSprite > 5) currSprite = 3;
+            }
+            lastSpriteUpdate = now;
+        }
+
+
+        // Set distance parameters
+        double distance = getDistanceBetween(this, pursued);
         
+        switch (currentState) {
+            case IDLE:
+                // TODO: RANDOM MOVEMENT
+                if (now - lastStateChangeTime > IDLE_DURATION) {
+                    currentState = State.PURSUE;
+                    lastStateChangeTime = now;
+                }
+                break;
+
+            case PURSUE:
+                pursuePlayer(pursued);
+                if (distance <= ATTACK_RANGE) {
+                    currentState = State.ATTACK;
+                    lastStateChangeTime = now;
+                }
+                break;
+
+            case ATTACK:
+                if (now - lastStateChangeTime > ATTACK_DURATION) { 
+                    attackPlayer(pursued, distance);
+                    currentState = State.IDLE;
+                    lastStateChangeTime = now;
+                } 
+                break;
+            default:
+                throw new AssertionError();
+        }
+
         matchHitBoxBounds();
     }
     
-    private void setImage() {
+    private void setSprites() {
         try {
-            String path = "Sprites\\rat_sprite_0.png";
-            InputStream is = getClass().getResourceAsStream(path);
-            sprite = ImageIO.read(is);
+            BufferedImage left0 = ImageIO.read(getClass().getResourceAsStream("Sprites\\Rat\\sprite_rat_left0.png"));
+            BufferedImage left1 = ImageIO.read(getClass().getResourceAsStream("Sprites\\Rat\\sprite_rat_left1.png"));
+            BufferedImage left2 = ImageIO.read(getClass().getResourceAsStream("Sprites\\Rat\\sprite_rat_left2.png"));
+            BufferedImage right0 = ImageIO.read(getClass().getResourceAsStream("Sprites\\Rat\\sprite_rat_right0.png"));
+            BufferedImage right1 = ImageIO.read(getClass().getResourceAsStream("Sprites\\Rat\\sprite_rat_right1.png"));
+            BufferedImage right2 = ImageIO.read(getClass().getResourceAsStream("Sprites\\Rat\\sprite_rat_right2.png"));
+            sprites = new BufferedImage[] {left0, left1, left2, right0, right1, right2};
+
         } catch (IOException e) {
             System.out.println("IOException in setImage of " + getClass() + getId());
         }

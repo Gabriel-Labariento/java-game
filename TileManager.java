@@ -6,7 +6,7 @@ public final class TileManager {
     public Tile[] tileImages;
 
     public TileManager() {
-        tileImages = new Tile[24];
+        tileImages = new Tile[46];
         setTileImages();
         // loadMap();
     }
@@ -157,4 +157,18 @@ public final class TileManager {
             // Open Door Bottom Right
             tile[23] = new Tile();
             tile[23].image = ImageIO.read(getClass().getResourceAsStream("Tile Images\\tile23.png"));
+
+            24 PATH UPPER CORNER LEFT
+            25 PATH UPPER
+            26 PATH UPPER CORNER RIGHT
+            27 PATH RIGHT
+            28 PATH BOTTOM CORNER RIGHT
+            29 PATH BOTTOM
+            30 PATH BOTTOM CORNER LEFT
+            31 PATH LEFT
+
+            32 LAVA
+            33-44 left to right, top to bottom purple floor tile pattern
+            45 PURPLE ROOM WALL
+
 */

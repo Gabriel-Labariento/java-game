@@ -65,27 +65,8 @@ public class Room extends GameObject implements Tileable{
     }
 
     public void draw(Graphics2D g2d, int cameraX, int cameraY){
-
-        if (isStartRoom) {
-            g2d.setColor(Color.GREEN);
-        } else if (isEndRoom){
-            g2d.setColor(Color.RED);
-        } else {
-            switch (difficulty) {
-                case 0:
-                    g2d.setColor(Color.LIGHT_GRAY); break;
-                case 1:
-                    g2d.setColor(Color.WHITE); break;
-                case 2:
-                    g2d.setColor(Color.DARK_GRAY); break;
-                default:
-                    g2d.setColor(Color.BLACK);
-            }
-        }
-
         // Border
-        g2d.drawRect(worldX - cameraX, worldY - cameraY, width, height);
-        
+        g2d.drawRect(worldX - cameraX, worldY - cameraY, width, height);        
     }
 
     @Override
@@ -108,8 +89,8 @@ public class Room extends GameObject implements Tileable{
 
     public int[][] loadLayoutFromFile() {
         int layout[][] = new int[HEIGHT_TILES][WIDTH_TILES];
-        // Check what type of object it is. TODO: MAKE PRETTIER
-        String filePath = "resources\\Object Layouts\\roomLayout0.txt";
+        // TODO: MAKE PRETTIER
+        String filePath = "resources\\Object Layouts\\fireMonsterRoomLayout.txt";
         try {
             InputStream is = getClass().getResourceAsStream(filePath);
             BufferedReader br = new BufferedReader(new InputStreamReader(is));
