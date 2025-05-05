@@ -55,8 +55,9 @@ public class Rat extends Enemy{
         .append(id).append(NetworkProtocol.SUB_DELIMITER)
         .append(worldX).append(NetworkProtocol.SUB_DELIMITER)
         .append(worldY).append(NetworkProtocol.SUB_DELIMITER)
-        .append(currentRoom.getRoomId()).append(NetworkProtocol.SUB_DELIMITER)
-        .append(currSprite).append(NetworkProtocol.DELIMITER);
+        .append(currentRoom.getRoomId()).append(NetworkProtocol.DELIMITER);
+        // .append(currentRoom.getRoomId()).append(NetworkProtocol.SUB_DELIMITER)1
+        // .append(currSprite).append(NetworkProtocol.DELIMITER);
         return sb.toString();
     }
 
