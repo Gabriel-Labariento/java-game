@@ -13,7 +13,7 @@ public class HeavyCat extends Player{
         screenY = 540/2 - height/2;
         worldX = x;
         worldY = y;
-        maxHealth = 10;
+        maxHealth = 6;
         hitPoints = maxHealth;
         damage = 5;
         isDown = false;
@@ -26,6 +26,14 @@ public class HeavyCat extends Player{
         Rectangle2D.Double sprite = new Rectangle2D.Double(xOffset, yOffset, width, height);
         g2d.setColor(Color.BLUE);
         g2d.fill(sprite);
+    }
+
+    @Override
+    public void levelUpStats(){
+        hitPoints += 1;
+        maxHealth += 1;
+        damage += 1;
+        speed += 1;
     }
 
     @Override

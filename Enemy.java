@@ -2,10 +2,15 @@
 import java.util.ArrayList;
 
 public abstract class Enemy extends Entity {
-    private ArrayList<Integer> attacksTakenById;
+    public ArrayList<Integer> attacksTakenById;
+    public int rewardXP;
 
     public Enemy(){
         attacksTakenById = new ArrayList<>();
+    }
+
+    public int getRewardXP(){
+        return rewardXP;
     }
     
     public void loadAttack(int id){
@@ -14,6 +19,10 @@ public abstract class Enemy extends Entity {
 
     public boolean validateAttack(int id){
         return !attacksTakenById.contains(id);
+    }
+
+    public int getLastAttackID(){
+        return attacksTakenById.get(attacksTakenById.size()-1);
     }
 
     private double[] calculateRepulsionForce(Entity other) {

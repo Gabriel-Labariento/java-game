@@ -28,6 +28,10 @@ public abstract class Attack extends Entity{
         expirationTime = System.currentTimeMillis() + duration;
     }
 
+    public Entity getOwner(){
+        return owner;
+    }
+
     public void attachToOwner(){    
         if (owner != null){
             int ownerX = owner.getWorldX();

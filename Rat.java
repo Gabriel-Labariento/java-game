@@ -17,6 +17,7 @@ public class Rat extends Enemy{
         maxHealth = 10;
         hitPoints = maxHealth;
         damage = 1;
+        rewardXP = 50;
         currentRoom = null;
     }
 

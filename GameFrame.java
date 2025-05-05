@@ -1,10 +1,5 @@
 import java.awt.*;
 import java.awt.event.*;
-import java.net.Inet4Address;
-import java.net.InetAddress;
-import java.net.NetworkInterface;
-import java.net.SocketException;
-import java.util.Enumeration;
 import javax.swing.*;
 
 public class GameFrame extends JFrame{
@@ -23,7 +18,7 @@ public class GameFrame extends JFrame{
     private JButton btn3;
     private JButton btn4;
     private JButton btn5;
-    // private JButton btn6;
+    private JButton btn6;
     private JLabel label1;
     private JLabel label2;
     private JTextField textField1;
@@ -43,34 +38,34 @@ public class GameFrame extends JFrame{
         btn3 = new JButton("Connect");
         btn4 = new JButton("Back");
         btn5 = new JButton("Host Server");
-        // btn6 = new JButton("Start Game");
-        label1 = new JLabel("IP Address: ");
+        btn6 = new JButton("Enter Game");
+        label1 = new JLabel();
         label2 = new JLabel("Port: ");
         textField1 = new JTextField(10);
         textField2 = new JTextField(10);
         lp = new JLayeredPane();
-        try {
-            Enumeration<NetworkInterface> e = NetworkInterface.getNetworkInterfaces();
-            while (e.hasMoreElements()) {
-                NetworkInterface networkInterface = (NetworkInterface) e.nextElement();
+        // try {
+        //     Enumeration<NetworkInterface> e = NetworkInterface.getNetworkInterfaces();
+        //     while (e.hasMoreElements()) {
+        //         NetworkInterface networkInterface = (NetworkInterface) e.nextElement();
 
-                //Check if interface is down or is only visible to the host
-                if (!networkInterface.isUp() || networkInterface.isLoopback())
-                    continue;
+        //         //Check if interface is down or is only visible to the host
+        //         if (!networkInterface.isUp() || networkInterface.isLoopback())
+        //             continue;
 
-                Enumeration<InetAddress> a = networkInterface.getInetAddresses();
-                while (a.hasMoreElements()) {
-                    InetAddress inetAddress = a.nextElement();
+        //         Enumeration<InetAddress> a = networkInterface.getInetAddresses();
+        //         while (a.hasMoreElements()) {
+        //             InetAddress inetAddress = a.nextElement();
 
-                    // Check if address is an Ipv4 address and is not only visible to host
-                    if (inetAddress instanceof Inet4Address && !inetAddress.isLoopbackAddress()) {
-                        System.out.println("IPv4 Address: " + inetAddress.getHostAddress());
-                    }
-                }
-            }
-        } catch (SocketException e) {
-            System.out.println("SocketException at GameFrame Constructor");
-        }   
+        //             // Check if address is an Ipv4 address and is not only visible to host
+        //             if (inetAddress instanceof Inet4Address && !inetAddress.isLoopbackAddress()) {
+        //                 System.out.println("IPv4 Address: " + inetAddress.getHostAddress());
+        //             }
+        //         }
+        //     }
+        // } catch (SocketException e) {
+        //     System.out.println("SocketException at GameFrame Constructor");
+        // }   
 
 
     }
@@ -106,10 +101,12 @@ public class GameFrame extends JFrame{
     public void loadClientUI(){
 
         label1.setForeground(Color.WHITE);
+        label1.setText("IP Address: ");
         label1.setBounds(17, 133, 232, 15);
         lp.add(label1, Integer.valueOf(1));
         
         label2.setForeground(Color.WHITE);
+        label2.setText("Port Number: ");
         label2.setBounds(17, 194, 232, 15);
         lp.add(label2, Integer.valueOf(1));
 
@@ -129,22 +126,23 @@ public class GameFrame extends JFrame{
         lp.add(btn5, Integer.valueOf(1));
     }
 
-    // public void loadHostUI(){
-
-
-    //     label1.setForeground(Color.WHITE);
-    //     label1.setText("IP Address: " + serverIP);
-    //     label1.setBounds(17, 133, 232, 15);
-    //     lp.add(label1, Integer.valueOf(1));
+    public void loadHostUI(){
+        label1.setForeground(Color.WHITE);
+        label1.setText("IP Address: " + serverIP);
+        label1.setBounds(17, 133, 232, 15);
+        lp.add(label1, Integer.valueOf(1));
         
-    //     label2.setForeground(Color.WHITE);
-    //     label2.setText("Port: " + serverPort);
-    //     label2.setBounds(17, 194, 232, 15);
-    //     lp.add(label2, Integer.valueOf(1));
+        label2.setForeground(Color.WHITE);
+        label2.setText("Port: " + serverPort);
+        label2.setBounds(17, 194, 232, 15);
+        lp.add(label2, Integer.valueOf(1));
 
-    //     btn4.setBounds(245, 280, 159, 35);
-    //     lp.add(btn4, Integer.valueOf(1));
-    // }
+        btn4.setBounds(245, 280, 159, 35);
+        lp.add(btn4, Integer.valueOf(1));
+
+        btn6.setBounds(54, 280, 159, 35);
+        lp.add(btn6, Integer.valueOf(1));
+    }
 
     public void clearGUI(){
         Component[] components = lp.getComponentsInLayer(1);
@@ -184,6 +182,12 @@ public class GameFrame extends JFrame{
                 gameClient.hostServer();
                 serverIP = gameClient.getServerIP();
                 serverPort = gameClient.getServerPort();
+                clearGUI();
+                loadHostUI();
+                refreshFrame();
+                
+            }
+            else if (o == btn6){
                 startPlay();
             }
 
@@ -195,6 +199,7 @@ public class GameFrame extends JFrame{
         btn3.addActionListener(btnListener);
         btn4.addActionListener(btnListener);
         btn5.addActionListener(btnListener);
+        btn6.addActionListener(btnListener);
     }
 
     private void startPlay(){

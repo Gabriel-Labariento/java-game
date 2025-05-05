@@ -9,10 +9,47 @@ public abstract class Player extends Entity{
     public boolean isDown;
     public boolean isReviving;
     public long revivalTime;
+    public int currentXP;
+    public int currentLvl;
+    public int nextXPCap;
+
+    // function nextLevel(level)
+    //     local exponent = 1.5
+    //     local baseXP = 1000
+    //     return math.floor(baseXP * (level ^ exponent))
+    // end
+
+    public Player(){
+        currentLvl = 1;
+        nextXPCap = 100;
+    }
+
+    public void applyXP(int xp){
+        currentXP += xp;
+
+        while (currentXP >= nextXPCap) { 
+            currentLvl++; 
+            System.out.println("New level: " + currentLvl);
+
+
+            //Increase stats (CHANGES SHOULD BE UNIQUE TO DIFFERENT PLAYERS)
+            levelUpStats();
+
+            //Exponential function for scaling required experience points properly
+            double exponentForScaling = 1.5;
+            int baseXP = 100;
+            nextXPCap = (int) Math.floor(baseXP * (Math.pow(currentLvl, exponentForScaling)));
+        }
+    }
+
+    public void levelUpStats(){
+    }
+
 
     public void setIsDown(boolean b){
         isDown = b;
     }
+
 
     public boolean getIsDown(){
         return isDown;

@@ -144,7 +144,7 @@ public class GameClient {
      */
     private void parseEntitiesData(String message){
 
-        System.out.println(message);
+        // System.out.println(message);
         String[] messageParts = message.split("\\" + NetworkProtocol.DELIMITER); // Have to use \\ to escape. Turns out "|" is special for java
         this.clientId = Integer.parseInt(messageParts[0]);
 
@@ -195,7 +195,7 @@ public class GameClient {
                     clientMaster.addEntity(other);
                 } 
             } else if (part.startsWith(NetworkProtocol.ENTITY)) {
-                System.out.println("Whole entity string: " + part);
+                // System.out.println("Whole entity string: " + part);
                 String[] entityData = part.substring(NetworkProtocol.ENTITY.length()).split(NetworkProtocol.SUB_DELIMITER);
                 
                 // for (String string : entityData) {

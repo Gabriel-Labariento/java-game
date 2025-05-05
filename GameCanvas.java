@@ -35,13 +35,16 @@ public class GameCanvas extends JComponent {
         g2d.setRenderingHints(rh);
 
         //Load game menu ui
-        if ( (clientMaster.getUserPlayer() == null) || (clientMaster.getCurrentRoom() == null) ){
+        Player userPlayer = clientMaster.getUserPlayer();
+
+        if ( (userPlayer == null) || (clientMaster.getCurrentRoom() == null) ){
             //Temporary Background
             g2d.setColor(Color.BLACK);
             g2d.fillRect(0, 0, width, height);
 
         } 
         else{
+            
 
             // Set the background/outside of the room
             g2d.setColor(Color.BLACK);
@@ -49,7 +52,7 @@ public class GameCanvas extends JComponent {
 
             int scaleFactor = 1;
             g2d.scale(scaleFactor, scaleFactor);
-            Player userPlayer = clientMaster.getUserPlayer();
+
             
             int screenX = (720/ (2 * scaleFactor) - userPlayer.getWidth() / (2 * scaleFactor));
             int screenY = (540/ (2 * scaleFactor) - userPlayer.getHeight() / (2 * scaleFactor));
@@ -78,6 +81,7 @@ public class GameCanvas extends JComponent {
 
             //Draw UI elements
             playerUI.drawPlayerUI(g2d, userPlayer);
+            
 
         }
         

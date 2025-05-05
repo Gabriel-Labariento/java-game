@@ -97,11 +97,21 @@ public class ServerMaster {
                     //Insert revival animation
                 }
             }
-            else if (entity instanceof Attack attack && attack.getIsExpired()){
-                entities.remove(entity);
-            }
             else if (entity instanceof Enemy enemy && enemy.getHitPoints() <= 0){
                 //Trigger death animation;
+                
+
+                //Give reward xp to the player who took the last hit
+                for (Entity e:entities){
+                    if(e instanceof Attack attack && attack.getId() == enemy.getLastAttackID()){
+                        ((Player)attack.getOwner()).applyXP(enemy.getRewardXP());
+                    }
+                }
+    
+                entities.remove(entity);
+            
+            }
+            else if (entity instanceof Attack attack && attack.getIsExpired()){
                 entities.remove(entity);
             }
             entity.updateEntity(this);
@@ -306,7 +316,6 @@ public class ServerMaster {
         // System.out.println("Processing clickc input for player: " + cid);
 
         Player originPlayer = (Player) getPlayerFromClientId(cid);
-        Attack playerAttack = (Attack) getAttackFromClientId(cid);
 
         //Debouncing constraints
         if(originPlayer.getIsOnCoolDown() || originPlayer.getIsDown()) return;
@@ -340,6 +349,7 @@ public class ServerMaster {
         //TODO: If originPlayer is of different type, instantiate another type of attack
         int attackWidth;
         int attackHeight;
+        Attack playerAttack;
         if (true){
             attackWidth = 40;
             attackHeight = 40;
