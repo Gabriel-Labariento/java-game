@@ -20,17 +20,15 @@ public class MobSpawner {
     private static final int LOWESTY = 5;
     private static final int INITIALSPAWNDELAY = 1;
     
-    private static String[][] spawnableEnemiesAtLevel = {
+    private static final String[][] spawnableEnemiesAtLevel = {
         {"Rat"} // TODO: ADD OTHER ENEMIES
     };
 
-    private static String[] bosses = {
+    private static final String[] bosses = {
         "RatKing" // TODO: ADD OTHER BOSSES
     };
 
     private ScheduledExecutorService spawnMobsScheduler;
-
-
 
     public MobSpawner(int level, int difficulty){
         this.level = level;
@@ -43,7 +41,7 @@ public class MobSpawner {
 
         spawnedEnemies = new ArrayList<>();
         spawnedCount = 0;
-        maxSpawned = 10;
+        // maxSpawned = 10;
         isSpawning = false;
     }
 
@@ -78,6 +76,7 @@ public class MobSpawner {
                         // Pick a random enemy to spawn out of the available in the list for the level
                         String toSpawn = spawnableEnemiesAtLevel[level][(int) (Math.random() * (spawnableEnemiesAtLevel[level].length))];
                         enemy = createEnemy(toSpawn, spawnX, spawnY);
+                        // System.out.println("Created enemy " + enemy.getClass());
                     }
 
                     if ( enemy != null ) {
@@ -88,7 +87,7 @@ public class MobSpawner {
                         // System.out.println("Added enemy: " + enemy.getAssetData(false) );
                     }
                 } catch (Exception e) {
-                    System.out.println("Exception in spawn() method");
+                    System.out.println("Exception in spawn() method:" + e);
                 }
             }            
         };

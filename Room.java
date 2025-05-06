@@ -107,7 +107,7 @@ public class Room extends GameObject implements Tileable{
     public int[][] loadLayoutFromFile() {
         int layout[][] = new int[HEIGHT_TILES][WIDTH_TILES];
         // Check what type of object it is. TODO: MAKE PRETTIER
-        String filePath = "Object Layouts\\roomLayout0.txt";
+        String filePath = "resources/Object Layouts/baseLayout.txt";
         try {
             InputStream is = getClass().getResourceAsStream(filePath);
             BufferedReader br = new BufferedReader(new InputStreamReader(is));
