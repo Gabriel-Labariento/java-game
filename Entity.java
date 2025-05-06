@@ -1,9 +1,8 @@
 import java.awt.Graphics2D;
-import java.awt.image.BufferedImage;
 
 public abstract class Entity extends GameObject {
     protected char identifier;
-    protected BufferedImage[] sprites;
+    // protected BufferedImage[] sprites;
     protected int prevWorldX;
     protected int prevWorldY;
     protected int speed;

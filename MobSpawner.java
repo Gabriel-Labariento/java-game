@@ -41,7 +41,7 @@ public class MobSpawner {
 
         spawnedEnemies = new ArrayList<>();
         spawnedCount = 0;
-        // maxSpawned = 10;
+        maxSpawned = 10;
         isSpawning = false;
     }
 

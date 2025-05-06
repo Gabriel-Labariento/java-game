@@ -9,6 +9,11 @@ public class Rat extends Enemy{
     private static final int SPRITE_FRAME_DURATION = 200;
     private long lastSpriteUpdate = 0;
     private int currSprite;
+    private static BufferedImage[] sprites;
+
+    static {
+        setSprites();
+    }
 
     public Rat(int x, int y) {
         id = ratCount++;
@@ -24,21 +29,21 @@ public class Rat extends Enemy{
         rewardXP = 50;
         currentRoom = null;
         currSprite = 0;
-        setSprites();
+        
     }
 
-     private void setSprites() {
+     private static void setSprites() {
         try {
-            BufferedImage left0 = ImageIO.read(getClass().getResourceAsStream("resources/Sprites/Rat/sprite_rat_left0.png"));
-            BufferedImage left1 = ImageIO.read(getClass().getResourceAsStream("resources/Sprites/Rat/sprite_rat_left1.png"));
-            BufferedImage left2 = ImageIO.read(getClass().getResourceAsStream("resources/Sprites/Rat/sprite_rat_left2.png"));
-            BufferedImage right0 = ImageIO.read(getClass().getResourceAsStream("resources/Sprites/Rat/sprite_rat_right0.png"));
-            BufferedImage right1 = ImageIO.read(getClass().getResourceAsStream("resources/Sprites/Rat/sprite_rat_right1.png"));
-            BufferedImage right2 = ImageIO.read(getClass().getResourceAsStream("resources/Sprites//Rat/sprite_rat_right2.png"));
+            BufferedImage left0 = ImageIO.read(Rat.class.getResourceAsStream("resources/Sprites/Rat/sprite_rat_left0.png"));
+            BufferedImage left1 = ImageIO.read(Rat.class.getResourceAsStream("resources/Sprites/Rat/sprite_rat_left1.png"));
+            BufferedImage left2 = ImageIO.read(Rat.class.getResourceAsStream("resources/Sprites/Rat/sprite_rat_left2.png"));
+            BufferedImage right0 = ImageIO.read(Rat.class.getResourceAsStream("resources/Sprites/Rat/sprite_rat_right0.png"));
+            BufferedImage right1 = ImageIO.read(Rat.class.getResourceAsStream("resources/Sprites/Rat/sprite_rat_right1.png"));
+            BufferedImage right2 = ImageIO.read(Rat.class.getResourceAsStream("resources/Sprites//Rat/sprite_rat_right2.png"));
             sprites = new BufferedImage[] {left0, left1, left2, right0, right1, right2};
 
         } catch (IOException e) {
-            System.out.println("IOException in setImage of " + getClass() + getId());
+            System.out.println("Exception in Rat setSprites()" + e);
         }
     }
 
@@ -81,21 +86,20 @@ public class Rat extends Enemy{
         if (pursued != null) pursuePlayer(pursued);
         else return;
 
-
         // Sprite walk update
-        // if (now - lastSpriteUpdate > SPRITE_FRAME_DURATION) {
-        //     if (worldX > pursued.getWorldX()) {
-        //         currSprite++;
-        //         if (currSprite > 2) currSprite = 0;
-        //     } else {
-        //         currSprite++;
-        //         if (currSprite < 3 || currSprite > 5) currSprite = 3;
-        //     }
-        //     lastSpriteUpdate = now;
-        // }
-        if (worldX > pursued.getWorldX()) {
-            currSprite = 0;
-        } else currSprite = 3;
+        if (now - lastSpriteUpdate > SPRITE_FRAME_DURATION) {
+            if (worldX > pursued.getWorldX()) {
+                currSprite++;
+                if (currSprite > 2) currSprite = 0;
+            } else {
+                currSprite++;
+                if (currSprite < 3 || currSprite > 5) currSprite = 3;
+            }
+            lastSpriteUpdate = now;
+        }
+        // if (worldX > pursued.getWorldX()) {
+        //     currSprite = 0;
+        // } else currSprite = 3;
     }
 
     public int getId() {
