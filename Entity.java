@@ -1,6 +1,7 @@
 import java.awt.Graphics2D;
 
 public abstract class Entity extends GameObject {
+    protected int id;
     protected char identifier;
     // protected BufferedImage[] sprites;
     protected int prevWorldX;
@@ -13,6 +14,8 @@ public abstract class Entity extends GameObject {
     protected int hasMoved;
     public Room currentRoom; 
     protected int currSprite;
+
+    
 
     public void draw(Graphics2D g2d, int xOffset, int yOffset){}
 
@@ -112,7 +115,14 @@ public abstract class Entity extends GameObject {
     public void setCurrSprite(int currSprite) {
         this.currSprite = currSprite;
     }
+    
+    public int getId() {
+        return id;
+    }
 
+    public void setId(int id) {
+        this.id = id;
+    }
 }
     
     

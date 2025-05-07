@@ -99,12 +99,4 @@ public class Rat extends Enemy{
 
         matchHitBoxBounds();
     }
-
-    public int getId() {
-        return id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
-    }
 }

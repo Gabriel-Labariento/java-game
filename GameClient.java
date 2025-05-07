@@ -32,6 +32,7 @@ public class GameClient {
         idToName.put('E', "PlayerSlash");
         idToName.put('F', "PlayerBullet");
         idToName.put('G', "Rat");
+        idToName.put('H', "RatKing");
         
         keyMap = new HashMap<>();
         keyMap.put("W", false);
@@ -260,24 +261,26 @@ public class GameClient {
         String name = idToName.get(identifier);
         // System.out.println("Loading entity " + identifier + " " + name + "at " + x + ", " + y);
         // if (name == null) System.out.println("Warning: unknown identity identifier " + identifier);
+        Entity e = null;
         switch (name) {
             case "Rat":
-                Rat r = new Rat(x, y);
-                r.setId(id);
-                r.setCurrentRoom(clientMaster.getRoomById(roomId));
-                r.setCurrSprite(sprite);
-                clientMaster.addEntity(r);
+                e = new Rat(x, y);
                 break;
             case "PlayerSlash":
-                PlayerSlash ps = new PlayerSlash(clientId, null, x, y, 40, 40, 0, false, roomId);
-                ps.setId(id);
-                ps.matchHitBoxBounds();
-                clientMaster.addEntity(ps);
-                // System.out.println("Added playerSlash to client entities");
+                e =  new PlayerSlash(clientId, null, x, y, 40, 40, 0, false, roomId);
                 break;
+            case "RatKing":
+                e = new RatKing(x, y);
             default:
                 break;
         }
+        if (e == null) return;
+
+        e.setId(id);
+        e.setCurrentRoom(clientMaster.getRoomById(roomId));
+        e.setCurrSprite(sprite);
+        e.matchHitBoxBounds();
+        clientMaster.addEntity(e);
     }
 
     public void startInputsThread(){

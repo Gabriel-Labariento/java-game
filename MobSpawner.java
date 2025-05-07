@@ -40,8 +40,7 @@ public class MobSpawner {
         maxSpawned = (difficulty == 3) ? 1 : (3 + level + difficulty);
 
         spawnedEnemies = new ArrayList<>();
-        spawnedCount = 0;
-        maxSpawned = 2;
+        // spawnedCount = 0;
         isSpawning = false;
     }
 
@@ -64,24 +63,29 @@ public class MobSpawner {
                     Enemy enemy = null;
 
                     if (inBossRoom && spawnedCount == 0) {
+                        System.out.println("In boss room");
                         spawnX = currentRoom.getCenterX();
                         spawnY = currentRoom.getCenterY();
 
                         String bossType = bosses[level];
+                        System.out.println(bossType);
                         enemy = createEnemy(bossType, spawnX, spawnY);
+                        System.out.println("Created " + enemy.getClass());
                     } else {
                         // Pick a random enemy to spawn out of the available in the list for the level
                         String toSpawn = spawnableEnemiesAtLevel[level][(int) (Math.random() * (spawnableEnemiesAtLevel[level].length))];
                         enemy = createEnemy(toSpawn, spawnX, spawnY);
-                        // System.out.println("Created enemy " + enemy.getClass());
+                        System.out.println("Created enemy " + enemy.getClass());
                     }
 
                     if ( enemy != null ) {
                         spawnedCount++;   
                         isSpawning = true;
+                        enemy.setCurrentRoom(currentRoom);
+                        enemy.matchHitBoxBounds();
                         spawnedEnemies.add(enemy);
                         ServerMaster.getInstance().addEntity(enemy);
-                        // System.out.println("Added enemy: " + enemy.getAssetData(false) );
+                        System.out.println("Added enemy: " + enemy.getAssetData(false) );
                     }
                 } catch (Exception e) {
                     System.out.println("Exception in spawn() method:" + e);
@@ -106,7 +110,6 @@ public class MobSpawner {
         for (Enemy e : spawnedEnemies) {
             if (e.isDead()) killed++;    
         }
-
         return killed;
     }
 

@@ -558,8 +558,6 @@ public class ServerMaster {
 
     public void handleSpawnersOnRoomChange(Room next){
         if (next.getMobSpawner() != null && (!next.getMobSpawner().isSpawning())) next.getMobSpawner().spawn();
-
-        if (next.isEndRoom() && next.getMobSpawner().isAllKilled()) incrementGameLevel();
     }
 
     /**
