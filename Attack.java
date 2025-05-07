@@ -1,5 +1,5 @@
 public abstract class Attack extends Entity{
-    public static int attackNum;
+    public static int attackNum = Integer.MIN_VALUE;
     public int duration;
     public int id;
     public int xOffset;

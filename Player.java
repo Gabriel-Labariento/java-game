@@ -116,7 +116,7 @@ public abstract class Player extends Entity{
         invincibilityEnd = System.currentTimeMillis() + INVINCIBILITY_DURATION;
     }
 
-    public boolean getIsInvincible(){
+    public boolean canTakeDamage(){
         return System.currentTimeMillis() >= invincibilityEnd;
     }
 

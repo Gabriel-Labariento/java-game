@@ -12,7 +12,7 @@ public abstract class Entity extends GameObject {
     protected int clientId;
     protected int hasMoved;
     public Room currentRoom; 
-    
+    protected int currSprite;
 
     public void draw(Graphics2D g2d, int xOffset, int yOffset){}
 
@@ -103,6 +103,14 @@ public abstract class Entity extends GameObject {
 
     public void setHitPoints(int hP) {
         hitPoints = hP;
+    }
+
+    public int getCurrSprite() {
+        return currSprite;
+    }
+
+    public void setCurrSprite(int currSprite) {
+        this.currSprite = currSprite;
     }
 
 }

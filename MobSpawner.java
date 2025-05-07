@@ -41,7 +41,7 @@ public class MobSpawner {
 
         spawnedEnemies = new ArrayList<>();
         spawnedCount = 0;
-        maxSpawned = 10;
+        maxSpawned = 2;
         isSpawning = false;
     }
 
@@ -57,9 +57,6 @@ public class MobSpawner {
                     Room currentRoom = ServerMaster.getInstance().getCurrentRoom();
                     // System.out.println("Current room in server master is Room " + currentRoom.getRoomId());
 
-                    // Don't spawn in the boss room. At least not yet
-                    if (currentRoom.isEndRoom()) return;
-    
                     // Pick a randoom tile coordinate
                     int spawnX = currentRoom.getWorldX() + ((LOWESTX + (int) (Math.random() * ((HIGHESTX - LOWESTX) + 1))) * GameCanvas.TILESIZE);
                     int spawnY = currentRoom.getWorldY() + ((LOWESTY + (int) (Math.random() * ((HIGHESTY - LOWESTY) + 1))) * GameCanvas.TILESIZE);
@@ -129,6 +126,8 @@ public class MobSpawner {
         switch (name) {
             case "Rat":
                 return new Rat(x, y);
+            case "RatKing":
+                return new RatKing(x, y);
             default:
                 System.out.println("Undetected enemy " + name );
                 return new Rat(x, y);

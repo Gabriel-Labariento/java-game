@@ -56,60 +56,17 @@ public class ServerMaster {
         //Check on and resolve the end of life properties of each entity
         for (Entity entity:entities){
             if(entity instanceof Player player && player.getHitPoints() <=0){
-                //DOWNING AND REVIVAL MECHANICS
-                //If the player has not yet been recorded as being downed, set them as such
-                if (!player.getIsDown()){
-                    player.setIsDown(true);
-
-                    //If no players are left, activate end game sequence
-                    downedPlayersNum++;
-                    if (downedPlayersNum == playerNum){
-                        System.out.println("GAME OVER");
-                    }
-                }
-
-                //Search through list of available revives to see if the player can be revived
-                boolean isInContact = false;
-                for (int i:availableRevives.values()){
-                    
-                    if (i == player.getClientId()){
-                        //If the player has not yet been recorded as reviving, set them as such
-                        if (!player.getIsReviving()){
-                            player.triggerRevival();
-                            player.setIsReviving(true);
-                        }
-
-                        isInContact = true;
-                        break;
-                    } 
-                }
-
-                //If the other player has moved away from the downed player
-                if(!isInContact){
-                    player.setIsReviving(false);
-                    //Insert UI indicators
-                }
-
-                //After the revivaltime and without the living player moving away, revive the downed player with one health
-                if(player.getIsReviving() && player.getIsRevived()){
-                    player.setHitPoints(1);
-                    player.setIsDown(false);
-                    //Insert revival animation
-                }
+                handleDownsAndRevives(player);
             }
             else if (entity instanceof Enemy enemy && enemy.getHitPoints() <= 0){
                 //Trigger death animation;
-                
-
                 //Give reward xp to the player who took the last hit
                 for (Entity e:entities){
                     if(e instanceof Attack attack && attack.getId() == enemy.getLastAttackID()){
                         ((Player)attack.getOwner()).applyXP(enemy.getRewardXP());
                     }
                 }
-    
                 entities.remove(entity);
-            
             }
             else if (entity instanceof Attack attack && attack.getIsExpired()){
                 entities.remove(entity);
@@ -118,6 +75,64 @@ public class ServerMaster {
         }
         //Reset list to track available revives per frame
         availableRevives.clear();
+
+        // Check for room clearing after all entity updates
+        if (checkRoomCleared()) handleRoomCleared();
+    }
+
+
+    private void handleDownsAndRevives(Player player) {
+        //DOWNING AND REVIVAL MECHANICS
+            //If the player has not yet been recorded as being downed, set them as such
+            if (!player.getIsDown()){
+                player.setIsDown(true);
+
+                //If no players are left, activate end game sequence
+                downedPlayersNum++;
+                if (downedPlayersNum == playerNum){
+                    System.out.println("GAME OVER");
+                }
+            }
+
+            //Search through list of available revives to see if the player can be revived
+            boolean isInContact = false;
+            for (int i:availableRevives.values()){
+                
+                if (i == player.getClientId()){
+                    //If the player has not yet been recorded as reviving, set them as such
+                    if (!player.getIsReviving()){
+                        player.triggerRevival();
+                        player.setIsReviving(true);
+                    }
+
+                    isInContact = true;
+                    break;
+                } 
+            }
+
+            //If the other player has moved away from the downed player
+            if(!isInContact){
+                player.setIsReviving(false);
+                //Insert UI indicators
+            }
+
+            //After the revivaltime and without the living player moving away, revive the downed player with one health
+            if(player.getIsReviving() && player.getIsRevived()){
+                player.setHitPoints(1);
+                player.setIsDown(false);
+                //Insert revival animation
+            }
+        }
+    
+    private boolean checkRoomCleared(){
+        if (currentRoom.isStartRoom()) return true;
+        return (currentRoom.getMobSpawner().isAllKilled());
+    }
+
+    private void handleRoomCleared(){
+        if (currentRoom.isStartRoom()) return;
+        currentRoom.getMobSpawner().stopSpawn();
+        currentRoom.openDoors();
     }
 
     // Checks for collisions between all objects inside the entity ArrayList
@@ -126,6 +141,7 @@ public class ServerMaster {
         try {
             //Make a new arraylist containing all of the elements of entities
             ArrayList<Entity> sortedEntities = new ArrayList<>(entities);
+            // System.out.println("Entity count: " + sortedEntities.size());
 
             //Sort entities from the universal arraylist by their worldx values (left bounds)
             Collections.sort(sortedEntities, Comparator.comparingInt(e -> e.getHitBoxBounds()[2]));
@@ -151,6 +167,7 @@ public class ServerMaster {
                     //Check for collisions in the top, bottom, left, right of entity1 against entity2
                     if (b1[0] < b2[1] && b1[1] > b2[0] && b1[2] < b2[3] && b1[3] > b2[2]){
                         resolveCollision(entity1, entity2, b1, b2);
+                        // System.out.println("Detected collision between " + entity1.getClass() + " and " + entity2.getClass());
                     }
                 }
             }   
@@ -176,6 +193,7 @@ public class ServerMaster {
             
         else if (e1 instanceof Attack attack && attack.getIsFriendly() && e2 instanceof Enemy enemy){
             damageEnemy(enemy, attack);
+            System.out.println("here");
         }
             
         else if (e2 instanceof Attack attack && attack.getIsFriendly() && e1 instanceof Enemy enemy){
@@ -208,23 +226,14 @@ public class ServerMaster {
             else if (!p2.getIsDown() && p1.getIsDown() && availableRevives.get(cid2) == null)
                 availableRevives.put(cid2, cid1);
         }
-
-        
-        // if (entity1 instanceof Player && entity2 instanceof Attack ||
-        //     entity2 instanceof Player && entity1 instanceof Attack) {
-        //         Player player = entity1 instanceof Player ? (Player) entity1 : (Player) entity2;
-        //         Attack attack = entity1 instanceof Attack ? (Attack) entity1 : (Attack) entity2;
-            
-        //         if (attack.getClientId() == player.getClientId()) continue; // don't process attack is from the player
-        //     }
-
     }
 
     //Players generate i-frames when damaged
     private void damagePlayer(Player player, Entity entity){
         //Debouncing condition
-        if(player.getIsInvincible()){
+        if(player.canTakeDamage()){
             player.setHitPoints(player.getHitPoints()-entity.getDamage());
+            applyKnockBack(player, entity);
             player.triggerInvincibility();
         }
 
@@ -235,14 +244,15 @@ public class ServerMaster {
         int id = attack.getId();
         //Debouncing condition
         if(enemy.validateAttack(id)){
+            System.out.println("inside here");
             enemy.setHitPoints(enemy.getHitPoints()-attack.getDamage());
+            applyKnockBack(enemy, attack);
             enemy.loadAttack(id);
         }
-
     }
 
     private void preventOverlap(Entity e1, Entity e2, int[] b1, int[] b2){
-
+        System.out.println("Inside prevent overlap");
         //Get the position vectors of both entities
         int[] positionVector1 = new int[2];
         positionVector1[0] = e1.getWorldX() + e1.getWidth()/2;
@@ -286,6 +296,25 @@ public class ServerMaster {
         e1.matchHitBoxBounds();
         e2.matchHitBoxBounds();
 
+    }
+
+    private void applyKnockBack(Entity target, Entity attacker) {
+        System.out.println("Applying knockback to enemy: " + target.getClass());
+
+        int[] entityPosition = target.getPositionVector();
+        int[] attackPosition = attacker.getPositionVector();
+
+        int[] normalVector = getNormalVector(entityPosition, attackPosition);
+
+        double normalVectorMagnitude = Math.sqrt((normalVector[0]*normalVector[0]) + (normalVector[1]*normalVector[1]));
+        double[] unitNormal = getUnitNormal(normalVector, normalVectorMagnitude);
+
+        int knockBackStrength = 24;
+        int newX = (int) (target. getWorldX() - unitNormal[0] * knockBackStrength);
+        int newY = (int)(target.getWorldY() - unitNormal[1] * knockBackStrength);
+
+        target.setPosition(newX, newY);
+        target.matchHitBoxBounds();
     }
 
     private void processInputs(){
@@ -362,6 +391,23 @@ public class ServerMaster {
         originPlayer.triggerCoolDown();
         entities.add(playerAttack); 
         // System.out.println("Created PlayerSlash: " + playerAttack.getId() + " at (" + playerAttack.getWorldX() + ", " + playerAttack.getWorldX() + ")");
+    }
+
+
+    private int[] getNormalVector(int[] v1, int[] v2){
+        int[] normalVector = new int[2];
+        normalVector[0] = v2[0] - v1[0];
+        normalVector[1] = v2[1] - v1[1];
+
+        return normalVector;
+    }
+
+    private double[] getUnitNormal(int[] normalVector, double normalVectorMagnitude) {
+        double[] unitNormal = new double[2];
+        unitNormal[0] = normalVector[0] / normalVectorMagnitude;
+        unitNormal[1] = normalVector[1] / normalVectorMagnitude;
+
+        return unitNormal;
     }
 
 
@@ -494,7 +540,7 @@ public class ServerMaster {
             userPlayer.setHitPoints(hp);
             currentRoom = newRoom;
             handleSpawnersOnRoomChange(newRoom);
-            currentRoom.closeDoors();
+            if (!currentRoom.isStartRoom())currentRoom.closeDoors();
 
             // Build String to be returned
             sb.append(NetworkProtocol.USER_PLAYER) 
