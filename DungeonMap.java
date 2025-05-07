@@ -89,6 +89,7 @@ public class DungeonMap {
             if (!(room.isStartRoom())) {
                 MobSpawner spawner = new MobSpawner(gameLevel, room.getDifficulty());
                 room.setMobSpawner(spawner);  // Delay spawning until player enters
+                spawner.setParentRoom(room);
             }
 
             // Handle boss room
@@ -96,6 +97,7 @@ public class DungeonMap {
                 MobSpawner bossSpawner = new MobSpawner(gameLevel, 3);
                 bossSpawner.setInBossRoom(true);
                 room.setMobSpawner(bossSpawner);    
+                bossSpawner.setParentRoom(room);
             }
         }
 

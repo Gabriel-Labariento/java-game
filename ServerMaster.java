@@ -482,7 +482,7 @@ public class ServerMaster {
 
         if (userPlayerData.startsWith(NetworkProtocol.ROOM_CHANGE)) {
             // Handle room change logic here on the server side
-            System.out.println("String in room change of getassetdata: " + userPlayerData); // What does this say
+            // System.out.println("String in room change of getassetdata: " + userPlayerData); // What does this say
             sb.append(handleRoomTransition(userPlayer, userPlayerData));
         } else {
             // Normal data without room change
@@ -540,7 +540,7 @@ public class ServerMaster {
             userPlayer.setHitPoints(hp);
             currentRoom = newRoom;
             handleSpawnersOnRoomChange(newRoom);
-            if (!currentRoom.isStartRoom())currentRoom.closeDoors();
+            if (!currentRoom.isStartRoom()) newRoom.closeDoors();
 
             // Build String to be returned
             sb.append(NetworkProtocol.USER_PLAYER) 
