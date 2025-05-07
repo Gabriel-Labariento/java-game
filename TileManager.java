@@ -6,7 +6,7 @@ public final class TileManager {
     public Tile[] tileImages;
 
     public TileManager() {
-        tileImages = new Tile[24];
+        tileImages = new Tile[46];
         setTileImages();
         // loadMap();
     }

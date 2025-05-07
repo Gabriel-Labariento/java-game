@@ -108,6 +108,7 @@ public class Room extends GameObject implements Tileable{
         int layout[][] = new int[HEIGHT_TILES][WIDTH_TILES];
         // Check what type of object it is. TODO: MAKE PRETTIER
         String filePath = "resources/Object Layouts/baseLayout.txt";
+        if (isEndRoom && ServerMaster.getInstance().getGameLevel() == 0) filePath = "resources/Object Layouts/ratKingRoomLayout.txt";
         try {
             InputStream is = getClass().getResourceAsStream(filePath);
             BufferedReader br = new BufferedReader(new InputStreamReader(is));
