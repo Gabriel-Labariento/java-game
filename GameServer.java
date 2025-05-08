@@ -8,7 +8,6 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 public class GameServer {
-    private static final int GAMELOOPINTERVAL = 16;
     private static final int TICKSPERSECOND = 60;
     private ServerSocket ss;
     private ArrayList<Socket> sockets;
@@ -60,6 +59,9 @@ public class GameServer {
                 if (!connectedPlayers.isEmpty()){
                     for (ConnectedPlayer cp : connectedPlayers) {
                         String data = serverMaster.getAssetsData(cp.cid);
+                        // System.out.println(data);
+                        serverMaster.updateUserPlayerIndex(cp.cid);
+
                         cp.promptAssetsThread(data);
                     }
                 }
@@ -90,12 +92,15 @@ public class GameServer {
                     while (true){
                         // Create a socket for the client to use
                         Socket sock = ss.accept();
+                        
                         // Disable Nagle's buffering algorithm: basically reduces latency
                         sock.setTcpNoDelay(true);
                         sockets.add(sock);
                         
                         ConnectedPlayer cp = new ConnectedPlayer(sock, clientNum);
                         clientNum++;
+                        cp.loadPreGameData();
+                        connectedPlayers.add(cp);
                         cp.startThreads();
                     }        
                     } catch (IOException ex) {
@@ -120,8 +125,6 @@ public class GameServer {
             cid = n;
             sendQueue = new LinkedBlockingDeque<>();
             
-            //Temporary insertion of heavycat
-            serverMaster.addEntity((new HeavyCat(cid, serverMaster.getCurrentRoom().getCenterX(), serverMaster.getCurrentRoom().getCenterY())));
             try {
                 dataIn = new DataInputStream(clientSocket.getInputStream());
                 dataOut = new DataOutputStream(clientSocket.getOutputStream());
@@ -129,6 +132,34 @@ public class GameServer {
                 System.out.println("IOException from ConnectedPlayer constructor");
             }
         }
+
+        public void loadPreGameData(){
+            try {
+                int byteLength = dataIn.readInt();
+                byte[] buffer = new byte[byteLength];
+                dataIn.readFully(buffer);
+                String playerType = new String(buffer, "UTF-8");
+
+                Player chosenPlayer = null;
+       
+                if (playerType.equals(NetworkProtocol.HEAVYCAT)){
+                    chosenPlayer = (new HeavyCat(cid, serverMaster.getCurrentRoom().getCenterX(), serverMaster.getCurrentRoom().getCenterY()));
+                }
+                else if (playerType.equals(NetworkProtocol.FASTCAT)){
+                    chosenPlayer = (new FastCat(cid, serverMaster.getCurrentRoom().getCenterX(), serverMaster.getCurrentRoom().getCenterY()));
+                }
+                else if (playerType.equals(NetworkProtocol.GUNCAT)){
+                    chosenPlayer = (new GunCat(cid, serverMaster.getCurrentRoom().getCenterX(), serverMaster.getCurrentRoom().getCenterY()));
+                }
+                
+                
+                serverMaster.addEntity(chosenPlayer);
+
+
+            } catch (IOException ex){
+                System.out.println("IOEception from receiveAssetsThread");
+            }
+         }
 
         public void startThreads(){
             startAssetsThread();
@@ -140,20 +171,53 @@ public class GameServer {
          */
         private void startAssetsThread(){
             System.out.println("NEW PLAYER HAS ENTERED");
-
-            final Runnable sendAssetsData = new Runnable(){
+            Thread sendAssetsThread = new Thread(){
                 boolean mapDataSent = false;
+
                 @Override
-                public void run() {
-                    if (!mapDataSent){
-                        sendMapData();
-                        mapDataSent = true;
-                        System.out.println("Map Data Sent");
+                public void run(){
+                    while (true) { 
+                        try {
+                            //Only start the rest of the thread if data is sent
+                            String assetsDataString = sendQueue.take();
+                            System.out.println(assetsDataString);
+
+                            if (!mapDataSent){
+                                sendMapData();
+                                mapDataSent = true;
+                                System.out.println("Map Data Sent");
+                            }
+
+                            byte[] assetsDataBytes = assetsDataString.getBytes("UTF-8");
+                            dataOut.writeInt(assetsDataBytes.length);
+                            dataOut.write(assetsDataBytes);
+
+                        } catch (IOException ex) {
+                            System.out.println("IOException from ConnectedPlayer's startAssetsThread method");
+                            break;
+                        } catch (InterruptedException ex) {
+                            System.out.println("InterrupedException from ConnectedPlayer's startAssetsThread method");
+                        }   
                     }
-                    sendEntitiesData();   
-                }
+                }    
             };
-            sendAssetsScheduler.scheduleAtFixedRate(sendAssetsData, 0, GAMELOOPINTERVAL, TimeUnit.MILLISECONDS);
+            sendAssetsThread.start();
+
+            // System.out.println("NEW PLAYER HAS ENTERED");
+
+            // final Runnable sendAssetsData = new Runnable(){
+            //     boolean mapDataSent = false;
+            //     @Override
+            //     public void run() {
+            //         if (!mapDataSent){
+            //             sendMapData();
+            //             mapDataSent = true;
+            //             System.out.println("Map Data Sent");
+            //         }
+            //         sendEntitiesData();   
+            //     }
+            // };
+            // sendAssetsScheduler.scheduleAtFixedRate(sendAssetsData, 0, GAMELOOPINTERVAL, TimeUnit.MILLISECONDS);
         }
 
         public void promptAssetsThread(String data){
@@ -178,18 +242,18 @@ public class GameServer {
         /**
          * Sends the serialized entities data by converting it to a byte array
          */
-        private void sendEntitiesData(){
-            try {
-                String assetsDataString = serverMaster.getAssetsData(cid);
-                // System.out.println(assetsDataString);
-                serverMaster.updateUserPlayerIndex(cid);
-                byte[] assetsDataBytes = assetsDataString.getBytes("UTF-8");
-                dataOut.writeInt(assetsDataBytes.length);
-                dataOut.write(assetsDataBytes);    
-            } catch (IOException e) {
-                System.out.println("IOException from sendEntitiesData() method");
-            }
-        }
+        // private void sendEntitiesData(int cid){
+        //     try {
+        //         String assetsDataString = serverMaster.getAssetsData(cid);
+        //         // System.out.println(assetsDataString);
+        //         serverMaster.updateUserPlayerIndex(cid);
+        //         byte[] assetsDataBytes = assetsDataString.getBytes("UTF-8");
+        //         dataOut.writeInt(assetsDataBytes.length);
+        //         dataOut.write(assetsDataBytes);    
+        //     } catch (IOException e) {
+        //         System.out.println("IOException from sendEntitiesData() method");
+        //     }
+        // }
         
         private void startInputsThread(){
             Thread getInputsThread = new Thread(){

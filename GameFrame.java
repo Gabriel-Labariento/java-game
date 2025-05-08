@@ -1,5 +1,6 @@
 import java.awt.*;
 import java.awt.event.*;
+import java.util.ArrayList;
 import javax.swing.*;
 
 public class GameFrame extends JFrame{
@@ -7,22 +8,20 @@ public class GameFrame extends JFrame{
     private String title;
     private String serverIP;
     private int serverPort;
+    private String playerType;
     private JLayeredPane lp;
     private JPanel cp;  
     private ImageIcon btnBG;
     private GameCanvas gameCanvas;
     private Entity[] entities;
     private GameClient gameClient;
-    private JButton btn1;
-    private JButton btn2;
-    private JButton btn3;
-    private JButton btn4;
-    private JButton btn5;
-    private JButton btn6;
+    private ArrayList<JButton> btns;
     private JLabel label1;
     private JLabel label2;
+    private JLabel label3;
     private JTextField textField1;
     private JTextField textField2;
+    private int fishSlideNum;
 
 
     public GameFrame(int width, int height, String title){
@@ -33,41 +32,28 @@ public class GameFrame extends JFrame{
         // btnBG = new ImageIcon("/UI Assets/btnBG");
         gameCanvas = new GameCanvas(width, height);
         gameClient = gameCanvas.getGameClient();
-        btn1 = new JButton("Play");
-        btn2 = new JButton("Quit");
-        btn3 = new JButton("Connect");
-        btn4 = new JButton("Back");
-        btn5 = new JButton("Host Server");
-        btn6 = new JButton("Enter Game");
+
+        //Set default values
+        playerType = NetworkProtocol.HEAVYCAT;
+        fishSlideNum = 1;
+
+        btns = new ArrayList<>();
+        btns.add(new JButton("Play"));
+        btns.add(new JButton("Quit"));
+        btns.add(new JButton("Connect"));
+        btns.add(new JButton("Back"));
+        btns.add(new JButton("Host Server"));
+        btns.add(new JButton("Enter Game"));
+        btns.add(new JButton("<"));
+        btns.add(new JButton(">"));
+
         label1 = new JLabel();
-        label2 = new JLabel("Port: ");
+        label2 = new JLabel();
+        label3 = new JLabel();
+
         textField1 = new JTextField(10);
         textField2 = new JTextField(10);
         lp = new JLayeredPane();
-        // try {
-        //     Enumeration<NetworkInterface> e = NetworkInterface.getNetworkInterfaces();
-        //     while (e.hasMoreElements()) {
-        //         NetworkInterface networkInterface = (NetworkInterface) e.nextElement();
-
-        //         //Check if interface is down or is only visible to the host
-        //         if (!networkInterface.isUp() || networkInterface.isLoopback())
-        //             continue;
-
-        //         Enumeration<InetAddress> a = networkInterface.getInetAddresses();
-        //         while (a.hasMoreElements()) {
-        //             InetAddress inetAddress = a.nextElement();
-
-        //             // Check if address is an Ipv4 address and is not only visible to host
-        //             if (inetAddress instanceof Inet4Address && !inetAddress.isLoopbackAddress()) {
-        //                 System.out.println("IPv4 Address: " + inetAddress.getHostAddress());
-        //             }
-        //         }
-        //     }
-        // } catch (SocketException e) {
-        //     System.out.println("SocketException at GameFrame Constructor");
-        // }   
-
-
     }
 
     public void setUpGUI() {     
@@ -86,16 +72,14 @@ public class GameFrame extends JFrame{
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         pack();
         setVisible(true);
-        
-
     }
 
     public void loadStartUI(){
-        btn1.setBounds(54, 116, 158, 33);
-        lp.add(btn1, Integer.valueOf(1));
+        btns.get(0).setBounds(54, 116, 158, 33);
+        lp.add(btns.get(0), Integer.valueOf(1));
 
-        btn2.setBounds(54, 169, 158, 33);
-        lp.add(btn2 , Integer.valueOf(1));
+        btns.get(1).setBounds(54, 169, 158, 33);
+        lp.add(btns.get(1) , Integer.valueOf(1));
     }
 
     public void loadClientUI(){
@@ -116,17 +100,17 @@ public class GameFrame extends JFrame{
         textField2.setBounds(245, 192, 159, 28);
         lp.add(textField2, Integer.valueOf(1));
         
-        btn3.setBounds(54, 280, 159, 35);
-        lp.add(btn3, Integer.valueOf(1));
+        btns.get(2).setBounds(54, 280, 159, 35);
+        lp.add(btns.get(2), Integer.valueOf(1));
 
-        btn4.setBounds(245, 280, 159, 35);
-        lp.add(btn4, Integer.valueOf(1));
+        btns.get(3).setBounds(245, 280, 159, 35);
+        lp.add(btns.get(3), Integer.valueOf(1));
 
-        btn5.setBounds(54, 385, 159, 35);
-        lp.add(btn5, Integer.valueOf(1));
+        btns.get(4).setBounds(54, 385, 159, 35);
+        lp.add(btns.get(4), Integer.valueOf(1));
     }
 
-    public void loadHostUI(){
+    public void loadPrePlayUI(){
         label1.setForeground(Color.WHITE);
         label1.setText("IP Address: " + serverIP);
         label1.setBounds(17, 133, 232, 15);
@@ -137,79 +121,119 @@ public class GameFrame extends JFrame{
         label2.setBounds(17, 194, 232, 15);
         lp.add(label2, Integer.valueOf(1));
 
-        btn4.setBounds(245, 280, 159, 35);
-        lp.add(btn4, Integer.valueOf(1));
+        updateFishCarousel();
+        label3.setForeground(Color.WHITE);
+        label3.setBounds(460, 255, 227, 15);
+        lp.add(label3, Integer.valueOf(1));
 
-        btn6.setBounds(54, 280, 159, 35);
-        lp.add(btn6, Integer.valueOf(1));
+        btns.get(3).setBounds(245, 280, 159, 35);
+        lp.add(btns.get(3), Integer.valueOf(1));
+
+        btns.get(5).setBounds(54, 280, 159, 35);
+        lp.add(btns.get(5), Integer.valueOf(1));
+
+        btns.get(6).setBounds(517, 280, 48, 35);
+        lp.add(btns.get(6), Integer.valueOf(1));
+
+        btns.get(7).setBounds(582, 280, 48, 35);
+        lp.add(btns.get(7), Integer.valueOf(1));
     }
 
-    public void clearGUI(){
-        Component[] components = lp.getComponentsInLayer(1);
-        for (Component c:components){
-            lp.remove(c);
+    public void updateFishCarousel(){
+        if (fishSlideNum > 3) fishSlideNum = 1; 
+        else if (fishSlideNum < 1) fishSlideNum = 3;
+
+        switch(fishSlideNum){
+            case 1:
+                label3.setText("Tuna (Heavy)");
+                playerType = NetworkProtocol.HEAVYCAT;
+                break;
+            case 2:
+                label3.setText("Anchovy (Light)");
+                playerType = NetworkProtocol.FASTCAT;
+                break;
+            case 3:
+                label3.setText("Archerfish (Ranged)");
+                playerType = NetworkProtocol.GUNCAT;
+                break;
         }
+        refreshFrame();
     }
 
-    private void refreshFrame(){
-        lp.revalidate();
-        lp.repaint();
-    }
+
 
     public void setUpButtons(){
         ActionListener btnListener = (ActionEvent ae) -> {
             Object o = ae.getSource();
             
-            if (o == btn1){
+            if (o == btns.get(0)){
                 clearGUI();
                 loadClientUI();
                 refreshFrame();
             }
-            else if (o == btn2){
+            else if (o == btns.get(1)){
                 System.exit(0);                
             }
-            else if (o == btn3){
+            else if (o == btns.get(2)){
                 serverIP = textField1.getText();
                 serverPort = Integer.parseInt(textField2.getText());
-                startPlay();
+                clearGUI();
+                loadPrePlayUI();
+                refreshFrame();
             }
-            else if (o == btn4){
+            else if (o == btns.get(3)){
                 clearGUI();
                 loadStartUI();
                 refreshFrame();
             }
-            else if (o == btn5){
+            else if (o == btns.get(4)){
                 gameClient.hostServer();
                 serverIP = gameClient.getServerIP();
                 serverPort = gameClient.getServerPort();
                 clearGUI();
-                loadHostUI();
+                loadPrePlayUI();
                 refreshFrame();
                 
             }
-            else if (o == btn6){
+            else if (o == btns.get(5)){
                 startPlay();
+            }
+            else if (o == btns.get(6)){
+                fishSlideNum--;
+                updateFishCarousel();
+            }
+            else if (o == btns.get(7)){
+                fishSlideNum++;
+                updateFishCarousel();
             }
 
  
         };
         //Assign an event handler for all of the btns
-        btn1.addActionListener(btnListener);
-        btn2.addActionListener(btnListener);
-        btn3.addActionListener(btnListener);
-        btn4.addActionListener(btnListener);
-        btn5.addActionListener(btnListener);
-        btn6.addActionListener(btnListener);
+        for (JButton btn:btns){
+            btn.addActionListener(btnListener);
+        }
+ 
     }
 
     private void startPlay(){
-        gameClient.connectToServer(serverIP, serverPort);
+        gameClient.connectToServer(serverIP, serverPort, playerType);
         clearGUI();
         addKeyBindings();
         addMouseListener();
         refreshFrame();
         //Force reload
         cp.requestFocusInWindow();
+    }
+
+    public void clearGUI(){
+        Component[] components = lp.getComponentsInLayer(1);
+        for (Component c:components) lp.remove(c);
+    }
+
+    private void refreshFrame(){
+        lp.revalidate();
+        lp.repaint();
     }
 
     public void addMouseListener(){

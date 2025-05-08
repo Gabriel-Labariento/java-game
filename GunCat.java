@@ -1,7 +1,11 @@
+import java.awt.Color;
+import java.awt.Graphics2D;
+import java.awt.geom.*;
+
 public class GunCat extends Player{
     public GunCat(int cid, int x, int y){
         this.clientId = cid;
-        identifier = 'B';
+        identifier = NetworkProtocol.GUNCAT.toCharArray()[0];;
         speed = 5;
         height = 16;
         width = 16;
@@ -13,6 +17,22 @@ public class GunCat extends Player{
         hitPoints = maxHealth;
         damage = 5;
         isDown = false;
+    }
+
+
+    @Override
+    public void draw(Graphics2D g2d, int xOffset, int yOffset){
+        Rectangle2D.Double sprite = new Rectangle2D.Double(xOffset, yOffset, width, height);
+        g2d.setColor(Color.YELLOW);
+        g2d.fill(sprite);
+    }
+
+    @Override
+    public void levelUpStats(){
+        hitPoints += 1;
+        maxHealth += 1;
+        damage += 1;
+        speed += 0;
     }
 
     @Override

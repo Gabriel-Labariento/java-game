@@ -49,10 +49,8 @@
         @Override
         public void updateEntity(ServerMaster gsm) {
             
-            if (isExpired) {
-                System.out.println("PlayerSlash expired");
-                return;
-            } 
+            if (isExpired) return;
+    
 
             attachToOwner();
 

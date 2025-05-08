@@ -6,7 +6,7 @@ public class HeavyCat extends Player{
     public HeavyCat(int cid, int x, int y){
         this.clientId = cid;
         identifier = NetworkProtocol.HEAVYCAT.toCharArray()[0];
-        speed = 5;
+        speed = 3;
         height = 16;
         width = 16;
         screenX = 720/2 - width/2;
@@ -33,7 +33,7 @@ public class HeavyCat extends Player{
         hitPoints += 1;
         maxHealth += 1;
         damage += 1;
-        speed += 1;
+        speed += 0;
     }
 
     @Override

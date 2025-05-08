@@ -52,7 +52,7 @@ public class GameClient {
         }));
     }
 
-    public void connectToServer(String ipAddress, int portNum){
+    public void connectToServer(String ipAddress, int portNum, String playerType){
         try {
             System.out.println("ATTEMPTING TO CONNECT TO SERVER...");
             theSocket = new Socket(ipAddress, portNum);
@@ -64,6 +64,7 @@ public class GameClient {
             dataIn = new DataInputStream(theSocket.getInputStream());
             dataOut = new DataOutputStream(theSocket.getOutputStream());
 
+            sendPreGameData(playerType);
             startAssetsThread();
             startInputsThread();
             // startRenderLoop();
@@ -109,6 +110,17 @@ public class GameClient {
 
     public int getServerPort(){
         return gs.getPort();
+    }
+
+    private void sendPreGameData(String playerType){
+        try {
+            byte[] preGameDataBytes = playerType.getBytes("UTF-8");
+            dataOut.writeInt(preGameDataBytes.length);
+            dataOut.write(preGameDataBytes);
+            
+        } catch (IOException ex) {
+            System.out.println("IOException from startInputsThread");
+        } 
     }
 
     private void startAssetsThread(){

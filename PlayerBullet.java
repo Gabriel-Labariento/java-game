@@ -4,7 +4,7 @@ import java.awt.geom.*;
 
 public class PlayerBullet extends Attack{
     public PlayerBullet(){            //For checking attack duration
-            duration = 400;
+            duration = 5000;
             setExpirationTime(duration);
 
             matchHitBoxBounds();
