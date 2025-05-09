@@ -6,10 +6,11 @@ public class ServerMaster {
     private DungeonMap dungeonMap;
     private int userPlayerIndex;
     private Room currentRoom;
-    private static int gameLevel = 0; // TODO: INCREMENT WHEN DEFEAT BOSS
+    private static int gameLevel;
     private static final int MAX_LEVEL = 7;
     private ConcurrentHashMap<Character, Integer> keyInputQueue;
     private ConcurrentHashMap<Integer, Integer> availableRevives;
+    private ArrayList<GameServer.ConnectedPlayer> connectedPlayers;
     private ArrayList<ClickInput> clickInputQueue;
     private int playerNum;
     private int downedPlayersNum;
@@ -19,15 +20,17 @@ public class ServerMaster {
     private ServerMaster(){
         playerNum = 0;
         downedPlayersNum = 0;
+        gameLevel = 0;
         entities = new CopyOnWriteArrayList<>();
         userPlayerIndex = -1;
         dungeonMap = new DungeonMap(gameLevel);
-        dungeonMap.generateRooms(3);
+        dungeonMap.generateRooms();
         currentRoom = dungeonMap.getStartRoom();
         //-----------------------------//
         keyInputQueue = new ConcurrentHashMap<>();
         availableRevives = new ConcurrentHashMap<>();
         clickInputQueue = new ArrayList<>();
+        connectedPlayers = new ArrayList<>();
     }
 
 
@@ -36,21 +39,21 @@ public class ServerMaster {
         return singleInstance;
     }
 
-    public void update(){
-        // Do not update the game at start of the gameserver (no entities yet)
-        //  System.out.println("Entities array size: " + entities.size());
-        if (entities.isEmpty()) return;
+        public void update(){
+            // Do not update the game at start of the gameserver (no entities yet)
+            //  System.out.println("Entities array size: " + entities.size());
+            if (entities.isEmpty()) return;
 
-        // Update objects accordingly to the inputs
-        processInputs();
+            // Update objects accordingly to the inputs
+            processInputs();
 
-        //Detect and resolve collisions
-        checkCollisions();
+            //Detect and resolve collisions
+            checkCollisions();
 
-        //Process the changes and update existing entities accordingly
-        updateEntities();
+            //Process the changes and update existing entities accordingly
+            updateEntities();
 
-    }
+        }
 
     public void updateEntities(){
         //Check on and resolve the end of life properties of each entity
@@ -126,14 +129,90 @@ public class ServerMaster {
     
     private boolean checkRoomCleared(){
         if (currentRoom.isStartRoom()) return true;
+        // System.out.println("Current room is end room: " + currentRoom.isEndRoom());
         return (currentRoom.getMobSpawner().isAllKilled());
     }
 
     private void handleRoomCleared(){
-        if (currentRoom.isStartRoom()) return;
+        if (currentRoom.isStartRoom() || currentRoom.isClearedHandled()) return;
+
+        if (!currentRoom.getMobSpawner().isSpawning()) return;
+
         currentRoom.getMobSpawner().stopSpawn();
         currentRoom.openDoors();
+
+        if (currentRoom.isEndRoom()) {
+            System.out.println("In handleRoomCleared, cleared endroom");
+            handleBossDefeat();
+        }
+
+        currentRoom.setIsClearedHandled(true);
     }
+    
+    private void handleBossDefeat(){
+        announceBossDefeat();
+        incrementGameLevel();
+        String doorData = addExitRoomGoingToNewDungeon();
+        StringBuilder sb = new StringBuilder();
+        sb.append(NetworkProtocol.BOSS_KILLED).append(doorData); //BK:D:doorId,x,y,direction,roomAId,roomBId
+        sendMessageToClients(sb.toString());
+    }
+
+    private void sendMessageToClients(String message){
+        System.out.println("Message in sendMessageToClients(): " + message);
+        System.out.println("Number of connected clients: " + connectedPlayers.size());
+        for (GameServer.ConnectedPlayer cp : connectedPlayers) {
+            cp.promptAssetsThread(message);
+        }
+    }
+
+    private void announceBossDefeat(){
+        StringBuilder sb = new StringBuilder();
+
+        sb.append("CONGRATULATIONS! YOU DEFEATED THE ");
+        switch (gameLevel) {
+            case 0:
+                sb.append("RAT KING");
+                break;
+            case 1: 
+                sb.append("VIPER");
+                break;
+            case 2:
+                sb.append("FIRE MONSTER");
+                break;
+            default:
+                break;
+        }
+        System.out.println(sb.toString());
+    }
+
+    private String addExitRoomGoingToNewDungeon(){
+        if (!currentRoom.isEndRoom()) return null;
+        String direction = null;
+        while (true) {
+            direction = currentRoom.chooseRandomDirection();
+            if (!currentRoom.getDoors().containsKey(direction)) break;
+        }
+        System.out.println("Direction: " + direction);
+
+        Door d = currentRoom.createDoorFromDirection(direction);
+        d.setIsExitToNewDungeon(true);
+        d.setIsOpen(true);
+        d.setRoomB(currentRoom);
+        currentRoom.addDoorToArrayList(d);
+        
+        return d.serialize();
+    }
+
+    // /**
+    //  * Sends a string in the format LC:
+    //  */
+    // public String broadcastLevelChange(){
+    //     DungeonMap next = generateNewDungeon();
+        
+    //     return null;
+    // }
+
 
     // Checks for collisions between all objects inside the entity ArrayList
     public void checkCollisions(){
@@ -299,7 +378,6 @@ public class ServerMaster {
     }
 
     private void applyKnockBack(Entity target, Entity attacker) {
-        System.out.println("Applying knockback to enemy: " + target.getClass());
 
         int[] entityPosition = target.getPositionVector();
         int[] attackPosition = attacker.getPositionVector();
@@ -422,26 +500,26 @@ public class ServerMaster {
      * Creates a new dungeon and updates user player position
      * in the new starting room.
      */
-    public void generateNewDungeon(){
+    public DungeonMap generateNewDungeon(){
         Player userPlayer = null;
-        
+
         if (userPlayerIndex >= 0 && userPlayerIndex < entities.size()) { // Ensure the userPlayer is in entities
             userPlayer = (Player) entities.get(userPlayerIndex);
         } 
 
         dungeonMap = new DungeonMap(gameLevel);
-        dungeonMap.generateRooms(3 + gameLevel);
-        currentRoom = dungeonMap.getStartRoom();
+        dungeonMap.generateRooms();
+        
+        return dungeonMap;
+        // entities.clear(); // Safe to clear, already have reference to userPlayer
 
-        entities.clear(); // Safe to clear, already have reference to userPlayer
-
-        if (userPlayer != null) {
-            userPlayer.setWorldX(currentRoom.getCenterX());
-            userPlayer.setWorldX(currentRoom.getCenterX());
-            userPlayer.setCurrentRoom(currentRoom);
-            entities.add(userPlayer);
-            updateUserPlayerIndex(userPlayer.getClientId());
-        }
+        // if (userPlayer != null) {
+        //     userPlayer.setWorldX(currentRoom.getCenterX());
+        //     userPlayer.setWorldX(currentRoom.getCenterX());
+        //     userPlayer.setCurrentRoom(currentRoom);
+        //     entities.add(userPlayer);
+        //     updateUserPlayerIndex(userPlayer.getClientId());
+        // }
         
     }
 
@@ -626,6 +704,14 @@ public class ServerMaster {
         return null;
     }
 
+    public void setConnectedPlayers(ArrayList<GameServer.ConnectedPlayer> connectedPlayers) {
+        this.connectedPlayers = connectedPlayers;
+    }
+ 
+    public void addConnectedPlayer(GameServer.ConnectedPlayer cp){
+        connectedPlayers.add(cp);
+    }
+    
     // Stores the x and y coordinates, as well as the client id of the click input.
     private static class ClickInput{
         public int x, y, cid;

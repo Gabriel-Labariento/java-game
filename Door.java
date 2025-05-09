@@ -6,7 +6,7 @@ public class Door extends GameObject implements Tileable {
     public static final int WIDTH_TILES = 2;
     private String direction;
     private Room roomA, roomB; // The door only appears on roomA, but is connected to another door in roomB 
-    private boolean isOpen;
+    private boolean isOpen, isExitToNewDungeon;
     
     
 
@@ -24,6 +24,7 @@ public class Door extends GameObject implements Tileable {
         tiles = new Tile[HEIGHT_TILES][WIDTH_TILES];
         populateTiles();
         isOpen = true;
+        isExitToNewDungeon = false;
         this.direction = direction;
         this.roomA = roomA;
         this.roomB = roomB;
@@ -111,5 +112,17 @@ public class Door extends GameObject implements Tileable {
 
     public void setIsOpen(boolean isOpen) {
         this.isOpen = isOpen;
+    }
+
+    public void setRoomB(Room roomB) {
+        this.roomB = roomB;
+    }
+
+    public boolean isExitToNewDungeon() {
+        return isExitToNewDungeon;
+    }
+
+    public void setIsExitToNewDungeon(boolean isExitToNewDungeon) {
+        this.isExitToNewDungeon = isExitToNewDungeon;
     }
 }

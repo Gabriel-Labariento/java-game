@@ -122,10 +122,15 @@ public class GameClient {
                         byte[] buffer = new byte[byteLength];
                         dataIn.readFully(buffer);
                         String receivedMessage = new String(buffer, "UTF-8");
-
+                        // System.out.println("ReceivedMessage: " + receivedMessage);
                         // If the received message starts with the protocol identifier for map data, parse the map data
                         if (receivedMessage.startsWith(NetworkProtocol.MAP_DATA)) {
                             parseMapData(receivedMessage);
+                        } else if (receivedMessage.startsWith(NetworkProtocol.BOSS_KILLED)) {
+                            System.out.println("Received message is boss killed");
+                            parseBossKilledData(receivedMessage);
+                        } else if (receivedMessage.startsWith(NetworkProtocol.LEVEL_CHANGE)) {
+                            // TODO: LEVEL CHANGE IN GAME CLIENT
                         } else {
                             synchronized (clientMaster.getEntities()) { // Synchronize entities arraylist to remove flickering
                                 clientMaster.getEntities().clear();
@@ -215,7 +220,7 @@ public class GameClient {
                     int y = Integer.parseInt(entityData[3]);
                     int sprite = Integer.parseInt(entityData[5]);
                     loadEntity(identifier, id, x, y, roomId, sprite);
-                } else {
+                } else { // SPRITELESS OBJECTS
                     // Don't load if not in the same room as the client.
                     int roomId = Integer.parseInt(entityData[4]);
                     if (!(roomId == clientMaster.getCurrentRoom().getRoomId())) continue;
@@ -241,6 +246,26 @@ public class GameClient {
         DungeonMapDeserializeResult result = new DungeonMap().deserialize(message);
         clientMaster.setCurrentRoom(result.getStartRoom());
         clientMaster.setAllRooms(result.getAllRooms());
+    }
+
+    /**
+     * Parses a string in the format BK:roomId, doorId,x,y,direction to
+     * create a new door in the end room after defeating a boss
+     * @param message the substring containing the end room and new door data
+     */
+    private void parseBossKilledData(String message) {
+        System.out.println("Message inside parseBossKilledData: " + message);
+        String[] dataParts = message.substring(NetworkProtocol.BOSS_KILLED.length() + NetworkProtocol.DOOR.length()).split(NetworkProtocol.SUB_DELIMITER);
+        int doorId = Integer.parseInt(dataParts[0]);
+        int x = Integer.parseInt(dataParts[1]);
+        int y = Integer.parseInt(dataParts[2]);
+        // System.out.println("Door Y: " + doorY);
+        String direction = dataParts[3];
+        int roomAID = Integer.parseInt(dataParts[4]);
+        int roomBID = Integer.parseInt(dataParts[5]);
+        Door d = new Door(x, y, direction, clientMaster.getRoomById(roomAID), clientMaster.getRoomById(roomBID));
+        d.setId(doorId);
+        clientMaster.getRoomById(roomAID).addDoorToArrayList(d);
     }
 
     public Player getPlayer(char identifier, int id, int x, int y){

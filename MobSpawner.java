@@ -34,12 +34,13 @@ public class MobSpawner {
     public MobSpawner(int level, int difficulty){
         this.level = level;
         this.difficulty = difficulty;
+        spawnedCount = 0;
         spawnRate =  5; // Spawns one enemy per spawnRate seconds
         spawnMobsScheduler = Executors.newSingleThreadScheduledExecutor();
         
         spawnRate = Math.max(2, 5 - (level / 2 - difficulty));
         maxSpawned = (difficulty == 3) ? 1 : (3 + level + difficulty);
-
+        maxSpawned = 1;
         spawnedEnemies = new ArrayList<>();
         // spawnedCount = 0;
         isSpawning = false;
@@ -54,14 +55,12 @@ public class MobSpawner {
                     // Stop spawning if maxSpawned has been reached.
                     if (spawnedCount >= maxSpawned) return;
 
-                    Room currentRoom = ServerMaster.getInstance().getCurrentRoom();
-
                     Enemy enemy = null;
 
                     if (inBossRoom && spawnedCount == 0) {
                         enemy = createBoss(level);
                         spawnEnemy(enemy);
-                        for (int i = 0; i < 10; i++) {
+                        for (int i = 0; i < 0; i++) {
                             enemy = createNormalEnemy(level);
                             spawnEnemy(enemy);
                         }

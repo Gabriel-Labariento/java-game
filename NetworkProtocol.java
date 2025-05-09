@@ -17,6 +17,8 @@ public class NetworkProtocol {
     public static final String ROOM = "R:";    // Room 
     public static final String DOOR = "D:"; // Door 
     public static final String ROOM_CHANGE = "RC:";
+    public static final String LEVEL_CHANGE = "LC:";
+    public static final String BOSS_KILLED = "BK:";
     public static final String HP = "@";
     public static final String ATTACK = "ATK:";
     public static final String KEYS = "K:";

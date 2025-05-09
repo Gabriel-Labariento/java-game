@@ -21,13 +21,17 @@ public class DungeonMap {
      * Generates a certain number of rooms (numRooms <= 3). Connects them and calls pickStartAndEndRooms() and populateAllRoomsDoorsArrayList()
      * @param numRooms number of rooms to be made, minimum of 3.
      */
-    public void generateRooms(int numRooms) {
+    public void generateRooms() {
 
         // Algorithm will not work for when rooms < 3. So ensure 3 is the minumum
-        numRooms = Math.max(3, numRooms + gameLevel);
+        int numRooms = Math.max(3,  3 + 2 * gameLevel);
+
+        final int MAX_ATTEMPTS = 10;
+        int attempts = 0;
 
         // Room generation
-        while (true) {
+        while (attempts < MAX_ATTEMPTS) {
+            attempts++;
             rooms.clear();
             createRoomsNoConnections(numRooms);
             
@@ -50,9 +54,14 @@ public class DungeonMap {
                     if (door.getValue() != null)
                         continue;
 
+                
+                    int MAX_CONNECTION_ATTEMPTS = 20;
+                    int connectionAttempts = 0;
+
                     Room randomRoom;
-                    // Try to add a room at the specified direction of the room
-                    while (true) {
+                    while (connectionAttempts < MAX_CONNECTION_ATTEMPTS) {
+                        connectionAttempts++;
+                        // Try to add a room at the specified direction of the room
                         randomRoom = chooseRandomRoom();
                         if (room.isConnectable(direction, randomRoom) && (randomRoom.canAddMoreDoors())) {
                             room.connectRooms(direction, randomRoom);

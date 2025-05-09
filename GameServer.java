@@ -24,6 +24,7 @@ public class GameServer {
         serverMaster = ServerMaster.getInstance();
         sockets = new ArrayList<>();
         connectedPlayers = new ArrayList<>();
+        serverMaster.setConnectedPlayers(connectedPlayers);
         gameLoopScheduler = Executors.newSingleThreadScheduledExecutor();
         sendAssetsScheduler = Executors.newSingleThreadScheduledExecutor();
         port = 5000;
@@ -42,9 +43,6 @@ public class GameServer {
         System.out.println("GAMESERVER HAS BEEN CREATED.");
     }
 
-    public int getPort() {
-        return port;
-    }
     
     public void startGameLoop(){
         final Runnable gameLoop = new Runnable(){
@@ -95,6 +93,7 @@ public class GameServer {
                         sockets.add(sock);
                         
                         ConnectedPlayer cp = new ConnectedPlayer(sock, clientNum);
+                        serverMaster.addConnectedPlayer(cp);
                         clientNum++;
                         cp.startThreads();
                     }        
@@ -106,8 +105,16 @@ public class GameServer {
         waitForConnectionsThread.start();
 
     }
+    
+    public int getPort() {
+        return port;
+    }
 
-    private class ConnectedPlayer {
+    public ArrayList<ConnectedPlayer> getConnectedPlayers() {
+        return connectedPlayers;
+    }
+    
+    public class ConnectedPlayer {
         private Socket clientSocket;
         private DataInputStream dataIn;
         private DataOutputStream dataOut;
@@ -150,14 +157,29 @@ public class GameServer {
                         mapDataSent = true;
                         System.out.println("Map Data Sent");
                     }
-                    sendEntitiesData();   
+                    if (!sendQueue.isEmpty()) {
+                        String customMsg = sendQueue.poll();
+                        sendCustomData(customMsg);
+                    } else sendEntitiesData();   
                 }
             };
             sendAssetsScheduler.scheduleAtFixedRate(sendAssetsData, 0, GAMELOOPINTERVAL, TimeUnit.MILLISECONDS);
         }
 
         public void promptAssetsThread(String data){
+            // System.out.println("In promptAssetsThread: " + data);
             sendQueue.offer(data);
+        }
+
+        private void sendCustomData(String message){    
+            try {
+                byte[] dataBytes = message.getBytes("UTF-8");
+                // System.out.println("Sending Custom Data:" + message);
+                dataOut.writeInt(dataBytes.length);
+                dataOut.write(dataBytes);
+            } catch (IOException ex) {
+                System.out.println("IOException from sendCustomData() method");
+            }
         }
 
         /**
@@ -190,7 +212,7 @@ public class GameServer {
                 System.out.println("IOException from sendEntitiesData() method");
             }
         }
-        
+
         private void startInputsThread(){
             Thread getInputsThread = new Thread(){
                 
@@ -230,46 +252,10 @@ public class GameServer {
                                     serverMaster.loadKeyInput(keyInput, cid);
 
                                 }
-                                // System.out.println("Parsed char: " + parsedChar); 
-                                
+                                // System.out.println("Parsed char: " + parsedChar);                         
                             }
                         }
                     }
-
-            //             int length = str.length();
-            //             boolean isLoadingY = false;
-            //             String x = "";
-            //             String y = "";
-            //             System.out.println(str);
-
-            //             for(int i = 0; i < length; i++){
-            //                 char parsedChar = str.charAt(i);
-                            
-            //                 if(!Character.isLetter(parsedChar)){
-            //                     //Delimiter for x and y
-            //                     if(parsedChar == ','){
-            //                         isLoadingY = true;
-            //                         continue;   
-            //                     }
-                                    
-            //                     //Check if loading char to either x or y strings
-            //                     if (isLoadingY)
-            //                         y += parsedChar;                        
-            //                     else
-            //                         x += parsedChar;
-            //                 }
-            //                 else{
-            //                     serverMaster.loadKeyInput(parsedChar, cid);
-            //                 }
-                                
-            //             }
-            //             if(!x.isEmpty() && !y.isEmpty()){
-            //                 serverMaster.loadClickInput(Integer.parseInt(x), Integer.parseInt(y), cid); 
-            //             }   
-            //         }
-
-            //     }
-            // };
             } 
          };
          getInputsThread.start();
