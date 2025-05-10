@@ -15,15 +15,10 @@ public abstract class Player extends Entity{
     public int pastXPCap;
     public Item heldItem;
 
-    // function nextLevel(level)
-    //     local exponent = 1.5
-    //     local baseXP = 1000
-    //     return math.floor(baseXP * (level ^ exponent))
-    // end
-
     public Player(){
         currentLvl = 1;
         currentXPCap = 100;
+        heldItem = null;
     }
 
     public void applyXP(int xp){
@@ -47,6 +42,14 @@ public abstract class Player extends Entity{
         }
     }
 
+    public void setHeldItem(Item item){
+        heldItem = item;
+    }
+
+    public Item getHeldItem(){
+        return heldItem;
+    }
+    
     public void levelUpStats(){
     }
 

@@ -15,7 +15,9 @@ public abstract class Item extends Entity{
         owner = player;
     }
 
-    public void applyEffects(Entity target){}
+    public abstract void applyEffects();
+
+    // public abstract void removeEffects();
 
     public boolean getIsConsumable(){
         return isConsumable;

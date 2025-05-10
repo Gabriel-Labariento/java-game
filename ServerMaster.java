@@ -120,6 +120,10 @@ public class ServerMaster {
             else if (entity instanceof Attack attack && attack.getIsExpired()){
                 entities.remove(attack);
             }
+            else if (entity instanceof Item item && item.getIsDespawned()){
+                entities.remove(item);
+            }
+
             entity.updateEntity(this);
         }
         //Reset list to track available revives per frame
@@ -215,15 +219,30 @@ public class ServerMaster {
                 availableRevives.put(cid2, cid1);
         }
 
-        
-        // if (entity1 instanceof Player && entity2 instanceof Attack ||
-        //     entity2 instanceof Player && entity1 instanceof Attack) {
-        //         Player player = entity1 instanceof Player ? (Player) entity1 : (Player) entity2;
-        //         Attack attack = entity1 instanceof Attack ? (Attack) entity1 : (Attack) entity2;
-            
-        //         if (attack.getClientId() == player.getClientId()) continue; // don't process attack is from the player
-        //     }
+        // ITEM collision handling
+        else if (e1 instanceof Item item && e2 instanceof Player player){
+            applyItem(item, player);
+        }
+        else if (e2 instanceof Item item && e1 instanceof Player player){
+            applyItem(item, player);
+        }
+    }
 
+    private void applyItem(Item item, Player player){
+        item.setOwner(player);
+        
+        if (item.getIsConsumable()){
+            item.applyEffects();
+            entities.remove(item);
+        }
+        else {
+            if (player.getHeldItem() == null){
+                player.setHeldItem(item);
+                item.applyEffects();
+                entities.remove(item);
+            } 
+        }
+        
     }
 
     //Players generate i-frames when damaged
@@ -448,10 +467,16 @@ public class ServerMaster {
         // User Player String: P$:clientId,playerX,playerY 
         Player userPlayer = (Player) getPlayerFromClientId(cid);
         String userPlayerData = userPlayer.getAssetData(true);
+        
 
         //UI elements
+        Item heldItem = userPlayer.getHeldItem();
+        int heldItemId = 0;
+        if (heldItem != null) heldItemId = heldItem.getIdentifier();
+
         sb.append(userPlayer.getXPBarPercent()).append(NetworkProtocol.DELIMITER)
-        .append(userPlayer.getCurrentLvl()).append(NetworkProtocol.DELIMITER);
+        .append(userPlayer.getCurrentLvl()).append(NetworkProtocol.DELIMITER).
+        append(heldItemId).append(NetworkProtocol.DELIMITER);
 
         if (userPlayerData.startsWith(NetworkProtocol.ROOM_CHANGE)) {
             // Handle room change logic here on the server side

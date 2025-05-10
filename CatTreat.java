@@ -8,6 +8,7 @@ public class CatTreat extends Item {
         worldX = x;
         worldY = y;
         currentRoom = null;
+        isConsumable = true;
 
         matchHitBoxBounds();
     }

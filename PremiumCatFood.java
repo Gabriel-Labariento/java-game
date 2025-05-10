@@ -8,6 +8,7 @@ public class PremiumCatFood extends Item {
         worldX = x;
         worldY = y;
         currentRoom = null;
+        isConsumable = true;
 
         matchHitBoxBounds();
     }

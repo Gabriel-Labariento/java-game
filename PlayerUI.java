@@ -13,11 +13,16 @@ public class PlayerUI extends GameObject{
         int userHealth = userPlayer.getHitPoints();
         double xpBarPercent = clientMaster.getXPBarPercent();
         int userLvl = clientMaster.getUserLvl();
+        
 
         //PORTRAIT UI ELEMENTS
         Ellipse2D.Double userPortrait = new Ellipse2D.Double(23/sf, 26/sf, 72/sf, 72/sf);
         g2d.setColor(Color.WHITE);
         g2d.fill(userPortrait);
+
+        //ITEM UI ELEMENTS
+        Entity heldItem = clientMaster.generateUIItem();
+        if (heldItem != null) heldItem.draw(g2d, 68/sf, 71/sf);
 
         //LEVELING SYSTEM UI ELEMENTS
         g2d.setColor(Color.WHITE);

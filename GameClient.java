@@ -13,7 +13,6 @@ public class GameClient {
     private DataOutputStream dataOut;
     private Scanner console;
     private int clientId;
-    private HashMap<Character, String> idToName;
     private HashMap<String, Boolean> keyMap;
     private int clickedX;
     private int clickedY;
@@ -25,25 +24,6 @@ public class GameClient {
         this.clientMaster = clientMaster;
         sendInputsScheduler = Executors.newSingleThreadScheduledExecutor();
 
-        idToName = new HashMap<>();
-        idToName.put(NetworkProtocol.REDFISH.charAt(0), "Redfish");
-        idToName.put(NetworkProtocol.CATTREAT.charAt(0), "Cat Treat");
-        idToName.put(NetworkProtocol.MILK.charAt(0), "Milk");
-        idToName.put(NetworkProtocol.PREMIUMCATFOOD.charAt(0), "Premium Cat Food++");
-        idToName.put(NetworkProtocol.GOLDFISH.charAt(0), "Goldfish");
-        idToName.put(NetworkProtocol.LIGHTSCARF.charAt(0), "Light Scarf");
-        idToName.put(NetworkProtocol.THICKSWEATER.charAt(0), "Thick Sweater");
-        idToName.put(NetworkProtocol.BAGOFCATNIP.charAt(0), "Bag of Catnip");
-        idToName.put(NetworkProtocol.LOUDBELL.charAt(0), "Loud Bell");
-        idToName.put(NetworkProtocol.PRINGLESCAN.charAt(0), "Pringles Can");
-        idToName.put(NetworkProtocol.HEAVYCAT.charAt(0), "HeavyCat");
-        idToName.put(NetworkProtocol.FASTCAT.charAt(0), "FastCat");
-        idToName.put(NetworkProtocol.GUNCAT.charAt(0), "GunCat");
-        idToName.put(NetworkProtocol.PLAYERSMASH.charAt(0), "PlayerSmash");
-        idToName.put(NetworkProtocol.PLAYERSLASH.charAt(0), "PlayerSlash");
-        idToName.put(NetworkProtocol.PLAYERBULLET.charAt(0), "PlayerBullet");
-        idToName.put(NetworkProtocol.RAT.charAt(0), "Rat");
-        
         keyMap = new HashMap<>();
         keyMap.put("W", false);
         keyMap.put("A", false);
@@ -172,6 +152,7 @@ public class GameClient {
         this.clientId = Integer.parseInt(messageParts[0]);
         clientMaster.setXPBarPercent(Integer.parseInt(messageParts[1]));
         clientMaster.setUserLvl(Integer.parseInt(messageParts[2]));
+        clientMaster.setHeldItemIdentifier(messageParts[3].charAt(0));
 
         for (String part : messageParts) {
             if (part.startsWith(NetworkProtocol.USER_PLAYER)) {
@@ -188,7 +169,7 @@ public class GameClient {
                 // System.out.println(" user Player loaded");
                 try {
                     Room currentRoom = clientMaster.getRoomById(playerRoomId);
-                    Player player = getPlayer(identifier, playerId, playerX, playerY);
+                    Player player = (Player) clientMaster.getEntity(identifier, playerId, playerX, playerY);
                     player.setCurrentRoom(currentRoom);
                     player.setHitPoints(playerHealth);
                     clientMaster.setUserPlayer(player);
@@ -214,7 +195,7 @@ public class GameClient {
                 
                 // Only load the player if it is not the user player and it is in the same room
                 if ( (otherId != clientId) && (otherRoomId == clientMaster.getCurrentRoom().getRoomId()) ) {
-                    Player other = getPlayer(identifier, otherId, x, y);
+                    Player other = (Player) clientMaster.getEntity(identifier, otherId, x, y);
                     other.setCurrentRoom(clientMaster.getRoomById(otherRoomId));
                     other.setHitPoints(hp);
                     clientMaster.addEntity(other);
@@ -234,7 +215,7 @@ public class GameClient {
                 int id = Integer.parseInt(entityData[1]);
                 int x = Integer.parseInt(entityData[2]);
                 int y = Integer.parseInt(entityData[3]);
-                loadEntity(identifier, id, x, y, roomId);    
+                clientMaster.loadEntity(identifier, id, x, y, roomId);    
             }
         
         }
@@ -250,80 +231,6 @@ public class GameClient {
         DungeonMapDeserializeResult result = new DungeonMap().deserialize(message);
         clientMaster.setCurrentRoom(result.getStartRoom());
         clientMaster.setAllRooms(result.getAllRooms());
-    }
-
-    public Player getPlayer(char identifier, int id, int x, int y){
-        String name = idToName.get(identifier);
-        switch (name){
-            case "HeavyCat":
-                return new HeavyCat(id, x, y);
-            case "FastCat":
-                return new FastCat(id, x, y);
-            case "GunCat":
-                return new GunCat(id, x, y);
-            default:
-                return null;
-        }
-    }
-
-    public void loadEntity(char identifier, int id, int x, int y, int roomId){
-        String name = idToName.get(identifier);
-        // System.out.println("Loading entity " + identifier + " " + name + "at " + x + ", " + y);
-        // if (name == null) System.out.println("Warning: unknown identity identifier " + identifier);
-        Entity e = null;
-        switch (name) {
-            case "Redfish":
-                e = new RedFish(x, y);
-                break;
-            case "Cat Treat":
-                e = new CatTreat(x, y);
-                break;
-            case "Milk":
-                e = new Milk(x, y);
-                break;
-            case "Premium Cat Food++":
-                e = new PremiumCatFood(x, y);
-                break;
-            case "Goldfish":
-                e = new Goldfish(x, y);
-                break;
-            case "Light Scarf":
-                e = new LightScarf(x, y);
-                break;
-            case "Thick Sweater":
-                e = new ThickSweater(x, y);
-                break;
-            case "Bag of Catnip":
-                e = new BagOfCatnip(x, y);
-                break;
-            case "Loud Bell":
-                e = new LoudBell(x, y);
-                break;
-            case "Pringles Can":
-                e = new PringlesCan(x, y);
-                break;
-            case "Rat":
-                e = new Rat(x, y);
-                break;
-            case "PlayerSlash":
-                e = new PlayerSlash(clientId, null, x, y, 0, false);
-                break;
-            case "PlayerSmash":
-                e = new PlayerSmash(clientId, null, x, y, 0, false);
-                break;
-            case "PlayerBullet":
-                e = new PlayerBullet(clientId, null, x, y, 0, 0, 0, false);
-                break;
-            case "":
-            default:
-                break;
-        }
-        if (e != null) {
-            e.setCurrentRoom(clientMaster.getRoomById(roomId));
-            clientMaster.addEntity(e);
-        }
-
-    
     }
 
     public void startInputsThread(){
