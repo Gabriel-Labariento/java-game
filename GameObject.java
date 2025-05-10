@@ -1,0 +1,120 @@
+public abstract class GameObject {
+    protected int worldX, worldY, height, width;
+    protected int HEIGHT_TILES, WIDTH_TILES;
+    protected Tile[][] tiles;
+    protected int[][] tileLayout;
+    int[] hitBoxBounds;
+
+    public abstract void matchHitBoxBounds();
+
+    /**
+     * Returns the x position of the object in terms of the entire game world. 
+     * @return the object's world x-coordinate
+     */
+    public int getWorldX() {
+        return worldX;
+    }
+
+    /**
+     * Returns the y position of the object in terms of the entire game world
+     * @return the object's world y-coordinate
+     */
+    public int getWorldY() {
+        return worldY;
+    }
+
+    /**
+     * Computes for the object's centerX via its x-position and width 
+     * @return integer value of the object's center x coordinate
+     */
+    public int getCenterX() {
+        return ( (int) ((worldX + width) / 2));
+    }
+
+    /**
+     * Computes for the object's centerY via its y-position and height
+     * @return integer value of the object's center y coordinate
+     */
+    public int getCenterY() {
+        return ( (int) ((worldY + height) / 2));
+    }
+
+    /**
+     * Gets the object's height
+     * @return an integer which is the object's height 
+     */
+    public int getHeight() {
+        return height;
+    }
+
+    /**
+     * Gets the object's width
+     * @return an integer which is the object's width 
+     */
+    public int getWidth() {
+        return width;
+    }
+
+    /**
+     * Checks for collision with other GameObject
+     * @param other object colliding/not colliding with
+     * @return true if colliding with other, false otherwise.
+     */
+    public boolean isColliding(GameObject other){
+        return !((worldX < other.getWorldX()) ||
+                ( (worldX + width) > other.getWorldX() + other.getWidth()) ||
+                (worldY < other.getWorldY()) ||
+                ((worldY + height) > other.getWorldY() + other.getHeight())
+        );
+    }
+
+    /**
+     * Provides the opposite of the provided direction
+     * @param direction the direction whose opposite is to be determined
+     * @return the opposite of the passed direction "T" <-> "B" and "L" <-> "R"
+     */
+    public static String getOppositeDirection(String direction){
+        switch (direction) {
+            case "T":
+                return "B";
+            case "R":
+                return "L";
+            case "B":
+                return "T";
+            case "L":
+                return "R";
+            default:
+                throw new AssertionError("Assertion in getOppositeDirection() method of the Room.");
+        }
+    }
+
+    /**
+     * Populates the 2D array Tile field of the object with new Tile objects.
+     */
+    public void populateTiles(){
+        tiles = new Tile[HEIGHT_TILES][WIDTH_TILES];
+
+        for (int i = 0; i < HEIGHT_TILES; i++) {
+            for (int j = 0; j < WIDTH_TILES; j++) {
+                tiles[i][j] = new Tile();
+            }
+        }
+    }
+
+    public Tile[][] getTiles() {
+        return tiles;
+    }
+
+    public int[][] getTileLayout() {
+        return tileLayout;
+    }
+
+    public int[] getHitBoxBounds() {
+        if (hitBoxBounds == null) {
+            return new int[] {worldY, worldY + height, worldX, worldX + width};
+        }
+        return hitBoxBounds;
+    }
+
+
+}
