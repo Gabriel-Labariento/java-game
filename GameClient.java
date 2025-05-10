@@ -127,12 +127,13 @@ public class GameClient {
                         if (receivedMessage.startsWith(NetworkProtocol.MAP_DATA)) {
                             parseMapData(receivedMessage);
                         } else if (receivedMessage.startsWith(NetworkProtocol.BOSS_KILLED)) {
-                            System.out.println("Received message is boss killed");
                             parseBossKilledData(receivedMessage);
                         } else if (receivedMessage.startsWith(NetworkProtocol.LEVEL_CHANGE)) {
-                            // TODO: LEVEL CHANGE IN GAME CLIENT
+                            clientMaster.getEntities().clear();
+                            String mapData = receivedMessage.substring(NetworkProtocol.LEVEL_CHANGE.length());  // Receives a string containing map and player data
+                            parseMapData(mapData);
                         } else {
-                            synchronized (clientMaster.getEntities()) { // Synchronize entities arraylist to remove flickering
+                            synchronized (clientMaster.getEntities()) {                                 // Synchronize entities arraylist to remove flickering
                                 clientMaster.getEntities().clear();
                                 parseEntitiesData(receivedMessage);
                             }
@@ -144,9 +145,16 @@ public class GameClient {
         receiveAssetsThread.start();
     }
     
+    // private String preparePlayerDataForParsing(String playerData){
+    //     String[] dataParts = playerData.split(NetworkProtocol.SUB_DELIMITER);
+    //     int cid = Integer.parseInt(dataParts[1]);
+    //     if (cid == clientId)
+    // }
+
+
     /**
-     * Parses a serialized string expected to be in the form ClientId|P:playerX,playerY|E:entity1X,entity1Y,entity2x,entity2Y...|
-     * @param message a serialized string in the form ClientId|P:playerX,playerY|E:entity1X,entity1Y,entity2x,entity2Y...|
+     * Parses a serialized string expected to be in the form ClientId|P:playerX,playerY,playerHealth,playerRoomId|E:entity1X,entity1Y,entity2x,entity2Y...|
+     * @param message a serialized string in the form ClientId|P:playerX,playerY,playerHealth,playerRoomId|E:entity1X,entity1Y,entity2x,entity2Y...|
      */
     private void parseEntitiesData(String message){
 
@@ -243,6 +251,7 @@ public class GameClient {
      * @param message the substring containing map data
      */
     private void parseMapData(String message){
+        System.out.println("Inside parseMapData: " + message);
         DungeonMapDeserializeResult result = new DungeonMap().deserialize(message);
         clientMaster.setCurrentRoom(result.getStartRoom());
         clientMaster.setAllRooms(result.getAllRooms());
@@ -254,7 +263,6 @@ public class GameClient {
      * @param message the substring containing the end room and new door data
      */
     private void parseBossKilledData(String message) {
-        System.out.println("Message inside parseBossKilledData: " + message);
         String[] dataParts = message.substring(NetworkProtocol.BOSS_KILLED.length() + NetworkProtocol.DOOR.length()).split(NetworkProtocol.SUB_DELIMITER);
         int doorId = Integer.parseInt(dataParts[0]);
         int x = Integer.parseInt(dataParts[1]);
@@ -313,14 +321,15 @@ public class GameClient {
             @Override
             public void run() {
                 try {
-                        String inputDataString = getInputsData();
+                    String inputDataString = getInputsData();
 
-                        // Send data if there are any actual inputs only
-                        if (!inputDataString.isEmpty()) {
-                            byte[] inputDataBytes = inputDataString.getBytes("UTF-8");
-                            dataOut.writeInt(inputDataBytes.length);
-                            dataOut.write(inputDataBytes);
-                        }
+                    // Send data if there are any actual inputs only
+                    if (!inputDataString.isEmpty()) {
+                        byte[] inputDataBytes = inputDataString.getBytes("UTF-8");
+                        dataOut.writeInt(inputDataBytes.length);
+                        dataOut.write(inputDataBytes);
+                    }
+
                     } catch (IOException ex) {
                         System.out.println("IOException from startInputsThread");
                     }   

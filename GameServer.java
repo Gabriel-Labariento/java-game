@@ -55,12 +55,16 @@ public class GameServer {
                     System.err.println("Exception in game loop update():" + e);
                 }
 
-                if (!connectedPlayers.isEmpty()){
+               try {
+                 if (!connectedPlayers.isEmpty()){
                     for (ConnectedPlayer cp : connectedPlayers) {
                         String data = serverMaster.getAssetsData(cp.cid);
-                        cp.promptAssetsThread(data);
+                        if (data != null) cp.promptAssetsThread(data);
                     }
                 }
+               } catch (Exception e) {
+                System.out.println("Exception in asset dispersion to connected players: " + e);
+               }
             }
         };
         gameLoopScheduler.scheduleAtFixedRate(gameLoop, 0, Math.round(1000/TICKSPERSECOND), TimeUnit.MILLISECONDS);
@@ -136,6 +140,8 @@ public class GameServer {
                 System.out.println("IOException from ConnectedPlayer constructor");
             }
         }
+
+        
 
         public void startThreads(){
             startAssetsThread();
@@ -259,8 +265,12 @@ public class GameServer {
             } 
          };
          getInputsThread.start();
+        }
+        
+        public int getCid() {
+            return cid;
+        }
     }
-}
 
   
     // When GameServer is run, the main method instantiates a new 

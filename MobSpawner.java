@@ -22,7 +22,8 @@ public class MobSpawner {
     private static final int INITIALSPAWNDELAY = 1;
     
     private static final String[][] spawnableEnemiesAtLevel = {
-        {"Rat"} // TODO: ADD OTHER ENEMIES
+        {"Rat"}, // TODO: ADD OTHER ENEMIES
+        {"Rat", "Snakelet"}
     };
 
     private static final String[] bosses = {

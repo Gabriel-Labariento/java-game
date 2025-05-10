@@ -219,7 +219,8 @@ public abstract class Player extends Entity{
         Door d = getCollidingDoor();
         if ( isUserPlayer && d != null) { // Only send room transition data for the user player
             if (d.isExitToNewDungeon()) {
-                // return ServerMaster.getInstance().broadcastLevelChange();
+                ServerMaster.getInstance().triggerLevelTransition();
+                return null;
             }
             else return getRoomTransitionData(d, d.getOtherRoom(currentRoom)); // return a different string upon room change
         } else {
