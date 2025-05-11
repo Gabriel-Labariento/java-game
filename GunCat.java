@@ -2,7 +2,8 @@ public class GunCat extends Player{
     public GunCat(int cid, int x, int y){
         this.clientId = cid;
         identifier = 'B';
-        speed = 5;
+        baseSpeed = 5;
+        speed = baseSpeed;
         height = 16;
         width = 16;
         screenX = 720/2 - width/2;

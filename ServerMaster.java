@@ -368,8 +368,9 @@ public class ServerMaster {
     private void damagePlayer(Player player, Entity entity){
         //Debouncing condition
         if(player.canTakeDamage()){
-            player.setHitPoints(player.getHitPoints()-entity.getDamage());
+            player.setHitPoints(player.getHitPoints() - entity.getDamage());
             applyKnockBack(player, entity);
+            if (entity instanceof Snake || entity instanceof Snakelet) player.addStatusEffect(new SlowEffect(180));
             player.triggerInvincibility();
         }
 
@@ -455,7 +456,10 @@ public class ServerMaster {
                 keyInputQueue.forEach((key, cid) ->{
                 // System.out.println("Processing input: " + key + " from " + cid);
                 Player player = (Player) getPlayerFromClientId(cid);
-                if (player == null) System.out.println("Player is null in process inputs");
+                if (player == null) {
+                    System.out.println("Player is null in process inputs");
+                    return;
+                }
                 //Restrain player movement if downed
                 if (!player.getIsDown()) player.update(key);           
                 
@@ -466,6 +470,7 @@ public class ServerMaster {
             clickInputQueue.clear();
         } catch (Exception e) {
             System.err.println("Exception in processInputs():" + e);
+            e.printStackTrace();
         }
     }
 
@@ -598,7 +603,7 @@ public class ServerMaster {
         // User Player String: P$:clientId,playerX,playerY 
         Player userPlayer = (Player) getPlayerFromClientId(cid);
         String userPlayerData = userPlayer.getAssetData(true);
-
+        if (userPlayerData == null) return null;
         //UI elements
         sb.append(userPlayer.getXPBarPercent()).append(NetworkProtocol.DELIMITER)
         .append(userPlayer.getCurrentLvl()).append(NetworkProtocol.DELIMITER);

@@ -17,7 +17,7 @@ public class Snakelet extends Enemy{
     public Snakelet(int x, int y) {
         id = snakeletCount++;
         identifier = NetworkProtocol.SNAKELET.toCharArray()[0];
-        speed = 2;
+        speed = 1;
         height = 16;
         width = 16;
         worldX = x;

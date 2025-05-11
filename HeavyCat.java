@@ -3,10 +3,12 @@ import java.awt.Graphics2D;
 import java.awt.geom.*;
 
 public class HeavyCat extends Player{
+
     public HeavyCat(int cid, int x, int y){
         this.clientId = cid;
         identifier = NetworkProtocol.HEAVYCAT.toCharArray()[0];
-        speed = 5;
+        baseSpeed = 3;
+        speed = baseSpeed;
         height = 16;
         width = 16;
         screenX = 720/2 - width/2;

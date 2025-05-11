@@ -58,6 +58,8 @@ public class GameServer {
                try {
                  if (!connectedPlayers.isEmpty()){
                     for (ConnectedPlayer cp : connectedPlayers) {
+                        Player p = (Player) serverMaster.getPlayerFromClientId(cp.cid);
+                        if (p == null) continue;
                         String data = serverMaster.getAssetsData(cp.cid);
                         if (data != null) cp.promptAssetsThread(data);
                     }

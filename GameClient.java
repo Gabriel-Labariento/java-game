@@ -6,17 +6,17 @@ import java.util.concurrent.*;
 
 public class GameClient {
     public static final int TRANSFERINTERVAL = 16;
-    private ClientMaster clientMaster;
+    private final ClientMaster clientMaster;
     private Socket theSocket;
     private DataInputStream dataIn;
     private DataOutputStream dataOut;
     private Scanner console;
     private int clientId;
-    private HashMap<Character, String> idToName;
-    private HashMap<String, Boolean> keyMap;
+    private final HashMap<Character, String> idToName;
+    private final HashMap<String, Boolean> keyMap;
     private int clickedX;
     private int clickedY;
-    private ScheduledExecutorService sendInputsScheduler;
+    private final ScheduledExecutorService sendInputsScheduler;
     private boolean isOnMenu;
     private GameServer gs;
 
@@ -253,7 +253,7 @@ public class GameClient {
      * @param message the substring containing map data
      */
     private void parseMapData(String message){
-        System.out.println("Inside parseMapData: " + message);
+        // System.out.println("Inside parseMapData: " + message);
         DungeonMapDeserializeResult result = new DungeonMap().deserialize(message);
         clientMaster.setCurrentRoom(result.getStartRoom());
         clientMaster.setAllRooms(result.getAllRooms());

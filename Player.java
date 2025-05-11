@@ -1,14 +1,20 @@
-public abstract class Player extends Entity{
+import java.util.ArrayList;
+import java.util.Iterator;
+
+public abstract class Player extends Entity implements Effectable{
     public static final int INVINCIBILITY_DURATION = 1000;
     public static final int REVIVAL_DURATION = 5000;
     public static final int COOLDOWN_DURATION = 1000;
     public long invincibilityEnd;
     public long coolDownEnd;
+    public long revivalTime;
+
     public int screenX;
     public int screenY;
+
     public boolean isDown;
     public boolean isReviving;
-    public long revivalTime;
+    
     public int currentXP;
     public int currentLvl;
     public int currentXPCap;
@@ -23,6 +29,7 @@ public abstract class Player extends Entity{
     public Player(){
         currentLvl = 1;
         currentXPCap = 100;
+        statusEffects = new ArrayList<>();
     }
 
     public void applyXP(int xp){
@@ -237,5 +244,27 @@ public abstract class Player extends Entity{
     };
     
     @Override
-    public void updateEntity(ServerMaster gsm) {}
+    public void updateEntity(ServerMaster gsm) {
+        updateStatusEffects();
+    }
+
+    @Override
+    public void updateStatusEffects(){
+        if (statusEffects.isEmpty()) return;
+        Iterator<StatusEffect> iter = statusEffects.iterator();
+        
+        while(iter.hasNext()){
+            StatusEffect currEffect = iter.next();
+            currEffect.tick(this);
+            if (currEffect.isExpired()) {
+                currEffect.removeStatusEffect(this);
+                iter.remove();
+            }
+        }
+    };
+
+    @Override
+    public void addStatusEffect(StatusEffect se){
+        if (canTakeDamage()) statusEffects.add(se);
+    };
 }

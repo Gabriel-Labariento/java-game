@@ -3,10 +3,12 @@ import java.awt.Graphics2D;
 import java.awt.geom.*;
 
 public class FastCat extends Player{
+
     public FastCat(int cid, int x, int y){
         this.clientId = cid;
         identifier = 'C';
-        speed = 5;
+        baseSpeed = 7;
+        speed = baseSpeed;
         height = 16;
         width = 16;
         screenX = 720/2 - width/2;

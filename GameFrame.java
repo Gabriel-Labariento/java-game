@@ -3,26 +3,26 @@ import java.awt.event.*;
 import javax.swing.*;
 
 public class GameFrame extends JFrame{
-    private int width, height;
-    private String title;
+    private final int width, height;
+    private final String title;
     private String serverIP;
     private int serverPort;
-    private JLayeredPane lp;
-    private JPanel cp;  
+    private final JLayeredPane lp;
+    private final JPanel cp;  
     private ImageIcon btnBG;
     private GameCanvas gameCanvas;
     private Entity[] entities;
     private GameClient gameClient;
-    private JButton btn1;
-    private JButton btn2;
-    private JButton btn3;
-    private JButton btn4;
-    private JButton btn5;
-    private JButton btn6;
-    private JLabel label1;
-    private JLabel label2;
-    private JTextField textField1;
-    private JTextField textField2;
+    private final JButton btn1;
+    private final JButton btn2;
+    private final JButton btn3;
+    private final JButton btn4;
+    private final JButton btn5;
+    private final JButton btn6;
+    private final JLabel label1;
+    private final JLabel label2;
+    private final JTextField textField1;
+    private final JTextField textField2;
 
 
     public GameFrame(int width, int height, String title){

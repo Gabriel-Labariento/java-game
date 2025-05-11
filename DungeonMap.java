@@ -313,9 +313,7 @@ public class DungeonMap {
         // System.out.println("Received in deserialize(): " + message);
         // Clear data 
         rooms.clear();
-        
-        int roomCount;
-        
+                
         // Helper utils
         HashMap<Integer, Room> mapIdToRoom = new HashMap<>();
         ArrayList<DoorDataHolder> doorDataList = new ArrayList<>();
@@ -325,9 +323,7 @@ public class DungeonMap {
         
         // Part 1: Deserialize Rooms and Doors
         for (String part : messageParts) {
-            if (part.startsWith(NetworkProtocol.MAP_DATA)) {
-                roomCount = Integer.parseInt(part.substring(NetworkProtocol.MAP_DATA.length()));
-            } else if (part.startsWith(NetworkProtocol.ROOM )){
+            if (part.startsWith(NetworkProtocol.ROOM )){
                 // Parse roomData
                 deserializeRooms(part.substring(NetworkProtocol.ROOM.length()), mapIdToRoom);
             } else if (part.startsWith(NetworkProtocol.DOOR)) {
@@ -429,8 +425,8 @@ public class DungeonMap {
      * DoorDataHolder, a new Door object can be made.
      */
     private class DoorDataHolder{
-        private int id, x, y, roomAId, roomBId;
-        private String direction;
+        private final int id, x, y, roomAId, roomBId;
+        private final String direction;
 
         public DoorDataHolder(int id, int x, int y, String direction, int roomAId, int roomBId) {
             this.id = id;

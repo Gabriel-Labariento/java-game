@@ -1,4 +1,5 @@
 import java.awt.Graphics2D;
+import java.util.ArrayList;
 
 public abstract class Entity extends GameObject {
     protected int id;
@@ -7,6 +8,7 @@ public abstract class Entity extends GameObject {
     protected int prevWorldX;
     protected int prevWorldY;
     protected int speed;
+    protected int baseSpeed;
     protected int maxHealth;
     protected int hitPoints;
     protected int damage;
@@ -14,7 +16,7 @@ public abstract class Entity extends GameObject {
     protected int hasMoved;
     public Room currentRoom; 
     protected int currSprite;
-
+    protected ArrayList<StatusEffect> statusEffects;
     
 
     public void draw(Graphics2D g2d, int xOffset, int yOffset){}
@@ -122,6 +124,14 @@ public abstract class Entity extends GameObject {
 
     public void setId(int id) {
         this.id = id;
+    }
+
+    public void setSpeed(int speed) {
+        this.speed = speed;
+    }
+
+    public int getBaseSpeed() {
+        return baseSpeed;
     }
 }
     
