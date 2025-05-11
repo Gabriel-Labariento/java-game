@@ -3,8 +3,8 @@ import java.awt.image.BufferedImage;
 import java.io.IOException;
 import javax.imageio.ImageIO;
 
-public class Rat extends Enemy{
-    public static int ratCount = 0;
+public class Snakelet extends Enemy{
+    public static int snakeletCount = 0;
     private int id;
     private static final int SPRITE_FRAME_DURATION = 200;
     private long lastSpriteUpdate = 0;
@@ -14,42 +14,42 @@ public class Rat extends Enemy{
         setSprites();
     }
 
-    public Rat(int x, int y) {
-        id = ratCount++;
-        identifier = NetworkProtocol.RAT.toCharArray()[0];
-        speed = 1;
+    public Snakelet(int x, int y) {
+        id = snakeletCount++;
+        identifier = NetworkProtocol.SNAKELET.toCharArray()[0];
+        speed = 2;
         height = 16;
         width = 16;
         worldX = x;
         worldY = y;
-        maxHealth = 10;
+        maxHealth = 15;
         hitPoints = maxHealth;
         damage = 1;
-        rewardXP = 50;
+        rewardXP = 75;
         currentRoom = null;
         currSprite = 0;
         
     }
 
-     private static void setSprites() {
+    private static void setSprites() {
         try {
-            BufferedImage left0 = ImageIO.read(Rat.class.getResourceAsStream("resources/Sprites/Rat/rat_left0.png"));
-            BufferedImage left1 = ImageIO.read(Rat.class.getResourceAsStream("resources/Sprites/Rat/rat_left1.png"));
-            BufferedImage left2 = ImageIO.read(Rat.class.getResourceAsStream("resources/Sprites/Rat/rat_left2.png"));
-            BufferedImage right0 = ImageIO.read(Rat.class.getResourceAsStream("resources/Sprites/Rat/rat_right0.png"));
-            BufferedImage right1 = ImageIO.read(Rat.class.getResourceAsStream("resources/Sprites/Rat/rat_right1.png"));
-            BufferedImage right2 = ImageIO.read(Rat.class.getResourceAsStream("resources/Sprites/Rat/rat_right2.png"));
+            BufferedImage left0 = ImageIO.read(Snakelet.class.getResourceAsStream("resources/Sprites/Snakelet/snakelet_left0.png"));
+            BufferedImage left1 = ImageIO.read(Snakelet.class.getResourceAsStream("resources/Sprites/Snakelet/snakelet_left1.png"));
+            BufferedImage left2 = ImageIO.read(Snakelet.class.getResourceAsStream("resources/Sprites/Snakelet/snakelet_left2.png"));
+            BufferedImage right0 = ImageIO.read(Snakelet.class.getResourceAsStream("resources/Sprites/Snakelet/snakelet_right0.png"));
+            BufferedImage right1 = ImageIO.read(Snakelet.class.getResourceAsStream("resources/Sprites/Snakelet/snakelet_right1.png"));
+            BufferedImage right2 = ImageIO.read(Snakelet.class.getResourceAsStream("resources/Sprites/Snakelet/snakelet_right2.png"));
             sprites = new BufferedImage[] {left0, left1, left2, right0, right1, right2};
 
         } catch (IOException e) {
-            System.out.println("Exception in Rat setSprites()" + e);
+            System.out.println("Exception in snakelet setSprites()" + e);
         }
     }
 
     @Override
     public void matchHitBoxBounds() {
         hitBoxBounds = new int[4];
-        hitBoxBounds[0]= worldY;
+        hitBoxBounds[0]= worldY + 3;
         hitBoxBounds[1] = worldY + height;
         hitBoxBounds[2]= worldX;
         hitBoxBounds[3] = worldX + width;
@@ -65,7 +65,7 @@ public class Rat extends Enemy{
     public String getAssetData(boolean isUserPlayer) {
         StringBuilder sb = new StringBuilder();
         // System.out.println("In getAssetData of Rat, identifier is " + identifier);
-        // String format: B,id,x,y,currentRoomId,currsprite|
+        // String format: I,id,x,y,currentRoomId,currsprite|
         sb.append(identifier).append(NetworkProtocol.SUB_DELIMITER)
         .append(id).append(NetworkProtocol.SUB_DELIMITER)
         .append(worldX).append(NetworkProtocol.SUB_DELIMITER)

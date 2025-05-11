@@ -27,7 +27,8 @@ public class MobSpawner {
     };
 
     private static final String[] bosses = {
-        "RatKing" // TODO: ADD OTHER BOSSES
+        "RatKing", // TODO: ADD OTHER BOSSES
+        "Snake"
     };
 
     private ScheduledExecutorService spawnMobsScheduler;
@@ -114,6 +115,10 @@ public class MobSpawner {
                 return new Rat(x, y);
             case "RatKing":
                 return new RatKing(x, y);
+            case "Snakelet":
+                return new Snakelet(x, y);
+            case "Snake":
+                return new Snake(x, y);
             default:
                 System.out.println("Undetected enemy " + name );
                 return new Rat(x, y);

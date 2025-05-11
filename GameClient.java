@@ -33,6 +33,8 @@ public class GameClient {
         idToName.put('F', "PlayerBullet");
         idToName.put('G', "Rat");
         idToName.put('H', "RatKing");
+        idToName.put('I', "Snakelet");
+        idToName.put('J', "Snake");
         
         keyMap = new HashMap<>();
         keyMap.put("W", false);
@@ -304,6 +306,13 @@ public class GameClient {
                 break;
             case "RatKing":
                 e = new RatKing(x, y);
+                break;
+            case "Snakelet":
+                e = new Snakelet(x, y);
+                break;
+            case "Snake":
+                e = new Snake(x, y);
+                break;
             default:
                 break;
         }

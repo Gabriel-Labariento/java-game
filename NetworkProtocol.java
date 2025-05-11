@@ -13,6 +13,8 @@ public class NetworkProtocol {
     public static final String PLAYERBULLET = "F";
     public static final String RAT = "G"; // Rat
     public static final String RATKING = "H";
+    public static final String SNAKELET = "I";
+    public static final String SNAKE = "J";
     public static final String MAP_DATA = "M:";       // Full map
     public static final String ROOM = "R:";    // Room 
     public static final String DOOR = "D:"; // Door 
