@@ -23,6 +23,7 @@ public class GameServer {
         serverMaster = ServerMaster.getInstance();
         sockets = new ArrayList<>();
         connectedPlayers = new ArrayList<>();
+        serverMaster.setConnectedPlayers(connectedPlayers);
         gameLoopScheduler = Executors.newSingleThreadScheduledExecutor();
         sendAssetsScheduler = Executors.newSingleThreadScheduledExecutor();
         port = 5000;
@@ -56,15 +57,16 @@ public class GameServer {
                     System.err.println("Exception in game loop update():" + e);
                 }
 
-                if (!connectedPlayers.isEmpty()){
+               try {
+                 if (!connectedPlayers.isEmpty()){
                     for (ConnectedPlayer cp : connectedPlayers) {
                         String data = serverMaster.getAssetsData(cp.cid);
-                        // System.out.println(data);
-                        serverMaster.updateUserPlayerIndex(cp.cid);
-
-                        cp.promptAssetsThread(data);
+                        if (data != null) cp.promptAssetsThread(data);
                     }
                 }
+               } catch (Exception e) {
+                System.out.println("Exception in asset dispersion to connected players: " + e);
+               }
             }
         };
         gameLoopScheduler.scheduleAtFixedRate(gameLoop, 0, Math.round(1000/TICKSPERSECOND), TimeUnit.MILLISECONDS);
@@ -100,7 +102,6 @@ public class GameServer {
                         ConnectedPlayer cp = new ConnectedPlayer(sock, clientNum);
                         clientNum++;
                         cp.loadPreGameData();
-                        connectedPlayers.add(cp);
                         cp.startThreads();
                     }        
                     } catch (IOException ex) {
@@ -222,6 +223,18 @@ public class GameServer {
 
         public void promptAssetsThread(String data){
             sendQueue.offer(data);
+        }
+
+        
+        private void sendCustomData(String message){    
+            try {
+                byte[] dataBytes = message.getBytes("UTF-8");
+                // System.out.println("Sending Custom Data:" + message);
+                dataOut.writeInt(dataBytes.length);
+                dataOut.write(dataBytes);
+            } catch (IOException ex) {
+                System.out.println("IOException from sendCustomData() method");
+            }
         }
 
         /**

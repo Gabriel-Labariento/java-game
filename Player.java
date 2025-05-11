@@ -36,13 +36,10 @@ public abstract class Player extends Entity{
             //Reset item effects
             if(heldItem != null){
                 heldItem.removeEffects();
-                heldItem.applyEffects();
             }
 
             //Exponential function for scaling required experience points properly
             pastXPCap = currentXPCap;
-
-            double exponentForScaling = 1.5;
             int baseXP = 100;
             currentXPCap = (int) Math.floor(baseXP * (Math.pow(currentLvl, exponentForScaling)));
         }
@@ -250,7 +247,11 @@ public abstract class Player extends Entity{
 
         Door d = getCollidingDoor();
         if ( isUserPlayer && d != null) { // Only send room transition data for the user player
-            return getRoomTransitionData(d, d.getOtherRoom(currentRoom)); // return a different string upon room change
+            if (d.isExitToNewDungeon()) {
+                ServerMaster.getInstance().triggerLevelTransition();
+                return null;
+            }
+            else return getRoomTransitionData(d, d.getOtherRoom(currentRoom)); // return a different string upon room change
         } else {
             // String format: identifier, clientId,x,y,hp,roomId
             sb.append(identifier).append(NetworkProtocol.SUB_DELIMITER)

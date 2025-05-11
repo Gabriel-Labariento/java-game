@@ -22,10 +22,7 @@ public class HeavyCat extends Player{
         matchHitBoxBounds();
     }
 
-    @Override
     public void draw(Graphics2D g2d, int xOffset, int yOffset){
-        Rectangle2D.Double sprite = new Rectangle2D.Double(xOffset, yOffset, width, height);
-        g2d.setColor(Color.BLUE);
         g2d.fill(sprite);
     }
 

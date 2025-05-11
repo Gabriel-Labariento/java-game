@@ -8,7 +8,7 @@ public class Room extends GameObject implements Tileable{
     public static final int HEIGHT_TILES = 33;
     private int roomId;
     private int difficulty; // 0 => 3, easiest to hardest
-    private boolean isStartRoom, isEndRoom;
+    private boolean isStartRoom, isEndRoom, isClearedHandled, isCleared;
     private MobSpawner mobSpawner;
   
     private ArrayList<Room> connections;
@@ -33,6 +33,8 @@ public class Room extends GameObject implements Tileable{
 
         isStartRoom = false;
         isEndRoom = false;
+        isClearedHandled = false;
+        isCleared = false;
 
         connections = new ArrayList<>();
         doors = new HashMap<>();
@@ -106,8 +108,12 @@ public class Room extends GameObject implements Tileable{
 
     public int[][] loadLayoutFromFile() {
         int layout[][] = new int[HEIGHT_TILES][WIDTH_TILES];
+        int gameLevel = ServerMaster.getInstance().getGameLevel();
         // Check what type of object it is. TODO: MAKE PRETTIER
-        String filePath = "Object Layouts\\roomLayout0.txt";
+        String filePath = "resources/Object Layouts/baseLayout.txt";
+        if (isEndRoom && gameLevel == 0) filePath = "resources/Object Layouts/ratKingRoomLayout.txt";
+        if (gameLevel == 1) filePath = "resources/Object Layouts/snakeRoomLayout.txt";
+        if (gameLevel == 2) filePath = "resources/Object Layouts/fireMonsterRoomLayout.txt";
         try {
             InputStream is = getClass().getResourceAsStream(filePath);
             BufferedReader br = new BufferedReader(new InputStreamReader(is));
@@ -219,7 +225,7 @@ public class Room extends GameObject implements Tileable{
      * Chooses one random direction.
       * @return a String indicating the chosen direction: "T" "R" "B" "L". 
      */
-    private String chooseRandomDirection(){
+    public String chooseRandomDirection(){
         int rand = (int) (Math.random() * 4);
         switch (rand) {
             case 0:
@@ -319,6 +325,39 @@ public class Room extends GameObject implements Tileable{
         }
     }
 
+    public Door createDoorFromDirection(String direction) {
+        int centerX = getCenterX();
+        int centerY = getCenterY();
+        
+        // Needed to position the door just right
+        int doorHeight = Door.HEIGHT_TILES * GameCanvas.TILESIZE;
+        int doorWidth = Door.WIDTH_TILES * GameCanvas.TILESIZE;
+        Door d;
+
+        switch (direction) {
+            case "T":
+                d = new Door(centerX - doorWidth, worldY, direction, this, null);
+                doorsArrayList.add(d);
+                break;
+            case "B":
+                d = new Door(centerX - doorWidth, worldY + height - doorHeight, direction, this, null);
+                doorsArrayList.add(d);
+                break;
+            case "L":
+                d = new Door(worldX, centerY - doorHeight, direction, this, null);
+                doorsArrayList.add(d);
+                break;
+            case "R":
+                d = new Door(worldX + width - doorWidth, centerY - doorHeight, direction, this, null);
+                doorsArrayList.add(d);
+                break;
+            default:
+                throw new AssertionError("Error in populateDoorsArrayList method of Room " + roomId);
+        }
+
+        return d;
+    }
+
     /**
      * Checks if a door has less than two rooms
      * @return boolean true/false indicating whether a room has less than two doors
@@ -391,7 +430,21 @@ public class Room extends GameObject implements Tileable{
     public void setDifficulty(int difficulty) {
         this.difficulty = difficulty;
     }
-    
 
+    public boolean isClearedHandled() {
+        return isClearedHandled;
+    }
+
+    public void setIsClearedHandled(boolean isClearedHandled) {
+        this.isClearedHandled = isClearedHandled;
+    }
+    
+    public boolean isCleared() {
+        return isCleared;
+    }
+
+    public void setCleared(boolean isCleared) {
+        this.isCleared = isCleared;
+    }
     
 }

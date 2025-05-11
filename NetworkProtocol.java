@@ -12,6 +12,9 @@ public class NetworkProtocol {
     public static final String PLAYERSLASH = "E";
     public static final String PLAYERBULLET = "F";
     public static final String RAT = "G"; // Rat
+    public static final String RATKING = "H";
+    public static final String SNAKELET = "I";
+    public static final String SNAKE = "J";
     public static final String REDFISH = "1"; // Rat
     public static final String CATTREAT = "2"; // Rat
     public static final String MILK = "3"; // Rat
@@ -26,6 +29,8 @@ public class NetworkProtocol {
     public static final String ROOM = "R:";    // Room 
     public static final String DOOR = "D:"; // Door 
     public static final String ROOM_CHANGE = "RC:";
+    public static final String LEVEL_CHANGE = "LC:";
+    public static final String BOSS_KILLED = "BK:";
     public static final String HP = "@";
     public static final String ATTACK = "ATK:";
     public static final String KEYS = "K:";

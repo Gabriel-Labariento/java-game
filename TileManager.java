@@ -6,7 +6,7 @@ public final class TileManager {
     public Tile[] tileImages;
 
     public TileManager() {
-        tileImages = new Tile[24];
+        tileImages = new Tile[46];
         setTileImages();
         // loadMap();
     }
@@ -19,7 +19,7 @@ public final class TileManager {
             // TODO : ADD TILES
             for (int i = 0; i < tileImages.length; i++) {
                 tileImages[i] = new Tile();
-                String path = "/Tile Images/tile" + i + ".png";
+                String path = "/resources/Tile Images/tile" + i + ".png";
                 InputStream is = getClass().getResourceAsStream(path);
                 if (is == null) {
                     System.err.println("Null Input Stream in getTileImage(), early return");

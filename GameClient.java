@@ -73,7 +73,6 @@ public class GameClient {
         gs.waitForConnections();   
         gs.startGameLoop();
         gs.closeSocketsOnShutdown();
-           
     }
       
     public String getServerIP(){
@@ -128,12 +127,18 @@ public class GameClient {
                         byte[] buffer = new byte[byteLength];
                         dataIn.readFully(buffer);
                         String receivedMessage = new String(buffer, "UTF-8");
-
+                        // System.out.println("ReceivedMessage: " + receivedMessage);
                         // If the received message starts with the protocol identifier for map data, parse the map data
                         if (receivedMessage.startsWith(NetworkProtocol.MAP_DATA)) {
                             parseMapData(receivedMessage);
+                        } else if (receivedMessage.startsWith(NetworkProtocol.BOSS_KILLED)) {
+                            parseBossKilledData(receivedMessage);
+                        } else if (receivedMessage.startsWith(NetworkProtocol.LEVEL_CHANGE)) {
+                            clientMaster.getEntities().clear();
+                            String mapData = receivedMessage.substring(NetworkProtocol.LEVEL_CHANGE.length());  // Receives a string containing map and player data
+                            parseMapData(mapData);
                         } else {
-                            synchronized (clientMaster.getEntities()) { // Synchronize entities arraylist to remove flickering
+                            synchronized (clientMaster.getEntities()) {                                 // Synchronize entities arraylist to remove flickering
                                 clientMaster.getEntities().clear();
                                 parseEntitiesData(receivedMessage);
                             }
@@ -213,15 +218,28 @@ public class GameClient {
                 // for (String string : entityData) {
                 //     // System.out.println("Entity string: " + string);
                 // }
-                // Don't load if not in the same room as the client.
-                int roomId = Integer.parseInt(entityData[4]);
-                if (!(roomId == clientMaster.getCurrentRoom().getRoomId())) continue;
-                
-                char identifier = entityData[0].toCharArray()[0];
-                int id = Integer.parseInt(entityData[1]);
-                int x = Integer.parseInt(entityData[2]);
-                int y = Integer.parseInt(entityData[3]);
-                clientMaster.loadEntity(identifier, id, x, y, roomId);    
+
+                if (entityData.length >= 6) {
+                    int roomId = Integer.parseInt(entityData[4]);
+                    if (!(roomId == clientMaster.getCurrentRoom().getRoomId())) continue;
+                    
+                    char identifier = entityData[0].toCharArray()[0];
+                    int id = Integer.parseInt(entityData[1]);
+                    int x = Integer.parseInt(entityData[2]);
+                    int y = Integer.parseInt(entityData[3]);
+                    int sprite = Integer.parseInt(entityData[5]);
+                    clientMaster.loadEntity(identifier, id, x, y, roomId, sprite);
+                } else { // SPRITELESS OBJECTS
+                    // Don't load if not in the same room as the client.
+                    int roomId = Integer.parseInt(entityData[4]);
+                    if (!(roomId == clientMaster.getCurrentRoom().getRoomId())) continue;
+                    
+                    char identifier = entityData[0].toCharArray()[0];
+                    int id = Integer.parseInt(entityData[1]);
+                    int x = Integer.parseInt(entityData[2]);
+                    int y = Integer.parseInt(entityData[3]);
+                    clientMaster.loadEntity(identifier, id, x, y, roomId, 0); // TODO: TEMPORARY 0 SPRITE   
+                }
             }
         
         }
@@ -234,24 +252,44 @@ public class GameClient {
      * @param message the substring containing map data
      */
     private void parseMapData(String message){
+        System.out.println("Inside parseMapData: " + message);
         DungeonMapDeserializeResult result = new DungeonMap().deserialize(message);
         clientMaster.setCurrentRoom(result.getStartRoom());
         clientMaster.setAllRooms(result.getAllRooms());
     }
-
+    
+    /**
+     * Parses a string in the format BK:roomId, doorId,x,y,direction to
+     * create a new door in the end room after defeating a boss
+     * @param message the substring containing the end room and new door data
+     */
+    private void parseBossKilledData(String message) {
+        String[] dataParts = message.substring(NetworkProtocol.BOSS_KILLED.length() + NetworkProtocol.DOOR.length()).split(NetworkProtocol.SUB_DELIMITER);
+        int doorId = Integer.parseInt(dataParts[0]);
+        int x = Integer.parseInt(dataParts[1]);
+        int y = Integer.parseInt(dataParts[2]);
+        // System.out.println("Door Y: " + doorY);
+        String direction = dataParts[3];
+        int roomAID = Integer.parseInt(dataParts[4]);
+        int roomBID = Integer.parseInt(dataParts[5]);
+        Door d = new Door(x, y, direction, clientMaster.getRoomById(roomAID), clientMaster.getRoomById(roomBID));
+        d.setId(doorId);
+        clientMaster.getRoomById(roomAID).addDoorToArrayList(d);
+    }
     public void startInputsThread(){
         final Runnable sendInputsData = new Runnable(){
             @Override
             public void run() {
                 try {
-                        String inputDataString = getInputsData();
+                    String inputDataString = getInputsData();
 
-                        // Send data if there are any actual inputs only
-                        if (!inputDataString.isEmpty()) {
-                            byte[] inputDataBytes = inputDataString.getBytes("UTF-8");
-                            dataOut.writeInt(inputDataBytes.length);
-                            dataOut.write(inputDataBytes);
-                        }
+                    // Send data if there are any actual inputs only
+                    if (!inputDataString.isEmpty()) {
+                        byte[] inputDataBytes = inputDataString.getBytes("UTF-8");
+                        dataOut.writeInt(inputDataBytes.length);
+                        dataOut.write(inputDataBytes);
+                    }
+
                     } catch (IOException ex) {
                         System.out.println("IOException from startInputsThread");
                     }   

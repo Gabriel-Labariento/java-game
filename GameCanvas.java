@@ -45,7 +45,6 @@ public class GameCanvas extends JComponent {
         } 
         else{
             
-
             // Set the background/outside of the room
             g2d.setColor(Color.BLACK);
             g2d.fillRect(0, 0, width, height);

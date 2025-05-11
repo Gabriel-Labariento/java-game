@@ -116,5 +116,25 @@ public abstract class GameObject {
         return hitBoxBounds;
     }
 
+    public int[] getPositionVector(){
+        int[] positionVector = new int[2];
+        positionVector[0] = worldX + width / 2;
+        positionVector[1] = worldY + height / 2;
+
+        return positionVector;
+    }
+
+    public double getDistanceBetween(GameObject a, GameObject b){
+        return Math.sqrt(
+                    (Math.pow(a.getCenterX() - b.getCenterX(), 2) + 
+                    Math.pow(a.getCenterY() - b.getCenterY(), 2))
+                );
+    } 
+
+    public double getSquaredDistanceBetween(GameObject a, GameObject b) {
+        int dx = a.getCenterX() - b.getCenterX();
+        int dy = a.getCenterY() - b.getCenterY();
+        return dx * dx + dy * dy;
+    }
 
 }

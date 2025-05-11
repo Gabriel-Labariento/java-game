@@ -1,19 +1,21 @@
 import java.awt.Graphics2D;
 
 public abstract class Entity extends GameObject {
+    protected int id;
     protected char identifier;
+    // protected BufferedImage[] sprites;
     protected int prevWorldX;
     protected int prevWorldY;
     protected int speed;
     protected int maxHealth;
     protected int hitPoints;
     protected int defense;
-    protected int damage;
     protected int clientId;
-    protected int hasMoved;
-    public Room currentRoom; 
-    public int id;
     public boolean isMaxHealthSet;
+    protected int currSprite;
+    protected int damage;
+
+    
 
     public void draw(Graphics2D g2d, int xOffset, int yOffset){}
 
@@ -132,6 +134,14 @@ public abstract class Entity extends GameObject {
         isMaxHealthSet = b;
     }
 
+    public int getCurrSprite() {
+        return currSprite;
+    }
+
+    public void setCurrSprite(int currSprite) {
+        this.currSprite = currSprite;
+    }
+    
     public int getId() {
         return id;
     }

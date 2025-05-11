@@ -72,6 +72,8 @@ public class GameFrame extends JFrame{
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         pack();
         setVisible(true);
+        
+
     }
 
     public void loadStartUI(){

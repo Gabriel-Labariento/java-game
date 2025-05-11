@@ -1,7 +1,6 @@
 import java.util.ArrayList;
 import java.util.concurrent.*;
 
-
 public class MobSpawner {
     
     private int spawnX, spawnY; // Where the mob will spawn in the room, x = (5 => 40), y = (5 => 28) 
@@ -11,6 +10,7 @@ public class MobSpawner {
     private int spawnRate; 
     private int spawnedCount;
     private int maxSpawned;
+    private Room parentRoom;
     private ArrayList<Enemy> spawnedEnemies; 
     private boolean isSpawning;
 
@@ -20,12 +20,14 @@ public class MobSpawner {
     private static final int LOWESTY = 5;
     private static final int INITIALSPAWNDELAY = 1;
     
-    private static String[][] spawnableEnemiesAtLevel = {
-        {"Rat"} // TODO: ADD OTHER ENEMIES
+    private static final String[][] spawnableEnemiesAtLevel = {
+        {"Rat"}, // TODO: ADD OTHER ENEMIES
+        {"Rat", "Snakelet"}
     };
 
-    private static String[] bosses = {
-        "RatKing" // TODO: ADD OTHER BOSSES
+    private static final String[] bosses = {
+        "RatKing", // TODO: ADD OTHER BOSSES
+        "Snake"
     };
 
     private ScheduledExecutorService spawnMobsScheduler;
@@ -33,15 +35,15 @@ public class MobSpawner {
     public MobSpawner(int level, int difficulty){
         this.level = level;
         this.difficulty = difficulty;
+        spawnedCount = 0;
         spawnRate =  5; // Spawns one enemy per spawnRate seconds
         spawnMobsScheduler = Executors.newSingleThreadScheduledExecutor();
         
         spawnRate = Math.max(2, 5 - (level / 2 - difficulty));
         maxSpawned = (difficulty == 3) ? 1 : (3 + level + difficulty);
-
+        maxSpawned = 1;
         spawnedEnemies = new ArrayList<>();
-        spawnedCount = 0;
-        maxSpawned = 10;
+        // spawnedCount = 0;
         isSpawning = false;
     }
 
@@ -54,39 +56,22 @@ public class MobSpawner {
                     // Stop spawning if maxSpawned has been reached.
                     if (spawnedCount >= maxSpawned) return;
 
-                    Room currentRoom = ServerMaster.getInstance().getCurrentRoom();
-                    // System.out.println("Current room in server master is Room " + currentRoom.getRoomId());
-
-                    // Don't spawn in the boss room. At least not yet
-                    if (currentRoom.isEndRoom()) return;
-    
-                    // Pick a randoom tile coordinate
-                    int spawnX = currentRoom.getWorldX() + ((LOWESTX + (int) (Math.random() * ((HIGHESTX - LOWESTX) + 1))) * GameCanvas.TILESIZE);
-                    int spawnY = currentRoom.getWorldY() + ((LOWESTY + (int) (Math.random() * ((HIGHESTY - LOWESTY) + 1))) * GameCanvas.TILESIZE);
-                    
                     Enemy enemy = null;
 
                     if (inBossRoom && spawnedCount == 0) {
-                        spawnX = currentRoom.getCenterX();
-                        spawnY = currentRoom.getCenterY();
-
-                        String bossType = bosses[level];
-                        enemy = createEnemy(bossType, spawnX, spawnY);
+                        enemy = createBoss(level);
+                        spawnEnemy(enemy);
+                        for (int i = 0; i < 0; i++) {
+                            enemy = createNormalEnemy(level);
+                            spawnEnemy(enemy);
+                        }
                     } else {
                         // Pick a random enemy to spawn out of the available in the list for the level
-                        String toSpawn = spawnableEnemiesAtLevel[level][(int) (Math.random() * (spawnableEnemiesAtLevel[level].length))];
-                        enemy = createEnemy(toSpawn, spawnX, spawnY);
-                    }
-
-                    if ( enemy != null ) {
-                        spawnedCount++;   
-                        isSpawning = true;
-                        spawnedEnemies.add(enemy);
-                        ServerMaster.getInstance().addEntity(enemy);
-                        // System.out.println("Added enemy: " + enemy.getAssetData(false) );
+                        enemy = createNormalEnemy(level);
+                        spawnEnemy(enemy);
                     }
                 } catch (Exception e) {
-                    System.out.println("Exception in spawn() method");
+                    System.out.println("Exception in spawn() method:" + e);
                 }
             }            
         };
@@ -108,7 +93,6 @@ public class MobSpawner {
         for (Enemy e : spawnedEnemies) {
             if (e.isDead()) killed++;    
         }
-
         return killed;
     }
 
@@ -128,6 +112,12 @@ public class MobSpawner {
         switch (name) {
             case "Rat":
                 return new Rat(x, y);
+            case "RatKing":
+                return new RatKing(x, y);
+            case "Snakelet":
+                return new Snakelet(x, y);
+            case "Snake":
+                return new Snake(x, y);
             default:
                 System.out.println("Undetected enemy " + name );
                 return new Rat(x, y);
@@ -142,4 +132,44 @@ public class MobSpawner {
         this.inBossRoom = inBossRoom;
     }
 
+    private int[] getRandomTileCoordinates () {
+        spawnX =  parentRoom.getWorldX() + ((LOWESTX + (int) (Math.random() * ((HIGHESTX - LOWESTX) + 1))) * GameCanvas.TILESIZE);
+        spawnY = parentRoom.getWorldY() + ((LOWESTY + (int) (Math.random() * ((HIGHESTY - LOWESTY) + 1))) * GameCanvas.TILESIZE);
+        
+        return new int[] {spawnX, spawnY};
+    }
+
+    private Enemy createBoss(int level){
+        spawnX = parentRoom.getCenterX();
+        spawnY = parentRoom.getCenterY();
+
+        String bossType = bosses[level];
+        return createEnemy(bossType, spawnX, spawnY);
+    }
+
+    private Enemy createNormalEnemy(int level){
+        int[] spawnCoors = getRandomTileCoordinates();
+        spawnX = spawnCoors[0];
+        spawnY = spawnCoors[1];
+
+        String toSpawn = spawnableEnemiesAtLevel[level][(int) (Math.random() * (spawnableEnemiesAtLevel[level].length))];
+        return createEnemy(toSpawn, spawnX, spawnY);
+    }
+
+    private void spawnEnemy(Enemy enemy) {
+        spawnedCount++;   
+        isSpawning = true;
+        enemy.setCurrentRoom(parentRoom);
+        enemy.matchHitBoxBounds();
+        spawnedEnemies.add(enemy);
+        ServerMaster.getInstance().addEntity(enemy);
+    }
+
+    public Room getParentRoom() {
+        return parentRoom;
+    }
+
+    public void setParentRoom(Room parentRoom) {
+        this.parentRoom = parentRoom;
+    }
 }

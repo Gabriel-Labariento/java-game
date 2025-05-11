@@ -1,5 +1,5 @@
 public abstract class Attack extends Entity{
-    public static int attackNum;
+    public static int attackNum = Integer.MIN_VALUE;
     public int duration;
     public int xOffset;
     public int yOffset;
@@ -11,7 +11,6 @@ public abstract class Attack extends Entity{
     @Override
     public String getAssetData(boolean isUserPlayer) {
         StringBuilder sb = new StringBuilder();
-        // System.out.println("In getAssetData of PlayerSlash, identifier is " + identifier);
         // String format: S,id,x,y,currentRoomId|
         sb.append(identifier).append(NetworkProtocol.SUB_DELIMITER)
         .append(id).append(NetworkProtocol.SUB_DELIMITER)

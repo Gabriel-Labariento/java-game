@@ -72,7 +72,6 @@ public class ClientMaster {
 
 
     public Entity getEntity(char identifier, int id, int x, int y){
-        //We use a hashmap to determine such for readability and since switch statements need constant values
         String name = IDENTIFIERTONAME.get(identifier);
         if (name == null) return null;
         switch (name){
@@ -157,5 +156,4 @@ public class ClientMaster {
     public Room getRoomById(int id) {
         return allRooms.get(id);
     }
-
 }

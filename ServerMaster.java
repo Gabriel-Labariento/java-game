@@ -7,7 +7,7 @@ public class ServerMaster {
     private ItemsHandler itemsHandler;
     private int userPlayerIndex;
     private Room currentRoom;
-    private static int gameLevel = 0; // TODO: INCREMENT WHEN DEFEAT BOSS
+    private static int gameLevel; // TODO: INCREMENT WHEN DEFEAT BOSS
     private static final int MAX_LEVEL = 7;
     private ConcurrentHashMap<Character, Integer> keyInputQueue;
     private ConcurrentHashMap<Integer, Integer> availableRevives;
@@ -19,10 +19,11 @@ public class ServerMaster {
     private ServerMaster(){
         playerNum = 0;
         downedPlayersNum = 0;
+        gameLevel = 0;
         entities = new CopyOnWriteArrayList<>();
         userPlayerIndex = -1;
         dungeonMap = new DungeonMap(gameLevel);
-        dungeonMap.generateRooms(3);
+        dungeonMap.generateRooms();
         currentRoom = dungeonMap.getStartRoom();
         //-----------------------------//
         keyInputQueue = new ConcurrentHashMap<>();
@@ -51,7 +52,6 @@ public class ServerMaster {
 
         //Process the changes and update existing entities accordingly
         updateEntities();
-
     }
 
     public void updateEntities(){
@@ -65,52 +65,10 @@ public class ServerMaster {
                     player.setHeldItem(null);
                     continue;
                 }
-
-                //DOWNING AND REVIVAL MECHANICS
-                //If the player has not yet been recorded as being downed, set them as such
-                if (!player.getIsDown()){
-                    player.setIsDown(true);
-
-                    //If no players are left, activate end game sequence
-                    downedPlayersNum++;
-                    if (downedPlayersNum == playerNum){
-                        System.out.println("GAME OVER");
-                    }
-                }
-
-                //Search through list of available revives to see if the player can be revived
-                boolean isInContact = false;
-                for (int i:availableRevives.values()){
-                    
-                    if (i == player.getClientId()){
-                        //If the player has not yet been recorded as reviving, set them as such
-                        if (!player.getIsReviving()){
-                            player.triggerRevival();
-                            player.setIsReviving(true);
-                        }
-
-                        isInContact = true;
-                        break;
-                    } 
-                }
-
-                //If the other player has moved away from the downed player
-                if(!isInContact){
-                    player.setIsReviving(false);
-                    //Insert UI indicators
-                }
-
-                //After the revivaltime and without the living player moving away, revive the downed player with one health
-                if(player.getIsReviving() && player.getIsRevived()){
-                    player.setHitPoints(1);
-                    player.setIsDown(false);
-                    //Insert revival animation
-                }
+                handleDownsAndRevives(player);
             }
             else if (entity instanceof Enemy enemy && enemy.getHitPoints() <= 0){
                 //Trigger death animation;
-                
-
                 //Give reward xp to the player who took the last hit
                 for (Entity e:entities){
                     if(e instanceof Attack attack && attack.getId() == enemy.getLastAttackID()){
@@ -121,9 +79,6 @@ public class ServerMaster {
                 Entity rolledItem = itemsHandler.rollItem(enemy);
                 if (rolledItem != null) addEntity(rolledItem);
                 entities.remove(enemy);
-
-                
-            
             }
             else if (entity instanceof Attack attack && attack.getIsExpired()){
                 entities.remove(attack);
@@ -136,7 +91,200 @@ public class ServerMaster {
         }
         //Reset list to track available revives per frame
         availableRevives.clear();
+
+        // Check for room clearing after all entity updates
+        if (checkRoomCleared()) handleRoomCleared();
     }
+
+
+    private void handleDownsAndRevives(Player player) {
+        //DOWNING AND REVIVAL MECHANICS
+            //If the player has not yet been recorded as being downed, set them as such
+            if (!player.getIsDown()){
+                player.setIsDown(true);
+
+                //If no players are left, activate end game sequence
+                downedPlayersNum++;
+                if (downedPlayersNum == playerNum){
+                    System.out.println("GAME OVER");
+                }
+            }
+
+            //Search through list of available revives to see if the player can be revived
+            boolean isInContact = false;
+            for (int i:availableRevives.values()){
+                
+                if (i == player.getClientId()){
+                    //If the player has not yet been recorded as reviving, set them as such
+                    if (!player.getIsReviving()){
+                        player.triggerRevival();
+                        player.setIsReviving(true);
+                    }
+
+                    isInContact = true;
+                    break;
+                } 
+            }
+
+            //If the other player has moved away from the downed player
+            if(!isInContact){
+                player.setIsReviving(false);
+                //Insert UI indicators
+            }
+
+            //After the revivaltime and without the living player moving away, revive the downed player with one health
+            if(player.getIsReviving() && player.getIsRevived()){
+                player.setHitPoints(1);
+                player.setIsDown(false);
+                //Insert revival animation
+            }
+        }
+    
+    private boolean checkRoomCleared(){
+        if (currentRoom.isStartRoom() || currentRoom.isCleared()) return true;
+        // System.out.println("Current room is end room: " + currentRoom.isEndRoom());
+        if (currentRoom.getMobSpawner().isAllKilled()) {
+            currentRoom.setCleared(true);
+            return true;
+        } return false;
+    }
+
+    /**
+     * Once a room is cleared, stops the mob spawner, opens its doors and marks it as cleared.
+     * Calls a handleBossDefeat() if room is an end room
+     */
+    private void handleRoomCleared(){
+        if (currentRoom.isStartRoom() || currentRoom.isClearedHandled()) return;
+
+        if (!currentRoom.getMobSpawner().isSpawning()) return;
+
+        currentRoom.getMobSpawner().stopSpawn();
+        currentRoom.openDoors();
+
+        if (currentRoom.isEndRoom()) {
+            System.out.println("In handleRoomCleared, cleared endroom");
+            handleBossDefeat();
+        }
+
+        currentRoom.setIsClearedHandled(true);
+    }
+    
+    /**
+     * Announces the defeat of the boss. Increments the game level
+     * and adds a new door to a random direction in the room. The 
+     * data for this door is sent to the client for drawing
+     */
+    private void handleBossDefeat(){
+        announceBossDefeat();
+        incrementGameLevel();
+        String doorData = addExitRoomGoingToNewDungeon();
+        StringBuilder sb = new StringBuilder();
+        sb.append(NetworkProtocol.BOSS_KILLED).append(doorData); //BK:D:doorId,x,y,direction,roomAId,roomBId
+        sendMessageToClients(sb.toString());
+    }
+
+    /**
+     * Sends a custom message to the clients. Primarily used for events that don't happen every frame:
+     * Boss killing, level change, etc.
+     * @param message the serialized string to be sent to the client/s.
+     */
+    private void sendMessageToClients(String message){
+        // System.out.println("Message in sendMessageToClients(): " + message);
+        // System.out.println("Number of connected clients: " + connectedPlayers.size());
+        for (GameServer.ConnectedPlayer cp : connectedPlayers) {
+            cp.promptAssetsThread(message);
+        }
+    }
+
+    /**
+     * Prints a customized string based on which boss was defeated.
+     */
+    private void announceBossDefeat(){
+        StringBuilder sb = new StringBuilder();
+
+        sb.append("CONGRATULATIONS! YOU DEFEATED THE ");
+        switch (gameLevel) {
+            case 0:
+                sb.append("RAT KING");
+                break;
+            case 1: 
+                sb.append("VIPER");
+                break;
+            case 2:
+                sb.append("FIRE MONSTER");
+                break;
+            default:
+                break;
+        }
+        System.out.println(sb.toString());
+    }
+
+    /**
+     * Creates a door on a random direction in the room where a door does not yet exist.
+     * It then serializes this door.
+     * @return a string in the format D:id,x,y,roomAID,roomBID where roomAID = roomBID = currentRoomID.
+     */
+    private String addExitRoomGoingToNewDungeon(){
+        if (!currentRoom.isEndRoom()) return null;
+        String direction = null;
+        while (true) {
+            direction = currentRoom.chooseRandomDirection();
+            if (!currentRoom.getDoors().containsKey(direction)) break;
+        }
+        System.out.println("Direction: " + direction);
+
+        Door d = currentRoom.createDoorFromDirection(direction);
+        d.setIsExitToNewDungeon(true);
+        d.setIsOpen(true);
+        d.setRoomB(currentRoom);
+        currentRoom.addDoorToArrayList(d);
+        
+        return d.serialize();
+    }
+
+    /**
+     * Creates a new dungeon, sends its data to the clients.
+     * Gets the data of the players and sends it to the clients as well.
+     * Sent String is in the format: LC:M:(See DungeonMap.serialize())|E:(Player Data)
+     */
+    public void triggerLevelTransition(){
+        ArrayList<Player> players = getAllPlayers();
+        entities.clear();
+
+        DungeonMap newDungeon = generateNewDungeon();
+        dungeonMap = newDungeon;
+        currentRoom = newDungeon.getStartRoom();
+
+        String newDungeonMapData = newDungeon.serialize();  
+        StringBuilder mapData = new StringBuilder();
+
+        mapData.append(NetworkProtocol.LEVEL_CHANGE).append(newDungeonMapData).append(NetworkProtocol.DELIMITER);
+        sendMessageToClients(mapData.toString());
+
+        StringBuilder playersData = new StringBuilder();
+
+        for (Player player : players) {
+            player.setCurrentRoom(currentRoom);
+            player.setWorldX(currentRoom.getCenterX());
+            player.setWorldY(currentRoom.getCenterY());
+            entities.add(player);
+            
+            // playersData.append(NetworkProtocol.PLAYER)
+            // .append(player.getIdentifier()).append(NetworkProtocol.SUB_DELIMITER)
+            // .append(player.getClientId()).append(NetworkProtocol.SUB_DELIMITER)
+            // .append(player.getCenterX()).append(NetworkProtocol.SUB_DELIMITER)
+            // .append(player.getCenterY()).append(NetworkProtocol.SUB_DELIMITER)
+            // .append(player.getHitPoints()).append(NetworkProtocol.SUB_DELIMITER)
+            // .append(currentRoom.getRoomId()).append(NetworkProtocol.DELIMITER);
+        }
+
+        for (GameServer.ConnectedPlayer cp : connectedPlayers) {
+            cp.promptAssetsThread(getAssetsData(cp.getCid()));
+        }
+        // System.out.println("Message sent " + playersData.toString());        
+        // sendMessageToClients(playersData.toString());
+    }
+    
 
     // Checks for collisions between all objects inside the entity ArrayList
     public void checkCollisions(){
@@ -144,6 +292,7 @@ public class ServerMaster {
         try {
             //Make a new arraylist containing all of the elements of entities
             ArrayList<Entity> sortedEntities = new ArrayList<>(entities);
+            // System.out.println("Entity count: " + sortedEntities.size());
 
             //Sort entities from the universal arraylist by their worldx values (left bounds)
             Collections.sort(sortedEntities, Comparator.comparingInt(e -> e.getHitBoxBounds()[2]));
@@ -169,6 +318,7 @@ public class ServerMaster {
                     //Check for collisions in the top, bottom, left, right of entity1 against entity2
                     if (b1[0] < b2[1] && b1[1] > b2[0] && b1[2] < b2[3] && b1[3] > b2[2]){
                         resolveCollision(entity1, entity2, b1, b2);
+                        // System.out.println("Detected collision between " + entity1.getClass() + " and " + entity2.getClass());
                     }
                 }
             }   
@@ -266,6 +416,7 @@ public class ServerMaster {
             if(dmgMitigationFactor < 0) dmgMitigationFactor = 0;
             int dmgReceived = (int) (entity.getDamage()*dmgMitigationFactor);
             player.setHitPoints(player.getHitPoints()-dmgReceived);
+            applyKnockBack(player, entity);
             player.triggerInvincibility();
         }
 
@@ -277,12 +428,12 @@ public class ServerMaster {
         //Debouncing condition
         if(enemy.validateAttack(id)){
             enemy.setHitPoints(enemy.getHitPoints()-attack.getDamage());
+            applyKnockBack(enemy, attack);
             enemy.loadAttack(id);
         }
     }
 
     private void preventOverlap(Entity e1, Entity e2, int[] b1, int[] b2){
-
         //Get the position vectors of both entities
         int[] positionVector1 = new int[2];
         positionVector1[0] = e1.getWorldX() + e1.getWidth()/2;
@@ -326,6 +477,24 @@ public class ServerMaster {
         e1.matchHitBoxBounds();
         e2.matchHitBoxBounds();
 
+    }
+
+        private void applyKnockBack(Entity target, Entity attacker) {
+
+        int[] entityPosition = target.getPositionVector();
+        int[] attackPosition = attacker.getPositionVector();
+
+        int[] normalVector = getNormalVector(entityPosition, attackPosition);
+
+        double normalVectorMagnitude = Math.sqrt((normalVector[0]*normalVector[0]) + (normalVector[1]*normalVector[1]));
+        double[] unitNormal = getUnitNormal(normalVector, normalVectorMagnitude);
+
+        int knockBackStrength = 24;
+        int newX = (int) (target. getWorldX() - unitNormal[0] * knockBackStrength);
+        int newY = (int)(target.getWorldY() - unitNormal[1] * knockBackStrength);
+
+        target.setPosition(newX, newY);
+        target.matchHitBoxBounds();
     }
 
     private void processInputs(){
@@ -405,8 +574,6 @@ public class ServerMaster {
         int worldX = (originPlayer.getWorldX() - playerScreenX) + attackScreenX;
         int worldY = (originPlayer.getWorldY() - playerScreenY) + attackScreenY;
 
-        //TODO: If originPlayer is of different type, instantiate another type of attack
-
         Attack playerAttack = null;
         int attackHeight;
         int attackWidth;
@@ -438,6 +605,22 @@ public class ServerMaster {
         // System.out.println("Created PlayerSlash: " + playerAttack.getId() + " at (" + playerAttack.getWorldX() + ", " + playerAttack.getWorldX() + ")");
     }
 
+    private int[] getNormalVector(int[] v1, int[] v2){
+        int[] normalVector = new int[2];
+        normalVector[0] = v2[0] - v1[0];
+        normalVector[1] = v2[1] - v1[1];
+
+        return normalVector;
+    }
+
+    private double[] getUnitNormal(int[] normalVector, double normalVectorMagnitude) {
+        double[] unitNormal = new double[2];
+        unitNormal[0] = normalVector[0] / normalVectorMagnitude;
+        unitNormal[1] = normalVector[1] / normalVectorMagnitude;
+
+        return unitNormal;
+    }
+
 
     /**
      * Increments the static gameLevel field if it is less than MAX_LEVEL
@@ -450,27 +633,12 @@ public class ServerMaster {
      * Creates a new dungeon and updates user player position
      * in the new starting room.
      */
-    public void generateNewDungeon(){
-        Player userPlayer = null;
-        
-        if (userPlayerIndex >= 0 && userPlayerIndex < entities.size()) { // Ensure the userPlayer is in entities
-            userPlayer = (Player) entities.get(userPlayerIndex);
-        } 
+    public DungeonMap generateNewDungeon(){
 
         dungeonMap = new DungeonMap(gameLevel);
-        dungeonMap.generateRooms(3 + gameLevel);
-        currentRoom = dungeonMap.getStartRoom();
-
-        entities.clear(); // Safe to clear, already have reference to userPlayer
-
-        if (userPlayer != null) {
-            userPlayer.setWorldX(currentRoom.getCenterX());
-            userPlayer.setWorldY(currentRoom.getCenterY());
-            userPlayer.setCurrentRoom(currentRoom);
-            addEntity(userPlayer);
-            updateUserPlayerIndex(userPlayer.getClientId());
-        }
+        dungeonMap.generateRooms();
         
+        return dungeonMap;
     }
 
     /**
@@ -531,13 +699,14 @@ public class ServerMaster {
                 sb.append(NetworkProtocol.PLAYER).append((entity.getAssetData(false)))
                 .append(NetworkProtocol.DELIMITER);
             } else if (!(entity instanceof  Player)) {
-                // NPCs ex. E:B,id,x,y,currentRoomId| => Rat with id at currentRoomId (x,y)
+                // NPCs ex. G:B,id,x,y,currentRoomId| => Rat with id at currentRoomId (x,y)
                 if (entity == null) continue;
                 sb.append(NetworkProtocol.ENTITY)
                 .append(entity.getAssetData(false));  
             } 
             
         }
+
         return sb.toString();
     }
 
@@ -573,7 +742,7 @@ public class ServerMaster {
             userPlayer.setHitPoints(hp);
             currentRoom = newRoom;
             handleSpawnersOnRoomChange(newRoom);
-            currentRoom.closeDoors();
+            if (!currentRoom.isStartRoom() && !currentRoom.isCleared()) newRoom.closeDoors();
 
             // Build String to be returned
             sb.append(NetworkProtocol.USER_PLAYER) 

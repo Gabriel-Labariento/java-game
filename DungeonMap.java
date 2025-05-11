@@ -21,13 +21,17 @@ public class DungeonMap {
      * Generates a certain number of rooms (numRooms <= 3). Connects them and calls pickStartAndEndRooms() and populateAllRoomsDoorsArrayList()
      * @param numRooms number of rooms to be made, minimum of 3.
      */
-    public void generateRooms(int numRooms) {
+    public void generateRooms() {
 
         // Algorithm will not work for when rooms < 3. So ensure 3 is the minumum
-        numRooms = Math.max(3, numRooms + gameLevel);
+        int numRooms = Math.max(3,  3 + 2 * gameLevel);
+
+        final int MAX_ATTEMPTS = 10;
+        int attempts = 0;
 
         // Room generation
-        while (true) {
+        while (attempts < MAX_ATTEMPTS) {
+            attempts++;
             rooms.clear();
             createRoomsNoConnections(numRooms);
             
@@ -49,10 +53,14 @@ public class DungeonMap {
                     // Skip the door if a room is already conected to it
                     if (door.getValue() != null)
                         continue;
+                
+                    int MAX_CONNECTION_ATTEMPTS = 20;
+                    int connectionAttempts = 0;
 
                     Room randomRoom;
-                    // Try to add a room at the specified direction of the room
-                    while (true) {
+                    while (connectionAttempts < MAX_CONNECTION_ATTEMPTS) {
+                        connectionAttempts++;
+                        // Try to add a room at the specified direction of the room
                         randomRoom = chooseRandomRoom();
                         if (room.isConnectable(direction, randomRoom) && (randomRoom.canAddMoreDoors())) {
                             room.connectRooms(direction, randomRoom);
@@ -89,6 +97,7 @@ public class DungeonMap {
             if (!(room.isStartRoom())) {
                 MobSpawner spawner = new MobSpawner(gameLevel, room.getDifficulty());
                 room.setMobSpawner(spawner);  // Delay spawning until player enters
+                spawner.setParentRoom(room);
             }
 
             // Handle boss room
@@ -96,6 +105,7 @@ public class DungeonMap {
                 MobSpawner bossSpawner = new MobSpawner(gameLevel, 3);
                 bossSpawner.setInBossRoom(true);
                 room.setMobSpawner(bossSpawner);    
+                bossSpawner.setParentRoom(room);
             }
         }
 
@@ -376,7 +386,6 @@ public class DungeonMap {
         int doorId = Integer.parseInt(doorData[0]);
         int doorX = Integer.parseInt(doorData[1]);
         int doorY = Integer.parseInt(doorData[2]);
-        // System.out.println("Door Y: " + doorY);
         String doorDirection = doorData[3];
         int roomAID = Integer.parseInt(doorData[4]);
         int roomBID = Integer.parseInt(doorData[5]);
