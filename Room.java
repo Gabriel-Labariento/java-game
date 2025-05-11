@@ -113,6 +113,7 @@ public class Room extends GameObject implements Tileable{
         String filePath = "resources/Object Layouts/baseLayout.txt";
         if (isEndRoom && gameLevel == 0) filePath = "resources/Object Layouts/ratKingRoomLayout.txt";
         if (gameLevel == 1) filePath = "resources/Object Layouts/snakeRoomLayout.txt";
+        if (gameLevel == 2) filePath = "resources/Object Layouts/fireMonsterRoomLayout.txt";
         try {
             InputStream is = getClass().getResourceAsStream(filePath);
             BufferedReader br = new BufferedReader(new InputStreamReader(is));
