@@ -9,26 +9,26 @@ public class ClientMaster {
     private int xpBarPercent;
     private int userLvl;
     private char heldItemIdentifier;
-    private static final HashMap<Character, String> idToName = new HashMap<>();
+    private static final HashMap<Character, String> IDENTIFIERTONAME = new HashMap<>();
     static {
-        //Initiliaze idtoname hashmap using static block
-        idToName.put(NetworkProtocol.REDFISH.charAt(0), "Redfish");
-        idToName.put(NetworkProtocol.CATTREAT.charAt(0), "Cat Treat");
-        idToName.put(NetworkProtocol.MILK.charAt(0), "Milk");
-        idToName.put(NetworkProtocol.PREMIUMCATFOOD.charAt(0), "Premium Cat Food++");
-        idToName.put(NetworkProtocol.GOLDFISH.charAt(0), "Goldfish");
-        idToName.put(NetworkProtocol.LIGHTSCARF.charAt(0), "Light Scarf");
-        idToName.put(NetworkProtocol.THICKSWEATER.charAt(0), "Thick Sweater");
-        idToName.put(NetworkProtocol.BAGOFCATNIP.charAt(0), "Bag of Catnip");
-        idToName.put(NetworkProtocol.LOUDBELL.charAt(0), "Loud Bell");
-        idToName.put(NetworkProtocol.PRINGLESCAN.charAt(0), "Pringles Can");
-        idToName.put(NetworkProtocol.HEAVYCAT.charAt(0), "HeavyCat");
-        idToName.put(NetworkProtocol.FASTCAT.charAt(0), "FastCat");
-        idToName.put(NetworkProtocol.GUNCAT.charAt(0), "GunCat");
-        idToName.put(NetworkProtocol.PLAYERSMASH.charAt(0), "PlayerSmash");
-        idToName.put(NetworkProtocol.PLAYERSLASH.charAt(0), "PlayerSlash");
-        idToName.put(NetworkProtocol.PLAYERBULLET.charAt(0), "PlayerBullet");
-        idToName.put(NetworkProtocol.RAT.charAt(0), "Rat");
+        //Initiliaze IDENTIFIERTONAME hashmap using static block
+        IDENTIFIERTONAME.put(NetworkProtocol.REDFISH.charAt(0), "Redfish");
+        IDENTIFIERTONAME.put(NetworkProtocol.CATTREAT.charAt(0), "Cat Treat");
+        IDENTIFIERTONAME.put(NetworkProtocol.MILK.charAt(0), "Milk");
+        IDENTIFIERTONAME.put(NetworkProtocol.PREMIUMCATFOOD.charAt(0), "Premium Cat Food++");
+        IDENTIFIERTONAME.put(NetworkProtocol.GOLDFISH.charAt(0), "Goldfish");
+        IDENTIFIERTONAME.put(NetworkProtocol.LIGHTSCARF.charAt(0), "Light Scarf");
+        IDENTIFIERTONAME.put(NetworkProtocol.THICKSWEATER.charAt(0), "Thick Sweater");
+        IDENTIFIERTONAME.put(NetworkProtocol.BAGOFCATNIP.charAt(0), "Bag of Catnip");
+        IDENTIFIERTONAME.put(NetworkProtocol.LOUDBELL.charAt(0), "Loud Bell");
+        IDENTIFIERTONAME.put(NetworkProtocol.PRINGLESCAN.charAt(0), "Pringles Can");
+        IDENTIFIERTONAME.put(NetworkProtocol.HEAVYCAT.charAt(0), "HeavyCat");
+        IDENTIFIERTONAME.put(NetworkProtocol.FASTCAT.charAt(0), "FastCat");
+        IDENTIFIERTONAME.put(NetworkProtocol.GUNCAT.charAt(0), "GunCat");
+        IDENTIFIERTONAME.put(NetworkProtocol.PLAYERSMASH.charAt(0), "PlayerSmash");
+        IDENTIFIERTONAME.put(NetworkProtocol.PLAYERSLASH.charAt(0), "PlayerSlash");
+        IDENTIFIERTONAME.put(NetworkProtocol.PLAYERBULLET.charAt(0), "PlayerBullet");
+        IDENTIFIERTONAME.put(NetworkProtocol.RAT.charAt(0), "Rat");
     }
 
     public ClientMaster(){
@@ -73,7 +73,7 @@ public class ClientMaster {
 
     public Entity getEntity(char identifier, int id, int x, int y){
         //We use a hashmap to determine such for readability and since switch statements need constant values
-        String name = idToName.get(identifier);
+        String name = IDENTIFIERTONAME.get(identifier);
         if (name == null) return null;
         switch (name){
             case "HeavyCat":
@@ -127,6 +127,7 @@ public class ClientMaster {
 
     public void setHeldItemIdentifier(char identifier){
         heldItemIdentifier = identifier;
+        // System.out.println(heldItemIdentifier);
     }
     
     public Entity generateUIItem(){

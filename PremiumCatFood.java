@@ -13,9 +13,14 @@ public class PremiumCatFood extends Item {
         matchHitBoxBounds();
     }
 
+    @Override
     public void applyEffects(){
-        double restoredHP = Math.round(owner.getMaxHealth()*0.25);
-        owner.setHitPoints(owner.getHitPoints() + (int) restoredHP);
+        owner.setDamage(owner.getDamage() + 1);
+    }
+
+    @Override
+    public void removeEffects(){
+        
     }
 
     @Override

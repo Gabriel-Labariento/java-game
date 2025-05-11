@@ -249,6 +249,13 @@ public class GameFrame extends JFrame{
         ActionMap am = cp.getActionMap(); 
         InputMap im = cp.getInputMap();
 
+        AbstractAction keyInputQ = new AbstractAction() {
+            @Override
+            public void actionPerformed(ActionEvent ae){
+                gameClient.keyInput("Q", true);
+            }
+        };
+
         AbstractAction keyInputW = new AbstractAction() {
             @Override
             public void actionPerformed(ActionEvent ae){
@@ -274,6 +281,13 @@ public class GameFrame extends JFrame{
             @Override
             public void actionPerformed(ActionEvent ae){
                 gameClient.keyInput("D", true);
+            }
+        };
+
+        AbstractAction stopInputQ = new AbstractAction() {
+            @Override
+            public void actionPerformed(ActionEvent ae){
+                gameClient.keyInput("Q", false);
             }
         };
 
@@ -305,19 +319,23 @@ public class GameFrame extends JFrame{
             }
         };
 
+        am.put("keyInputQ", keyInputQ);
         am.put("keyInputW", keyInputW);
         am.put("keyInputS", keyInputS);
         am.put("keyInputA", keyInputA);
         am.put("keyInputD", keyInputD);
+        am.put("stopInputQ", stopInputQ);
         am.put("stopInputW", stopInputW);
         am.put("stopInputS", stopInputS);
         am.put("stopInputA", stopInputA);
         am.put("stopInputD", stopInputD);
 
+        im.put(KeyStroke.getKeyStroke(KeyEvent.VK_Q, 0, false), "keyInputQ");
         im.put(KeyStroke.getKeyStroke(KeyEvent.VK_W, 0, false), "keyInputW");
         im.put(KeyStroke.getKeyStroke(KeyEvent.VK_A, 0, false), "keyInputA");
         im.put(KeyStroke.getKeyStroke(KeyEvent.VK_S, 0, false), "keyInputS");
         im.put(KeyStroke.getKeyStroke(KeyEvent.VK_D, 0, false), "keyInputD");
+        im.put(KeyStroke.getKeyStroke(KeyEvent.VK_Q, 0, true), "stopInputQ");
         im.put(KeyStroke.getKeyStroke(KeyEvent.VK_W, 0, true), "stopInputW");
         im.put(KeyStroke.getKeyStroke(KeyEvent.VK_A, 0, true), "stopInputA");
         im.put(KeyStroke.getKeyStroke(KeyEvent.VK_S, 0, true), "stopInputS");

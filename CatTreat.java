@@ -13,9 +13,15 @@ public class CatTreat extends Item {
         matchHitBoxBounds();
     }
 
+    @Override
     public void applyEffects(){
-        double restoredHP = Math.floor(owner.getMaxHealth()*0.25);
-        owner.setHitPoints(owner.getHitPoints() + (int) restoredHP);
+        double addedXP = Math.round((owner.getCurrentXPCap() - owner.getPastXPCap())*0.10);
+        owner.applyXP((int) addedXP);
+    }
+
+    @Override
+    public void removeEffects(){
+        
     }
 
     @Override

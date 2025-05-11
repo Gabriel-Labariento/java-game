@@ -12,7 +12,7 @@ public abstract class Entity extends GameObject {
     protected int hasMoved;
     public Room currentRoom; 
     public int id;
-    
+    public boolean isMaxHealthSet;
 
     public void draw(Graphics2D g2d, int xOffset, int yOffset){}
 
@@ -101,13 +101,26 @@ public abstract class Entity extends GameObject {
         return maxHealth;
     }
 
+    public void setMaxHealth(int mh){
+        maxHealth = mh;
+    }
+
     public int getDamage() {
         return damage;
     }
 
+    public void setDamage(int damage){
+        this.damage = damage;
+    }
+
     public void setHitPoints(int hP) {
-        if(hP > maxHealth) hP = maxHealth; 
+        //Limit new hp to maxhealth-unless entity is being parsed clientside (since maxhealth isnt communicated to client)
+        if(hP > maxHealth && !isMaxHealthSet) hP = maxHealth; 
         hitPoints = hP;
+    }
+
+    public void setIsMaxHealthSet(boolean b){
+        isMaxHealthSet = b;
     }
 
     public int getId() {
@@ -117,6 +130,14 @@ public abstract class Entity extends GameObject {
     public void setId(int id) {
         this.id = id;
     }
+
+    public void setSpeed(int s){
+        //Set a hard limit
+        if(s < 2) s = 2;
+        speed = s;
+    }
+
+
 
 }
     

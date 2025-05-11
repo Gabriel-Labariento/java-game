@@ -25,6 +25,7 @@ public class GameClient {
         sendInputsScheduler = Executors.newSingleThreadScheduledExecutor();
 
         keyMap = new HashMap<>();
+        keyMap.put("Q", false);
         keyMap.put("W", false);
         keyMap.put("A", false);
         keyMap.put("S", false);
@@ -39,6 +40,8 @@ public class GameClient {
                 theSocket.close();
             } catch (IOException ex) {
                 System.err.println("IOException from closeSocketOnShutdown() method");
+            } catch (NullPointerException ex2){
+                System.err.println("NullPointerException from closeSocketOnShutdown() method");
             }
         }));
     }
@@ -67,9 +70,10 @@ public class GameClient {
 
     public void hostServer(){
         gs = new GameServer();
+        gs.waitForConnections();   
         gs.startGameLoop();
         gs.closeSocketsOnShutdown();
-        gs.waitForConnections();      
+           
     }
       
     public String getServerIP(){
@@ -171,6 +175,7 @@ public class GameClient {
                     Room currentRoom = clientMaster.getRoomById(playerRoomId);
                     Player player = (Player) clientMaster.getEntity(identifier, playerId, playerX, playerY);
                     player.setCurrentRoom(currentRoom);
+                    player.setIsMaxHealthSet(true);
                     player.setHitPoints(playerHealth);
                     clientMaster.setUserPlayer(player);
                     clientMaster.setCurrentRoom(currentRoom);
@@ -197,6 +202,7 @@ public class GameClient {
                 if ( (otherId != clientId) && (otherRoomId == clientMaster.getCurrentRoom().getRoomId()) ) {
                     Player other = (Player) clientMaster.getEntity(identifier, otherId, x, y);
                     other.setCurrentRoom(clientMaster.getRoomById(otherRoomId));
+                    other.setIsMaxHealthSet(true);
                     other.setHitPoints(hp);
                     clientMaster.addEntity(other);
                 } 
@@ -257,6 +263,7 @@ public class GameClient {
     public String getInputsData(){
         StringBuilder str = new StringBuilder();
 
+        if(keyMap.get("Q")) str.append("Q");
         if(keyMap.get("W")) str.append("W");
         if(keyMap.get("A")) str.append("A");
         if(keyMap.get("S")) str.append("S");
@@ -276,6 +283,9 @@ public class GameClient {
 
     public void keyInput(String input, Boolean isPressed){
         switch (input) {
+            case "Q":
+                keyMap.replace("Q", isPressed);
+                break;
             case "W":
                 keyMap.replace("W", isPressed);
                 break;

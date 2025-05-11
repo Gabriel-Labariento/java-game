@@ -287,15 +287,18 @@ public class GameServer {
                             } else {
                                 // System.out.println(part);
                                 int keyInputNum = 0;
+
                                 for (char keyInput:part.toCharArray()){
-                                    //Load only two keyInputs per reception
+
+                                    //Load only two keyInputs for movement per reception
                                     if (keyInputNum == 2) break;
-                                    keyInputNum++;
                                     serverMaster.loadKeyInput(keyInput, cid);
 
-                                }
-                                // System.out.println("Parsed char: " + parsedChar); 
-                                
+                                    //If not keyInput for movement, then skip input counting
+                                    if(part.charAt(0) == 'Q') continue;
+            
+                                    keyInputNum++;
+                                }            
                             }
                         }
                     }

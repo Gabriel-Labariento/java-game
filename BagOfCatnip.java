@@ -12,9 +12,19 @@ public class BagOfCatnip extends Item {
         matchHitBoxBounds();
     }
 
+    @Override
     public void applyEffects(){
-        double restoredHP = Math.round(owner.getMaxHealth()*0.25);
-        owner.setHitPoints(owner.getHitPoints() + (int) restoredHP);
+        initialCDDuration = owner.getCoolDownDuration();
+        owner.setCoolDownDuration((int) Math.round(initialCDDuration*1.5));
+
+        initialDamage = owner.getDamage();
+        owner.setDamage((int) Math.round(initialDamage*2.0));
+    }
+
+    @Override
+    public void removeEffects(){
+        owner.setCoolDownDuration(initialCDDuration);
+        owner.setDamage(initialDamage);
     }
 
     @Override

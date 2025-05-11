@@ -12,9 +12,15 @@ public class PringlesCan extends Item {
         matchHitBoxBounds();
     }
 
+    @Override
     public void applyEffects(){
         double restoredHP = Math.round(owner.getMaxHealth()*0.25);
         owner.setHitPoints(owner.getHitPoints() + (int) restoredHP);
+    }
+
+    @Override
+    public void removeEffects(){
+        
     }
 
     @Override

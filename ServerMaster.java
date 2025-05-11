@@ -58,6 +58,14 @@ public class ServerMaster {
         //Check on and resolve the end of life properties of each entity
         for (Entity entity:entities){
             if(entity instanceof Player player && player.getHitPoints() <=0){
+                //Trigger goldfish effects on death if player is holding it
+                if ((player.getHeldItem()) instanceof Goldfish){
+                    player.setHitPoints(player.getMaxHealth());
+                    player.setIsDown(false);
+                    player.setHeldItem(null);
+                    continue;
+                }
+
                 //DOWNING AND REVIVAL MECHANICS
                 //If the player has not yet been recorded as being downed, set them as such
                 if (!player.getIsDown()){
@@ -192,7 +200,6 @@ public class ServerMaster {
             damageEnemy(enemy, attack);
         }
             
-
         //PLAYER/ENEMY COLLISION HANDLING
         else if (e1 instanceof Player player && e2 instanceof Enemy enemy){
             preventOverlap(player, enemy, b1, b2);
@@ -236,9 +243,14 @@ public class ServerMaster {
             entities.remove(item);
         }
         else {
+            if(item.getIsOnPickUpCD()) return;
+
             if (player.getHeldItem() == null){
+                //Reset first time use boolean in thick sweater to avoid immediate application of regen on pickup
+                if(item instanceof ThickSweater ts) ts.setIsFirstTimeUse(true);
                 player.setHeldItem(item);
                 item.applyEffects();
+                item.setIsHeld(true);
                 entities.remove(item);
             } 
         }
@@ -316,8 +328,28 @@ public class ServerMaster {
         keyInputQueue.forEach((key, cid) ->{
             // System.out.println("Processing input: " + key + "," + cid);
             Player player = (Player) getPlayerFromClientId(cid);
-            //Restrain player movement if downed
-            if (!player.getIsDown()) player.update(key);           
+
+            //Restrain player if downed
+            if (!player.getIsDown()) {
+                if (key == 'Q'){
+                    //Remove item effects and drop it on the ground
+                    Item heldItem = player.getHeldItem();
+                    if (heldItem != null){
+                        //Call background state methods on heldItem
+                        heldItem.removeEffects();
+                        heldItem.setIsHeld(false);
+                        heldItem.triggerPickUpCD();
+                        heldItem.triggerDespawnTimer();
+                        
+                        //Visual drop mechanics
+                        heldItem.setWorldX(player.getWorldX());
+                        heldItem.setWorldY(player.getWorldY());
+                        heldItem.matchHitBoxBounds();
+                        addEntity(heldItem);
+                    }
+                }
+                player.update(key);   
+            }        
             
         });
         keyInputQueue.clear();
@@ -471,12 +503,12 @@ public class ServerMaster {
 
         //UI elements
         Item heldItem = userPlayer.getHeldItem();
-        int heldItemId = 0;
-        if (heldItem != null) heldItemId = heldItem.getIdentifier();
+        char heldItemIdentifier = '0';
+        if (heldItem != null) heldItemIdentifier = heldItem.getIdentifier();
 
         sb.append(userPlayer.getXPBarPercent()).append(NetworkProtocol.DELIMITER)
         .append(userPlayer.getCurrentLvl()).append(NetworkProtocol.DELIMITER).
-        append(heldItemId).append(NetworkProtocol.DELIMITER);
+        append(heldItemIdentifier).append(NetworkProtocol.DELIMITER);
 
         if (userPlayerData.startsWith(NetworkProtocol.ROOM_CHANGE)) {
             // Handle room change logic here on the server side

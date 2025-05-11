@@ -13,10 +13,14 @@ public class RedFish extends Item {
         matchHitBoxBounds();
     }
 
+    @Override
     public void applyEffects(){
-        double restoredHP = Math.floor(owner.getMaxHealth()*0.25);
+        double restoredHP = Math.round(owner.getMaxHealth()*0.25);
         owner.setHitPoints(owner.getHitPoints() + (int) restoredHP);
     }
+
+    @Override
+    public void removeEffects(){}
 
     @Override
     public void draw(Graphics2D g2d, int xOffset, int yOffset){

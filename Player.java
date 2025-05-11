@@ -1,7 +1,7 @@
 public abstract class Player extends Entity{
     public static final int INVINCIBILITY_DURATION = 1000;
     public static final int REVIVAL_DURATION = 5000;
-    public static final int COOLDOWN_DURATION = 1000;
+    public int coolDownDuration;
     public long invincibilityEnd;
     public long coolDownEnd;
     public int screenX;
@@ -33,6 +33,12 @@ public abstract class Player extends Entity{
             levelUpStats();
             hitPoints = maxHealth;
 
+            //Reset item effects
+            if(heldItem != null){
+                heldItem.removeEffects();
+                heldItem.applyEffects();
+            }
+
             //Exponential function for scaling required experience points properly
             pastXPCap = currentXPCap;
 
@@ -40,6 +46,22 @@ public abstract class Player extends Entity{
             int baseXP = 100;
             currentXPCap = (int) Math.floor(baseXP * (Math.pow(currentLvl, exponentForScaling)));
         }
+    }
+
+    public int getPastXPCap(){
+        return pastXPCap;
+    }
+
+    public int getCurrentXPCap(){
+        return currentXPCap;
+    }
+
+    public int getCoolDownDuration(){
+        return coolDownDuration;
+    }
+
+    public void setCoolDownDuration(int duration){
+        coolDownDuration = duration;
     }
 
     public void setHeldItem(Item item){
@@ -71,7 +93,7 @@ public abstract class Player extends Entity{
     }
 
     public void triggerCoolDown(){
-        coolDownEnd = System.currentTimeMillis() + COOLDOWN_DURATION;
+        coolDownEnd = System.currentTimeMillis() + coolDownDuration;
     }
 
     public boolean getIsOnCoolDown(){
@@ -98,17 +120,23 @@ public abstract class Player extends Entity{
         prevWorldX = worldX;
         prevWorldY = worldY;
 
-        if(input == 'W') {
-            if (isMoveInbound(0, -1 * speed)) worldY -= speed;
-        }
-        if(input == 'A') {
-            if (isMoveInbound(-1 * speed, 0)) worldX -= speed;
-        }
-        if(input == 'S') {
-            if (isMoveInbound(0, speed)) worldY += speed;
-        }
-        if(input == 'D') {
-            if (isMoveInbound(speed, 0)) worldX += speed;
+
+        switch (input){
+            case 'Q':
+                heldItem = null;
+                break;
+            case 'W':
+                if (isMoveInbound(0, -1 * speed)) worldY -= speed;
+                break;
+            case 'A':
+                if (isMoveInbound(-1 * speed, 0)) worldX -= speed;
+                break;
+            case 'S':
+                if (isMoveInbound(0, speed)) worldY += speed;
+                break;
+            case 'D':
+                if (isMoveInbound(speed, 0)) worldX += speed;
+                break;
         }
         matchHitBoxBounds();
     }
@@ -237,5 +265,10 @@ public abstract class Player extends Entity{
     };
     
     @Override
-    public void updateEntity(ServerMaster gsm) {}
+    public void updateEntity(ServerMaster gsm) {
+        //Do regen mechanics if player is holding a thick sweater
+        if(heldItem instanceof ThickSweater ts){
+            ts.triggerRegenSystem();
+        }
+    }
 }

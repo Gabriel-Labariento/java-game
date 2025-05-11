@@ -17,6 +17,7 @@ public class HeavyCat extends Player{
         hitPoints = maxHealth;
         damage = 5;
         isDown = false;
+        coolDownDuration = 1200;
 
         matchHitBoxBounds();
     }

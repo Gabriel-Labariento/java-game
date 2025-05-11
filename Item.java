@@ -1,12 +1,19 @@
 public abstract class Item extends Entity{
     public long despawnTime;
-    public int isDespawned;
-    public static final int dropDuration = 60000;
+    public long pickUpCDTime;
+    public static final int DROPDURATION = 60000;
+    public static final int PICKUPCDDURATION = 5000;
     public Player owner;
     public boolean isConsumable;
+    public boolean isHeld;
+    public int initialCDDuration;
+    public int initialDamage;
+    public int initialMaxHealth;
+    public int initialHitPoints;
+    public int initialSpeed;
 
     public Item(){
-        despawnTime = System.currentTimeMillis() + dropDuration;
+        triggerDespawnTimer();
         width = 16;
         height = 16;
     }
@@ -15,15 +22,32 @@ public abstract class Item extends Entity{
         owner = player;
     }
 
+    public void triggerDespawnTimer(){
+        despawnTime = System.currentTimeMillis() + DROPDURATION;
+    }
+
+    public void setIsHeld(boolean b){
+        isHeld = b;
+    }
+
     public abstract void applyEffects();
 
-    // public abstract void removeEffects();
+    public abstract void removeEffects();
+
+    public void triggerPickUpCD(){
+        pickUpCDTime = System.currentTimeMillis() + PICKUPCDDURATION;
+    }
+
+    public boolean getIsOnPickUpCD(){
+        return System.currentTimeMillis() < pickUpCDTime;
+    }
 
     public boolean getIsConsumable(){
         return isConsumable;
     }
 
     public boolean getIsDespawned(){
+        if (isHeld) return false;
         return System.currentTimeMillis() >= despawnTime;
     }
 
