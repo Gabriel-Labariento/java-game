@@ -7,6 +7,7 @@ public abstract class Entity extends GameObject {
     // protected BufferedImage[] sprites;
     protected int prevWorldX;
     protected int prevWorldY;
+    protected boolean isCollidingWithSolidTile;
     protected int speed;
     protected int baseSpeed;
     protected int maxHealth;
@@ -18,6 +19,10 @@ public abstract class Entity extends GameObject {
     protected int currSprite;
     protected ArrayList<StatusEffect> statusEffects;
     
+    public Entity(){
+        statusEffects = new ArrayList<>();
+        isCollidingWithSolidTile = false;
+    }
 
     public void draw(Graphics2D g2d, int xOffset, int yOffset){}
 
@@ -132,6 +137,22 @@ public abstract class Entity extends GameObject {
 
     public int getBaseSpeed() {
         return baseSpeed;
+    }
+
+    public int getVelocityX(){
+        return worldX - prevWorldX;
+    }
+
+    public int getVelocityY(){
+        return worldY - prevWorldY;
+    }
+
+    public boolean isIsCollidingWithSolidTile() {
+        return isCollidingWithSolidTile;
+    }
+
+    public void setIsCollidingWithSolidTile(boolean isCollidingWithSolidTile) {
+        this.isCollidingWithSolidTile = isCollidingWithSolidTile;
     }
 }
     

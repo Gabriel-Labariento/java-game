@@ -461,7 +461,7 @@ public class ServerMaster {
                     return;
                 }
                 //Restrain player movement if downed
-                if (!player.getIsDown()) player.update(key);           
+                if (!player.getIsDown()) player.move(key);           
                 
             });
             keyInputQueue.clear();

@@ -15,7 +15,7 @@ public class Room extends GameObject implements Tileable{
     private HashMap<String, Room> doors;
     private ArrayList<Door> doorsArrayList;
 
-    int[][] loadedLayout;
+    public int[][] loadedLayout;
     
 
     /**

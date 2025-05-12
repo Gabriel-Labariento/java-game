@@ -3,34 +3,65 @@ import java.io.*;
 import javax.imageio.ImageIO;
 
 public final class TileManager {
-    public Tile[] tileImages;
+    public Tile[] tiles;
 
     public TileManager() {
-        tileImages = new Tile[46];
+        tiles = new Tile[46];
         setTileImages();
-        // loadMap();
+        setTileCollisions();
     }
+
+
 
     /**
      * Creates N tiles in Tile[] tile and sets their image field.
      */
-    public void setTileImages() {
+    private void setTileImages() {
         try {
             // TODO : ADD TILES
-            for (int i = 0; i < tileImages.length; i++) {
-                tileImages[i] = new Tile();
+            for (int i = 0; i < tiles.length; i++) {
+                tiles[i] = new Tile();
                 String path = "/resources/Tile Images/tile" + i + ".png";
                 InputStream is = getClass().getResourceAsStream(path);
                 if (is == null) {
                     System.err.println("Null Input Stream in getTileImage(), early return");
                     return;
                 }
-                tileImages[i].image = ImageIO.read(is);
+                tiles[i].image = ImageIO.read(is);
             }
         } catch (IOException e) {
             System.out.println("IOException in getTileImage");
         }
             
+    }
+
+    /**
+     * Goes through the list of tiles and sets their collision field
+     * to true if they are solid (non-walkable)
+     */
+    private void setTileCollisions(){
+        // Water bush
+        for (int i = 3; i < 7; i++){
+            tiles[i].collision = true;
+        }
+
+        // Water Hole
+        for (int i = 8; i < 16; i++){
+            tiles[i].collision = true;
+        }
+
+        // Closed Door
+        for (int i = 16; i < 20; i++){
+            tiles[i].collision = true;
+        }
+
+        // Lava
+        tiles[32].collision = true;
+        
+        // Fire room wall
+        tiles[45].collision = true;
+
+
     }
 
     public void drawTiledObject (Graphics2D g2d, GameObject go, int cameraX, int cameraY) {
@@ -52,7 +83,7 @@ public final class TileManager {
                 int tileNum = layout[row][col];
                 int screenX = goX + col * GameCanvas.TILESIZE - cameraX;
                 int screenY = goY + row * GameCanvas.TILESIZE - cameraY;
-                g2d.drawImage(tileImages[tileNum].image, screenX, screenY, GameCanvas.TILESIZE, GameCanvas.TILESIZE, null);       
+                g2d.drawImage(tiles[tileNum].image, screenX, screenY, GameCanvas.TILESIZE, GameCanvas.TILESIZE, null);       
             }
         }
     }
@@ -157,4 +188,17 @@ public final class TileManager {
             // Open Door Bottom Right
             tile[23] = new Tile();
             tile[23].image = ImageIO.read(getClass().getResourceAsStream("Tile Images\\tile23.png"));
+
+            24 PATH UPPER CORNER LEFT
+            25 PATH UPPER
+            26 PATH UPPER CORNER RIGHT
+            27 PATH RIGHT
+            28 PATH BOTTOM CORNER RIGHT
+            29 PATH BOTTOM
+            30 PATH BOTTOM CORNER LEFT
+            31 PATH LEFT
+
+            32 LAVA
+            33-44 left to right, top to bottom purple floor tile pattern
+            45 PURPLE ROOM WALL
 */

@@ -10,7 +10,8 @@ public class GameCanvas extends JComponent {
     private ClientMaster clientMaster;
     private ScheduledExecutorService renderLoopScheduler;
     private ScheduledExecutorService sendInputsScheduler;
-    private TileManager tileManager;
+    public TileManager tileManager;
+    public TileCollisionChecker tileCollisionChecker;
     public PlayerUI playerUI;
 
     public GameCanvas(int width, int height){
@@ -22,6 +23,7 @@ public class GameCanvas extends JComponent {
         gameClient = new GameClient(clientMaster);
         setPreferredSize(new Dimension(width, height));
         tileManager = new TileManager();
+        tileCollisionChecker = new TileCollisionChecker(tileManager);
         playerUI = new PlayerUI();
     }
 
@@ -121,6 +123,10 @@ public class GameCanvas extends JComponent {
 
     public void setSendInputsScheduler(ScheduledExecutorService sendInputsScheduler) {
         this.sendInputsScheduler = sendInputsScheduler;
+    }
+
+    public TileManager getTileManager() {
+        return tileManager;
     }
 
 }

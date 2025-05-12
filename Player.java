@@ -19,13 +19,7 @@ public abstract class Player extends Entity implements Effectable{
     public int currentLvl;
     public int currentXPCap;
     public int pastXPCap;
-
-    // function nextLevel(level)
-    //     local exponent = 1.5
-    //     local baseXP = 1000
-    //     return math.floor(baseXP * (level ^ exponent))
-    // end
-
+  
     public Player(){
         currentLvl = 1;
         currentXPCap = 100;
@@ -97,9 +91,27 @@ public abstract class Player extends Entity implements Effectable{
         return System.currentTimeMillis() >= revivalTime;
     }
 
-    public void update(char input){
+    /**
+     * Moves the player when an input sent is valid
+     * @param input the input key corresponding to movement: W, A, S, D.
+     */
+    public void move(char input){
+
         prevWorldX = worldX;
         prevWorldY = worldY;
+
+        int dx = 0, dy = 0;
+
+        if(input == 'W') dy -= speed;
+        if(input == 'A') dx -= speed;
+        if(input == 'S') dy += speed;
+        if(input == 'D') dx += speed;
+
+        worldX += dx;
+        worldY += dy;
+
+
+
 
         if(input == 'W') {
             if (isMoveInbound(0, -1 * speed)) worldY -= speed;
