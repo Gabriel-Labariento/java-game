@@ -1,5 +1,3 @@
-
-
 public class TileCollisionChecker {
 
     private TileManager tileManager;
