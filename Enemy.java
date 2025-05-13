@@ -4,9 +4,11 @@ import java.util.ArrayList;
 public abstract class Enemy extends Entity {
     public ArrayList<Integer> attacksTakenById;
     public int rewardXP;
+    public boolean isBoss;
 
     public Enemy(){
         attacksTakenById = new ArrayList<>();
+        isBoss = false;
     }
 
     public int getRewardXP(){

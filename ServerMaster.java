@@ -438,7 +438,7 @@ public class ServerMaster {
         //Debouncing condition
         if(enemy.validateAttack(id)){
             enemy.setHitPoints(enemy.getHitPoints()-attack.getDamage());
-            applyKnockBack(enemy, attack);
+            // if () applyKnockBack(enemy, attack);
             enemy.loadAttack(id);
         }
     }
@@ -602,8 +602,8 @@ public class ServerMaster {
         else if (originPlayer.getIdentifier() == NetworkProtocol.GUNCAT.toCharArray()[0]){
             attackWidth = 16;
             attackHeight = 16;
-            playerAttack = new PlayerBullet(cid, originPlayer, worldX-attackWidth/2, worldY - attackHeight/2, 
-            normalizedX, normalizedY, attackDamage, true);
+            playerAttack = new PlayerBullet(originPlayer, worldX-attackWidth/2, worldY - attackHeight/2, 
+            normalizedX, normalizedY, attackDamage);
         }
         
         if(playerAttack != null){

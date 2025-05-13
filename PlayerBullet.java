@@ -6,13 +6,12 @@ public class PlayerBullet extends Attack{
     private double normalizedX;
     private double normalizedY;
     
-    public PlayerBullet(int cid, Entity entity, int x, int y, double nX, double nY, int d, boolean isFriendly){
+    public PlayerBullet(Entity owner, int x, int y, double nX, double nY, int d){
         attackNum++;
         id = attackNum;
-        clientId = cid;
         identifier = NetworkProtocol.PLAYERBULLET.toCharArray()[0];
-        owner = entity;
-        this.isFriendly = isFriendly;
+        this.owner = owner;
+        isFriendly = true;
         damage = d;
         //Temporary hitPoints allocation
         width = 16;

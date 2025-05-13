@@ -32,6 +32,9 @@ public class ClientMaster {
         IDENTIFIERTONAME.put(NetworkProtocol.RATKING.charAt(0), "RatKing");
         IDENTIFIERTONAME.put(NetworkProtocol.SNAKE.charAt(0), "Snake");
         IDENTIFIERTONAME.put(NetworkProtocol.SNAKELET.charAt(0), "Snakelet");
+        IDENTIFIERTONAME.put(NetworkProtocol.SPIDER.charAt(0), "Spider");
+        IDENTIFIERTONAME.put(NetworkProtocol.SPIDERBULLET.charAt(0), "SpiderBullet");
+
     }
 
     public ClientMaster(){
@@ -112,12 +115,16 @@ public class ClientMaster {
                 return new Snake(x, y);
             case "Snakelet":
                 return new Snakelet(x, y);
+            case "Spider":
+                return new Spider(x, y);
             case "PlayerSlash":
                 return new PlayerSlash(id, null, x, y, 0, false);
             case "PlayerSmash":
                 return new PlayerSmash(id, null, x, y, 0, false);
             case "PlayerBullet":
-                return new PlayerBullet(id, null, x, y, 0, 0, 0, false);
+                return new PlayerBullet(null, x, y, 0, 0, 0);
+            case "SpiderBullet":
+                return new SpiderBullet(null, x, y, 0, 0);
             default:
                 return null;
         }

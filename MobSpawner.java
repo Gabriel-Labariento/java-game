@@ -21,7 +21,7 @@ public class MobSpawner {
     private static final int INITIALSPAWNDELAY = 1;
     
     private static final String[][] spawnableEnemiesAtLevel = {
-        {"Rat"}, // TODO: ADD OTHER ENEMIES
+        {"Spider"}, // TODO: ADD OTHER ENEMIES
         {"Rat", "Snakelet"}
     };
 
@@ -58,11 +58,16 @@ public class MobSpawner {
                     Enemy enemy = null;
                     if (inBossRoom && spawnedCount == 0) {
                         enemy = createBoss(level);
-                        spawnEnemy(enemy);
                         for (int i = 0; i < 0; i++) {
                             enemy = createNormalEnemy(level);
                             spawnEnemy(enemy);
                         }
+                        // if (enemy instanceof  RatKing && !enemy.isDead()) {
+                        //     // TODO: RATKING IMPLEMENTATION
+                        // }
+                        spawnEnemy(enemy);
+
+                        
                     } else {
                         // Pick a random enemy to spawn out of the available in the list for the level
                         enemy = createNormalEnemy(level);
@@ -116,6 +121,8 @@ public class MobSpawner {
                 return new Snakelet(x, y);
             case "Snake":
                 return new Snake(x, y);
+            case "Spider":
+                return new Spider(x, y);
             default:
                 System.out.println("Undetected enemy " + name );
                 return new Rat(x, y);
