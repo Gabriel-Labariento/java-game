@@ -17,6 +17,7 @@ public class NetworkProtocol {
     public static final String SNAKE = "J";
     public static final String SPIDER = "K";
     public static final String SPIDERBULLET = "L";
+    public static final String COCKROACH = "M";
     public static final String REDFISH = "1"; // Rat
     public static final String CATTREAT = "2"; // Rat
     public static final String MILK = "3"; // Rat

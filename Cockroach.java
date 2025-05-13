@@ -3,21 +3,25 @@ import java.awt.image.BufferedImage;
 import java.io.IOException;
 import javax.imageio.ImageIO;
 
-public class Spider extends Enemy{
-    public static int spiderCount = 0;
+public class Cockroach extends Enemy{
+    public static int cockRoachCount = 0;
     private static final int SPRITE_FRAME_DURATION = 200;
-    private static final int BULLET_COOLDOWN = 5000;
-    private long lastBulletSend = 0;
+    private static final int IDLE_DURATION = 400;
+    private static final int ATTACK_DURATION = 300;
     private long lastSpriteUpdate = 0;
+    private long lastStateChangeTime = 0;
+     private static final int ATTACK_RANGE = GameCanvas.TILESIZE * 2;
     private static BufferedImage[] sprites;
-
+    private enum State {IDLE, PURSUE, ATTACK}; 
+    private State currentState;
+    
     static {
         setSprites();
     }
 
-    public Spider(int x, int y) {
-        id = spiderCount++;
-        identifier = NetworkProtocol.SPIDER.toCharArray()[0];
+    public Cockroach(int x, int y) {
+        id = cockRoachCount++;
+        identifier = NetworkProtocol.COCKROACH.toCharArray()[0];
         speed = 1;
         height = 16;
         width = 16;
@@ -29,19 +33,20 @@ public class Spider extends Enemy{
         rewardXP = 50;
         currentRoom = null;
         currSprite = 0;
-        
+        currentState = State.IDLE;
     }
 
      private static void setSprites() {
         try {
-            BufferedImage up0 = ImageIO.read(Spider.class.getResourceAsStream("resources/Sprites/Spider/spider_up0.png"));
-            BufferedImage up1 = ImageIO.read(Spider.class.getResourceAsStream("resources/Sprites/Spider/spider_up1.png"));
-            BufferedImage down0 = ImageIO.read(Spider.class.getResourceAsStream("resources/Sprites/Spider/spider_down0.png"));
-            BufferedImage down1 = ImageIO.read(Spider.class.getResourceAsStream("resources/Sprites/Spider/spider_down1.png"));
+            BufferedImage up0 = ImageIO.read(Cockroach.class.getResourceAsStream("resources/Sprites/Cockroach/cockroach_up0.png"));
+            BufferedImage up1 = ImageIO.read(Cockroach.class.getResourceAsStream("resources/Sprites/Cockroach/cockroach_up1.png"));
+            BufferedImage down0 = ImageIO.read(Cockroach.class.getResourceAsStream("resources/Sprites/Cockroach/cockroach_down0.png"));
+            BufferedImage down1 = ImageIO.read(Cockroach.class.getResourceAsStream("resources/Sprites/Cockroach/cockroach_down1.png"));
+
             sprites = new BufferedImage[] {up0, up1, down0, down1};
 
         } catch (IOException e) {
-            System.out.println("Exception in Spider setSprites()" + e);
+            System.out.println("Exception in Cockroach setSprites()" + e);
         }
     }
 
@@ -82,29 +87,51 @@ public class Spider extends Enemy{
 
         Player pursued = scanForPlayer(gsm);
         if (pursued == null) return;
-        if (getSquaredDistanceBetween(this, pursued) < (GameCanvas.TILESIZE * 4) * (GameCanvas.TILESIZE * 4)) {
-            if (now - lastBulletSend > BULLET_COOLDOWN) {
-                sendProjectile(gsm, pursued);
-                lastBulletSend = now;
-            }
-        }
-        else pursuePlayer(pursued);
 
         // Sprite walk update
         if (now - lastSpriteUpdate > SPRITE_FRAME_DURATION) {
             if (worldY > pursued.getWorldY()) {
                 currSprite = (currSprite == 1) ? 0 : 1;
-            } else {
+            } else if (worldY < pursued.getWorldY()) {
                 currSprite = (currSprite == 2) ? 3 : 2;
             }
             lastSpriteUpdate = now;
         }
 
+        double distanceSquared = getSquaredDistanceBetween(this, pursued);
+
+        switch (currentState) {
+            case IDLE:
+                if (now - lastStateChangeTime > IDLE_DURATION) {
+                    currentState = State.PURSUE;
+                    lastStateChangeTime = now;
+                }
+                break;
+
+            case PURSUE:
+                pursuePlayer(pursued);
+                if (distanceSquared <= ATTACK_RANGE * ATTACK_RANGE) {
+                    currentState = State.ATTACK;
+                    lastStateChangeTime = now;
+                }
+                break;
+
+            case ATTACK:
+                if (now - lastStateChangeTime > ATTACK_DURATION) { 
+                    initiateJump(pursued);
+                    currentState = State.IDLE;
+                    lastStateChangeTime = now;
+                } 
+                break;
+
+            default:
+                throw new AssertionError();
+        }
 
         matchHitBoxBounds();
     }
 
-    private void sendProjectile(ServerMaster gsm, Player target){
+    private void initiateJump(Player target){
         int vectorX = target.getCenterX() - getCenterX();
         int vectorY = target.getCenterY() - getCenterY(); 
         double normalizedVector = Math.sqrt((vectorX*vectorX)+(vectorY*vectorY));
@@ -114,8 +141,11 @@ public class Spider extends Enemy{
         double normalizedX = vectorX / normalizedVector;
         double normalizedY = vectorY / normalizedVector;
 
-        SpiderBullet sb = new SpiderBullet(this, this.worldX-SpiderBullet.WIDTH/2, this.worldY-SpiderBullet.HEIGHT/2, normalizedX, normalizedY);
-        gsm.addEntity(sb);
-        System.out.println("projectile sent");
+        int jumpDistance = GameCanvas.TILESIZE * 3;
+
+        int newX = (int) (worldX + normalizedX * jumpDistance);
+        int newY = (int) (worldY + normalizedY * jumpDistance);
+
+        setPosition(newX, newY);
     }
 }
