@@ -1,12 +1,23 @@
 
-import java.awt.Color;
 import java.awt.Graphics2D;
-import java.awt.geom.Rectangle2D;
+import java.awt.image.BufferedImage;
+import java.io.IOException;
+import javax.imageio.ImageIO;
 
  public class SpiderBullet extends Attack {
         public static final int HEIGHT = 16;
         public static final int WIDTH = 16;
         double normalizedX, normalizedY;
+        private static BufferedImage sprite;
+
+        static {
+            try {
+                BufferedImage img = ImageIO.read(SpiderBullet.class.getResourceAsStream("resources/Sprites/Spider/spiderbullet.png"));
+                sprite = img;
+            } catch (IOException e) {
+                System.out.println("Exception in SpiderBullet setSprites()" + e);
+            }
+        }
 
         public SpiderBullet(Entity owner, int x, int y, double nX, double nY){
             attackNum++;
@@ -20,7 +31,7 @@ import java.awt.geom.Rectangle2D;
             height = 16;
             worldX = x;
             worldY = y;
-            speed = 3;
+            speed = 2; // Note: Do not make equal to 1. When multiplied with floats, becomes 0.
             normalizedX = nX;
             normalizedY = nY;
 
@@ -33,9 +44,7 @@ import java.awt.geom.Rectangle2D;
 
         @Override
         public void draw(Graphics2D g2d, int xOffset, int yOffset){
-            Rectangle2D.Double sprite = new Rectangle2D.Double(xOffset, yOffset, width, height);
-            g2d.setColor(Color.PINK);
-            g2d.fill(sprite);
+            g2d.drawImage(sprite, xOffset, yOffset, width, height, null);
         }
 
         @Override
@@ -53,8 +62,8 @@ import java.awt.geom.Rectangle2D;
         }
 
         private void moveBullet(){
-            worldX += (int) speed* normalizedX;
-            worldY += (int) speed* normalizedY;
+            worldX += speed * normalizedX;
+            worldY += speed * normalizedY;
             matchHitBoxBounds();
         }
         

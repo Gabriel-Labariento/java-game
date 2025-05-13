@@ -29,6 +29,7 @@ public class ClientMaster {
         IDENTIFIERTONAME.put(NetworkProtocol.PLAYERSLASH.charAt(0), "PlayerSlash");
         IDENTIFIERTONAME.put(NetworkProtocol.PLAYERBULLET.charAt(0), "PlayerBullet");
         IDENTIFIERTONAME.put(NetworkProtocol.RAT.charAt(0), "Rat");
+        IDENTIFIERTONAME.put(NetworkProtocol.RATSLASH.charAt(0), "RatSlash");
         IDENTIFIERTONAME.put(NetworkProtocol.RATKING.charAt(0), "RatKing");
         IDENTIFIERTONAME.put(NetworkProtocol.SNAKE.charAt(0), "Snake");
         IDENTIFIERTONAME.put(NetworkProtocol.SNAKELET.charAt(0), "Snakelet");
@@ -110,6 +111,8 @@ public class ClientMaster {
                 return new PringlesCan(x, y);
             case "Rat":
                 return new Rat(x, y);
+            case "RatSlash":
+                return new RatSlash(null, x, y);
             case "RatKing":
                 return new RatKing(x, y);
             case "Snake":

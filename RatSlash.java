@@ -3,21 +3,19 @@
     import java.awt.Graphics2D;
     import java.awt.geom.*;
 
-    public class PlayerSlash extends Attack{
+    public class RatSlash extends Attack{
+        public static final int HEIGHT = 16;
+        public static final int WIDTH = 16;
 
-        public PlayerSlash(int cid, Entity entity, int x, int y, int d, boolean isFriendly){
+        public RatSlash(Entity owner, int x, int y){
             attackNum++;
             id = attackNum;
-            clientId = cid;
-            identifier = NetworkProtocol.PLAYERSLASH.toCharArray()[0];
-            owner = entity;
-            this.isFriendly = isFriendly;
-            damage = d;
-            //Temporary hitPoints allocation
-            hitPoints = 100;
-            
-            width = 40;
-            height = 40;
+            identifier = NetworkProtocol.RATSLASH.toCharArray()[0];
+            this.owner = owner;
+            isFriendly = false;
+            damage = 1;
+            width = WIDTH;
+            height = HEIGHT;
             worldX = x;
             worldY = y;
 

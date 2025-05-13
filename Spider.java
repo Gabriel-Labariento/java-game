@@ -116,6 +116,5 @@ public class Spider extends Enemy{
 
         SpiderBullet sb = new SpiderBullet(this, this.worldX-SpiderBullet.WIDTH/2, this.worldY-SpiderBullet.HEIGHT/2, normalizedX, normalizedY);
         gsm.addEntity(sb);
-        System.out.println("projectile sent");
     }
 }

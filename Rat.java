@@ -6,7 +6,9 @@ import javax.imageio.ImageIO;
 public class Rat extends Enemy{
     public static int ratCount = 0;
     private static final int SPRITE_FRAME_DURATION = 200;
+    private static final int BITE_COOLDOWN = 1500;
     private long lastSpriteUpdate = 0;
+    private long lastBiteAttack = 0;
     private static BufferedImage[] sprites;
 
     static {
@@ -81,8 +83,14 @@ public class Rat extends Enemy{
         long now = System.currentTimeMillis();
 
         Player pursued = scanForPlayer(gsm);
-        if (pursued != null) pursuePlayer(pursued);
-        else return;
+        if (pursued == null) return;
+        if (getSquaredDistanceBetween(this, pursued) < GameCanvas.TILESIZE * GameCanvas.TILESIZE) {
+            if (now - lastBiteAttack > BITE_COOLDOWN ) {
+                createBiteAttack(gsm, pursued);
+                lastBiteAttack = now;
+            }
+        }
+        else pursuePlayer(pursued);
 
         // Sprite walk update
         if (now - lastSpriteUpdate > SPRITE_FRAME_DURATION) {
@@ -97,5 +105,24 @@ public class Rat extends Enemy{
         }
 
         matchHitBoxBounds();
+    }
+
+
+    private void createBiteAttack(ServerMaster gsm, Player target){
+        int vectorX = target.getCenterX() - getCenterX();
+        int vectorY = target.getCenterY() - getCenterY(); 
+        double normalizedVector = Math.sqrt((vectorX*vectorX)+(vectorY*vectorY));
+
+        //Avoids 0/0 division edge case
+        if (normalizedVector == 0) normalizedVector = 1; 
+        double normalizedX = vectorX / normalizedVector;
+        double normalizedY = vectorY / normalizedVector;
+
+        int biteDistance = GameCanvas.TILESIZE;
+        int biteX = (int) (worldX + normalizedX * biteDistance);
+        int biteY = (int) (worldY + normalizedY * biteDistance);
+
+        RatSlash rs = new RatSlash(this, biteX, biteY);
+        gsm.addEntity(rs);
     }
 }

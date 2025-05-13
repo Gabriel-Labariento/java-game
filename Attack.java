@@ -36,11 +36,6 @@ public abstract class Attack extends Entity{
             int prevOwnerX = owner.getPrevWorldX();
             int prevOwnerY = owner.getPrevWorldY();
 
-            // if(owner.getHasMoved()){
-            //     worldX += ownerX - prevOwnerX;
-            //     worldY += ownerY - prevOwnerY;
-            // }
-
             // Initialize attack-owner offset
             if (!isOffsetInitialized){
                 isOffsetInitialized = true;
