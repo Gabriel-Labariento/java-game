@@ -21,7 +21,7 @@ public class MobSpawner {
     private static final int INITIALSPAWNDELAY = 1;
     
     private static final String[][] spawnableEnemiesAtLevel = {
-        {"Rat"}, // TODO: ADD OTHER ENEMIES
+        {"SmallDog"}, // TODO: ADD OTHER ENEMIES
         {"Rat", "Snakelet"}
     };
 
@@ -125,6 +125,8 @@ public class MobSpawner {
                 return new Spider(x, y);
             case "Cockroach":
                 return new Cockroach(x, y);
+            case "SmallDog":
+                return new SmallDog(x, y);
             default:
                 System.out.println("Undetected enemy " + name );
                 return new Rat(x, y);

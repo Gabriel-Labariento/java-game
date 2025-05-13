@@ -3,24 +3,24 @@ import java.awt.image.BufferedImage;
 import java.io.IOException;
 import javax.imageio.ImageIO;
 
-public class RatSlash extends Attack{
-    public static final int HEIGHT = 16;
-    public static final int WIDTH = 16;
+public class EnemyBark extends Attack{
+    public static final int HEIGHT = 40;
+    public static final int WIDTH = 40;
     private static BufferedImage sprite;
 
     static {
         try {
-            BufferedImage img = ImageIO.read(RatSlash.class.getResourceAsStream("resources/Sprites/Rat/ratslash.png"));
+            BufferedImage img = ImageIO.read(EnemyBark.class.getResourceAsStream("resources/Sprites/SharedEnemy/enemybark.png"));
             sprite = img;
         } catch (IOException e) {
-            System.out.println("Exception in SpiderBullet setSprites()" + e);
+            System.out.println("Exception in EnemyBark setSprite()" + e);
         }
     }
 
-    public RatSlash(Entity owner, int x, int y){
+    public EnemyBark(Entity owner, int x, int y){
         attackNum++;
         id = attackNum;
-        identifier = NetworkProtocol.RATSLASH.toCharArray()[0];
+        identifier = NetworkProtocol.ENEMYBARK.toCharArray()[0];
         this.owner = owner;
         isFriendly = false;
         damage = 1;

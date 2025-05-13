@@ -29,13 +29,16 @@ public class ClientMaster {
         IDENTIFIERTONAME.put(NetworkProtocol.PLAYERSLASH.charAt(0), "PlayerSlash");
         IDENTIFIERTONAME.put(NetworkProtocol.PLAYERBULLET.charAt(0), "PlayerBullet");
         IDENTIFIERTONAME.put(NetworkProtocol.RAT.charAt(0), "Rat");
-        IDENTIFIERTONAME.put(NetworkProtocol.RATSLASH.charAt(0), "RatSlash");
+        IDENTIFIERTONAME.put(NetworkProtocol.ENEMYBITE.charAt(0), "EnemyBite");
+        IDENTIFIERTONAME.put(NetworkProtocol.ENEMYBARK.charAt(0), "EnemyBark");
         IDENTIFIERTONAME.put(NetworkProtocol.RATKING.charAt(0), "RatKing");
         IDENTIFIERTONAME.put(NetworkProtocol.SNAKE.charAt(0), "Snake");
         IDENTIFIERTONAME.put(NetworkProtocol.SNAKELET.charAt(0), "Snakelet");
         IDENTIFIERTONAME.put(NetworkProtocol.SPIDER.charAt(0), "Spider");
         IDENTIFIERTONAME.put(NetworkProtocol.SPIDERBULLET.charAt(0), "SpiderBullet");
         IDENTIFIERTONAME.put(NetworkProtocol.COCKROACH.charAt(0), "Cockroach");
+        IDENTIFIERTONAME.put(NetworkProtocol.SMALLDOG.charAt(0), "SmallDog");
+        
 
     }
 
@@ -111,8 +114,8 @@ public class ClientMaster {
                 return new PringlesCan(x, y);
             case "Rat":
                 return new Rat(x, y);
-            case "RatSlash":
-                return new RatSlash(null, x, y);
+            case "EnemyBite":
+                return new EnemyBite(null, x, y);
             case "RatKing":
                 return new RatKing(x, y);
             case "Snake":
@@ -123,6 +126,10 @@ public class ClientMaster {
                 return new Spider(x, y);
             case "Cockroach":
                 return new Cockroach(x, y);
+            case "SmallDog":
+                return new SmallDog(x, y);
+            case "EnemyBark":
+                return new EnemyBark(null, x, y);
             case "PlayerSlash":
                 return new PlayerSlash(id, null, x, y, 0, false);
             case "PlayerSmash":

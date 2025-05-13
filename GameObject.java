@@ -28,7 +28,7 @@ public abstract class GameObject {
      * @return integer value of the object's center x coordinate
      */
     public int getCenterX() {
-        return ( (int) ((worldX + width) / 2));
+        return ( (int) (worldX + width / 2));
     }
 
     /**
@@ -36,7 +36,7 @@ public abstract class GameObject {
      * @return integer value of the object's center y coordinate
      */
     public int getCenterY() {
-        return ( (int) ((worldY + height) / 2));
+        return ( (int) (worldY + height / 2));
     }
 
     /**

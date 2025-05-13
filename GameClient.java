@@ -155,8 +155,7 @@ public class GameClient {
      * @param message a serialized string in the form ClientId|P:playerX,playerY|E:entity1X,entity1Y,entity2x,entity2Y...|
      */
     private void parseEntitiesData(String message){
-
-        System.out.println(message);
+        // System.out.println(message);
         String[] messageParts = message.split("\\" + NetworkProtocol.DELIMITER); // Have to use \\ to escape. Turns out "|" is special for java
         this.clientId = Integer.parseInt(messageParts[0]);
         clientMaster.setXPBarPercent(Integer.parseInt(messageParts[1]));
@@ -252,7 +251,7 @@ public class GameClient {
      * @param message the substring containing map data
      */
     private void parseMapData(String message){
-        System.out.println("Inside parseMapData: " + message);
+        // System.out.println("Inside parseMapData: " + message);
         DungeonMapDeserializeResult result = new DungeonMap().deserialize(message);
         clientMaster.setCurrentRoom(result.getStartRoom());
         clientMaster.setAllRooms(result.getAllRooms());

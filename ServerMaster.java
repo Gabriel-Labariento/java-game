@@ -438,7 +438,7 @@ public class ServerMaster {
         //Debouncing condition
         if(enemy.validateAttack(id)){
             enemy.setHitPoints(enemy.getHitPoints()-attack.getDamage());
-            // if () applyKnockBack(enemy, attack);
+            if (!enemy.isBoss) applyKnockBack(enemy, attack);
             enemy.loadAttack(id);
         }
     }

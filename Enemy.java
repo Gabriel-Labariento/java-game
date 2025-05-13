@@ -27,40 +27,11 @@ public abstract class Enemy extends Entity {
         return attacksTakenById.get(attacksTakenById.size()-1);
     }
 
-    private double[] calculateRepulsionForce(Entity other) {
-        final int repulsionFactor = 32;
 
-        int dx = getCenterX() - other.getCenterX();
-        int dy = getCenterY() - other.getCenterY();
-        int distanceSquared = dx * dx + dy * dy;
-        double distance = Math.sqrt(distanceSquared);
-
-
-        // Avoid division by zero and extremely strong forces at small distances
-        if (distance < 1e-5) {
-            return new double[] {0,0};
-        } 
-
-        int forceMagnitude = repulsionFactor / distanceSquared;
-
-        double x = (dx / distance) * forceMagnitude;
-        double y = (dy / distance) * forceMagnitude;
-
-        double[] repulsionForce = {x,y};
-        return repulsionForce; 
-    }
-
-    // TODO: FIGURE OUT HOW TO MAKE ENEMIES NOT COLLIDE WITH EACH OTHER
-    public void moveAwayFromOtherEntity(Entity other) {
-        double[] repulsionForce = calculateRepulsionForce(other);
-        worldX += repulsionForce[0];
-        worldY += repulsionForce[1];
-    }
-
-    // Right now, simple logic that scans if the distance between the player and the entity is <= scanRadius.
+      // Right now, simple logic that scans if the distance between the player and the entity is <= scanRadius.
     // Pursues if yes. Does not yet consider obstacles.
     public Player scanForPlayer(ServerMaster gsm){
-        final int scanRadius = 96;
+        final int scanRadius = GameCanvas.TILESIZE * 6;
         Player closestPlayer = null;
         double minDistance = 10000; // Random large number
 
@@ -90,5 +61,44 @@ public abstract class Enemy extends Entity {
         else if (player.getCenterY() < getCenterY()) worldY -= speed;
     }
 
+    public void createBiteAttack(ServerMaster gsm, Player target){
+        int vectorX = target.getCenterX() - getCenterX();
+        int vectorY = target.getCenterY() - getCenterY(); 
+        double normalizedVector = Math.sqrt((vectorX*vectorX)+(vectorY*vectorY));
+
+        //Avoids 0/0 division edge case
+        if (normalizedVector == 0) normalizedVector = 1; 
+        double normalizedX = vectorX / normalizedVector;
+        double normalizedY = vectorY / normalizedVector;
+
+        int biteDistance = GameCanvas.TILESIZE;
+        int biteX = (int) (worldX + normalizedX * biteDistance);
+        int biteY = (int) (worldY + normalizedY * biteDistance);
+        biteX -= EnemyBite.WIDTH / 2;
+        biteY -= EnemyBite.HEIGHT / 2;
+
+        EnemyBite eb = new EnemyBite(this, biteX, biteY);
+        gsm.addEntity(eb);
+    }
     
+    public void createBarkAttack(ServerMaster gsm, Player target){
+        int vectorX = target.getCenterX() - getCenterX();
+        int vectorY = target.getCenterY() - getCenterY(); 
+        double normalizedVector = Math.sqrt((vectorX*vectorX)+(vectorY*vectorY));
+
+        //Avoids 0/0 division edge case
+        if (normalizedVector == 0) normalizedVector = 1; 
+        double normalizedX = vectorX / normalizedVector;
+        double normalizedY = vectorY / normalizedVector;
+
+        double barkDistance = GameCanvas.TILESIZE * 2.5;
+        int barkX = (int) (this.getCenterX() + normalizedX * barkDistance);
+        int barkY = (int) (this.getCenterY() + normalizedY * barkDistance);
+
+        barkX -= EnemyBark.WIDTH / 2;
+        barkY -= EnemyBark.HEIGHT / 2;
+
+        EnemyBark eb = new EnemyBark(this, barkX, barkY);
+        gsm.addEntity(eb);
+    }
 }
