@@ -55,14 +55,18 @@ public class Door extends GameObject implements Tileable {
      * @return a string with the format D:doorId,x,y,direction,roomAId,roomBId
      */
     public String serialize(){
+
+        int roomAID = (roomA == null) ? -1 : roomA.getRoomId();
+        int roomBID = (roomB == null) ? -1 : roomB.getRoomId();
+
         StringBuilder sb = new StringBuilder();
         sb.append(NetworkProtocol.DOOR)
         .append(id).append(NetworkProtocol.SUB_DELIMITER)
         .append(worldX).append(NetworkProtocol.SUB_DELIMITER)
         .append(worldY).append(NetworkProtocol.SUB_DELIMITER)
         .append(direction).append(NetworkProtocol.SUB_DELIMITER)
-        .append(roomA.getRoomId()).append(NetworkProtocol.SUB_DELIMITER)
-        .append(roomB.getRoomId());
+        .append(roomAID).append(NetworkProtocol.SUB_DELIMITER)
+        .append(roomBID);
 
         return sb.toString();
     }

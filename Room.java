@@ -7,7 +7,7 @@ public class Room extends GameObject implements Tileable{
     public static final int WIDTH_TILES = 45;
     public static final int HEIGHT_TILES = 33;
     private int roomId;
-
+    private int gameLevel;
     private int difficulty; // 0 => 3, easiest to hardest
     private boolean isStartRoom, isEndRoom, isClearedHandled, isCleared;
     private MobSpawner mobSpawner;
@@ -25,13 +25,13 @@ public class Room extends GameObject implements Tileable{
      * @param x the x-coordinate of the room
      * @param y the y-coordinate of the room
      */
-    public Room(int roomId, int x, int y){
+    public Room(int roomId, int x, int y, int gameLevel){
         this.roomId = roomId;
         this.worldX = x;
         this.worldY = y;
         height = GameCanvas.TILESIZE * HEIGHT_TILES;
         width = GameCanvas.TILESIZE * WIDTH_TILES;
-
+        this.gameLevel = gameLevel;
         isStartRoom = false;
         isEndRoom = false;
         isClearedHandled = false;
@@ -109,7 +109,6 @@ public class Room extends GameObject implements Tileable{
 
     public int[][] loadLayoutFromFile() {
         int layout[][] = new int[HEIGHT_TILES][WIDTH_TILES];
-        int gameLevel = ServerMaster.getInstance().getGameLevel();
         // Check what type of object it is. TODO: MAKE PRETTIER
         String filePath = "resources/Object Layouts/baseLayout.txt";
         if (isEndRoom && gameLevel == 0) filePath = "resources/Object Layouts/ratKingRoomLayout.txt";
