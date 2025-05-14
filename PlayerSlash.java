@@ -9,7 +9,7 @@
             attackNum++;
             id = attackNum;
             clientId = cid;
-            identifier = NetworkProtocol.PLAYERSLASH.toCharArray()[0];
+            identifier = NetworkProtocol.PLAYERSLASH;
             owner = entity;
             this.isFriendly = isFriendly;
             damage = d;

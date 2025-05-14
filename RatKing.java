@@ -14,7 +14,7 @@ public class RatKing extends Enemy {
 
     public RatKing(int x, int y) {
         id = -1; // Only one instance, doesn't really matter the value but there has to be one
-        identifier = NetworkProtocol.RATKING.toCharArray()[0];
+        identifier = NetworkProtocol.RATKING;
         speed = 1;
         height = 48;
         width = 48;

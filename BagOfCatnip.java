@@ -4,7 +4,7 @@ import java.awt.geom.*;
 public class BagOfCatnip extends Item {
     
     public BagOfCatnip(int x, int y){
-        identifier = NetworkProtocol.BAGOFCATNIP.charAt(0);
+        identifier = NetworkProtocol.BAGOFCATNIP;
         worldX = x;
         worldY = y;
         currentRoom = null;

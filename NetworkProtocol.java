@@ -31,8 +31,10 @@ public class NetworkProtocol {
     public static final String TURTLE = "X";
     public static final String SNAKE = "Y";
     public static final String ADULTCAT = "Z";
-    public static final String CONJOINEDRATS = "!";
-    public static final String FISHMONSTER = "@";
+    public static final String CONJOINEDRATS = "AA";
+    public static final String FISHMONSTER = "AB";
+    public static final String SPIDERBULLET = "AC";
+
     public static final String REDFISH = "1"; // Rat
     public static final String CATTREAT = "2"; // Rat
     public static final String MILK = "3"; // Rat

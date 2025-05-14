@@ -14,7 +14,7 @@ public class SecurityBot extends Enemy{
     }
 
     public SecurityBot(int x, int y) {
-        identifier = NetworkProtocol.SECURITYBOT.toCharArray()[0];
+        identifier = NetworkProtocol.SECURITYBOT;
         speed = 1;
         height = 16;
         width = 16;
@@ -98,6 +98,9 @@ public class SecurityBot extends Enemy{
             }
             lastSpriteUpdate = now;
         }
+
+        
+
 
         matchHitBoxBounds();
     }

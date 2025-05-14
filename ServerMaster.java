@@ -559,60 +559,68 @@ public class ServerMaster {
         //Debouncing constraints
         if(originPlayer.getIsOnCoolDown() || originPlayer.getIsDown()) return;
         
+        Thread runAttack = new Thread(){
+            @Override
+            public void run(){
+                originPlayer.triggerCoolDown();
+                originPlayer.runAttackFrames();
+
+                int attackDamage = originPlayer.getDamage();
+                int frameWidth = 800;
+                int frameHeight = 600;
+                int centerX = frameWidth/2;
+                int centerY = frameHeight/2;
+                
+                //Get a point a set distance away from the center of the screen in the direction of the click
+                int vectorX = clickX - centerX;
+                int vectorY = clickY - centerY;  
+                int distance = 20;
+                double normalizedVector = Math.sqrt((vectorX*vectorX)+(vectorY*vectorY));
+
+                //Avoids 0/0 division edge case
+                if (normalizedVector == 0) normalizedVector = 1; 
+                double normalizedX = vectorX/normalizedVector;
+                double normalizedY = vectorY/normalizedVector;
+                int attackScreenX = (int) (centerX + distance*normalizedX);
+                int attackScreenY = (int) (centerY + distance*normalizedY);
+
+                int playerScreenX = frameWidth/2 - originPlayer.getWidth()/2;
+                int playerScreenY = frameHeight/2 - originPlayer.getHeight()/2;
+
+                int worldX = (originPlayer.getWorldX() - playerScreenX) + attackScreenX;
+                int worldY = (originPlayer.getWorldY() - playerScreenY) + attackScreenY;
+
+                Attack playerAttack = null;
+                int attackHeight;
+                int attackWidth;
+
+                if (originPlayer.getIdentifier() == NetworkProtocol.FASTCAT){
+                    attackWidth = 40;
+                    attackHeight = 40;
+                    playerAttack = new PlayerSlash(cid, originPlayer, worldX-attackWidth/2, worldY - attackHeight/2, 
+                    attackDamage, true);
+                } 
+                else if (originPlayer.getIdentifier() == NetworkProtocol.HEAVYCAT){
+                    attackWidth = 80;
+                    attackHeight = 80;
+                    playerAttack = new PlayerSmash(cid, originPlayer, worldX-attackWidth/2, worldY - attackHeight/2, 
+                    attackDamage, true);
+                }
+                else if (originPlayer.getIdentifier() == NetworkProtocol.GUNCAT){
+                    attackWidth = 16;
+                    attackHeight = 16;
+                    playerAttack = new PlayerBullet(cid, originPlayer, worldX-attackWidth/2, worldY - attackHeight/2, 
+                    normalizedX, normalizedY, attackDamage, true);
+                }
+                
+                if(playerAttack != null){
+                    playerAttack.setCurrentRoom(originPlayer.getCurrentRoom());
+                    addEntity(playerAttack); 
+                }
+            }
+        };
+        runAttack.start();
         
-        int attackDamage = originPlayer.getDamage();
-        int frameWidth = 800;
-        int frameHeight = 600;
-        int centerX = frameWidth/2;
-        int centerY = frameHeight/2;
-
-        //Get a point a set distance away from the center of the screen in the direction of the click
-        int vectorX = clickX - centerX;
-        int vectorY = clickY - centerY;  
-        int distance = 20;
-        double normalizedVector = Math.sqrt((vectorX*vectorX)+(vectorY*vectorY));
-
-        //Avoids 0/0 division edge case
-        if (normalizedVector == 0) normalizedVector = 1; 
-        double normalizedX = vectorX/normalizedVector;
-        double normalizedY = vectorY/normalizedVector;
-        int attackScreenX = (int) (centerX + distance*normalizedX);
-        int attackScreenY = (int) (centerY + distance*normalizedY);
-
-        int playerScreenX = frameWidth/2 - originPlayer.getWidth()/2;
-        int playerScreenY = frameHeight/2 - originPlayer.getHeight()/2;
-
-        int worldX = (originPlayer.getWorldX() - playerScreenX) + attackScreenX;
-        int worldY = (originPlayer.getWorldY() - playerScreenY) + attackScreenY;
-
-        Attack playerAttack = null;
-        int attackHeight;
-        int attackWidth;
-        if (originPlayer.getIdentifier() == NetworkProtocol.FASTCAT.toCharArray()[0]){
-            attackWidth = 40;
-            attackHeight = 40;
-            playerAttack = new PlayerSlash(cid, originPlayer, worldX-attackWidth/2, worldY - attackHeight/2, 
-            attackDamage, true);
-        } 
-        else if (originPlayer.getIdentifier() == NetworkProtocol.HEAVYCAT.toCharArray()[0]){
-            attackWidth = 80;
-            attackHeight = 80;
-            playerAttack = new PlayerSmash(cid, originPlayer, worldX-attackWidth/2, worldY - attackHeight/2, 
-            attackDamage, true);
-        }
-        else if (originPlayer.getIdentifier() == NetworkProtocol.GUNCAT.toCharArray()[0]){
-            attackWidth = 16;
-            attackHeight = 16;
-            playerAttack = new PlayerBullet(cid, originPlayer, worldX-attackWidth/2, worldY - attackHeight/2, 
-            normalizedX, normalizedY, attackDamage, true);
-        }
-        
-        if(playerAttack != null){
-            playerAttack.setCurrentRoom(originPlayer.getCurrentRoom());
-            originPlayer.triggerCoolDown();
-            originPlayer.runAttackFrames();
-            addEntity(playerAttack); 
-        }
 
         // System.out.println("Created PlayerSlash: " + playerAttack.getId() + " at (" + playerAttack.getWorldX() + ", " + playerAttack.getWorldX() + ")");
     }
@@ -689,7 +697,7 @@ public class ServerMaster {
 
         //UI elements
         Item heldItem = userPlayer.getHeldItem();
-        char heldItemIdentifier = '0';
+        String heldItemIdentifier = "0";
         if (heldItem != null) heldItemIdentifier = heldItem.getIdentifier();
 
         sb.append(userPlayer.getXPBarPercent()).append(NetworkProtocol.DELIMITER)
@@ -742,7 +750,7 @@ public class ServerMaster {
             String[] dataParts = userPlayerData.split(NetworkProtocol.SUB_DELIMITER);
             
             // Extract data from it
-            char identifier = dataParts[0].substring(NetworkProtocol.ROOM_CHANGE.length()).toCharArray()[0];
+            String identifier = dataParts[0].substring(NetworkProtocol.ROOM_CHANGE.length());
             // System.out.println("identifier:" + identifier);
             int clientId = Integer.parseInt(dataParts[1]);
             int newX = Integer.parseInt(dataParts[2]);

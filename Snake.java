@@ -14,7 +14,7 @@ public class Snake extends Enemy {
 
     public Snake(int x, int y) {
         id = -1; // Only one instance, doesn't really matter the value but there has to be one
-        identifier = NetworkProtocol.SNAKE.toCharArray()[0];
+        identifier = NetworkProtocol.SNAKE;
         speed = 1;
         height = 48;
         width = 48;

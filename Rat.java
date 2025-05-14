@@ -14,7 +14,7 @@ public class Rat extends Enemy{
 
     public Rat(int x, int y) {
         id = ratCount++;
-        identifier = NetworkProtocol.RAT.toCharArray()[0];
+        identifier = NetworkProtocol.RAT;
         speed = 1;
         height = 16;
         width = 16;

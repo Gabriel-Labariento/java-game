@@ -4,7 +4,7 @@ import java.awt.geom.*;
 public class Goldfish extends Item {
     
     public Goldfish(int x, int y){
-        identifier = NetworkProtocol.GOLDFISH.charAt(0);
+        identifier = NetworkProtocol.GOLDFISH;
         worldX = x;
         worldY = y;
         currentRoom = null;

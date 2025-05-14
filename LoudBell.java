@@ -4,7 +4,7 @@ import java.awt.geom.*;
 public class LoudBell extends Item {
     
     public LoudBell(int x, int y){
-        identifier = NetworkProtocol.LOUDBELL.charAt(0);
+        identifier = NetworkProtocol.LOUDBELL;
         worldX = x;
         worldY = y;
         currentRoom = null;

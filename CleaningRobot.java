@@ -15,7 +15,7 @@ public class CleaningRobot extends Enemy{
 
     public CleaningRobot(int x, int y) {
         id = cleaningRobotNum++;
-        identifier = NetworkProtocol.RAT.toCharArray()[0];
+        identifier = NetworkProtocol.RAT;
         speed = 1;
         height = 16;
         width = 16;

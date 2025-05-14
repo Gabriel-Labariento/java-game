@@ -4,7 +4,7 @@ import java.awt.geom.*;
 public class LightScarf extends Item {
 
     public LightScarf(int x, int y){
-        identifier = NetworkProtocol.LIGHTSCARF.charAt(0);
+        identifier = NetworkProtocol.LIGHTSCARF;
         worldX = x;
         worldY = y;
         currentRoom = null;

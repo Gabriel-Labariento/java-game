@@ -8,7 +8,7 @@ public class PlayerSmash extends Attack{
         attackNum++;
         id = attackNum;
         clientId = cid;
-        identifier = NetworkProtocol.PLAYERSMASH.toCharArray()[0];
+        identifier = NetworkProtocol.PLAYERSMASH;
         owner = entity;
         this.isFriendly = isFriendly;
         damage = d;

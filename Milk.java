@@ -4,7 +4,7 @@ import java.awt.geom.*;
 public class Milk extends Item {
     
     public Milk(int x, int y){
-        identifier = NetworkProtocol.MILK.charAt(0);
+        identifier = NetworkProtocol.MILK;
         worldX = x;
         worldY = y;
         currentRoom = null;

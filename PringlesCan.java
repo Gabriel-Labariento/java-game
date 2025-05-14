@@ -4,7 +4,7 @@ import java.awt.geom.*;
 public class PringlesCan extends Item {
     
     public PringlesCan(int x, int y){
-        identifier = NetworkProtocol.PRINGLESCAN.charAt(0);
+        identifier = NetworkProtocol.PRINGLESCAN;
         worldX = x;
         worldY = y;
         currentRoom = null;

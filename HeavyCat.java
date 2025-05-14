@@ -1,9 +1,6 @@
-import java.awt.Color;
 import java.awt.Graphics2D;
-import java.awt.geom.*;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
-
 import javax.imageio.ImageIO;
 
 public class HeavyCat extends Player{
@@ -15,7 +12,7 @@ public class HeavyCat extends Player{
 
     public HeavyCat(int cid, int x, int y){
         this.clientId = cid;
-        identifier = NetworkProtocol.HEAVYCAT.toCharArray()[0];
+        identifier = NetworkProtocol.HEAVYCAT;
         speed = 2;
         height = 16;
         width = 16;
@@ -29,6 +26,7 @@ public class HeavyCat extends Player{
         isDown = false;
         coolDownDuration = 1200;
         currSprite = 0;
+        attackFrameDuration = 200;
 
         matchHitBoxBounds();
     }
@@ -75,5 +73,23 @@ public class HeavyCat extends Player{
         hitBoxBounds[1] = worldY + height;
         hitBoxBounds[2]= worldX;
         hitBoxBounds[3] = worldX + width;
+    }
+
+    @Override
+    public void runAttackFrames(){
+        int frameCount = 0;
+        while(frameCount < 4){
+            long now = System.currentTimeMillis();
+        
+            if (now - lastSpriteUpdate > attackFrameDuration) {
+                setIsAttacking(true);
+                currSprite++;
+                if (currSprite < 6) currSprite = 6;
+                if (currSprite > 8) currSprite = 3;
+                lastSpriteUpdate = now;
+                frameCount++;
+            }
+        }
+        setIsAttacking(false);
     }
 }

@@ -4,7 +4,7 @@ import java.awt.geom.*;
 public class RedFish extends Item {
     
     public RedFish(int x, int y){
-        identifier = NetworkProtocol.REDFISH.charAt(0);
+        identifier = NetworkProtocol.REDFISH;
         worldX = x;
         worldY = y;
         currentRoom = null;

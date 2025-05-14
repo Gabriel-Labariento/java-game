@@ -10,7 +10,7 @@ public class PlayerBullet extends Attack{
         attackNum++;
         id = attackNum;
         clientId = cid;
-        identifier = NetworkProtocol.PLAYERBULLET.toCharArray()[0];
+        identifier = NetworkProtocol.PLAYERBULLET;
         owner = entity;
         this.isFriendly = isFriendly;
         damage = d;

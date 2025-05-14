@@ -2,7 +2,7 @@ import java.awt.Graphics2D;
 
 public abstract class Entity extends GameObject {
     protected int id;
-    protected char identifier;
+    protected String identifier;
     // protected BufferedImage[] sprites;
     protected int prevWorldX;
     protected int prevWorldY;
@@ -15,6 +15,7 @@ public abstract class Entity extends GameObject {
     protected int currSprite;
     protected int damage;
     protected boolean isAttacking;
+    protected int attackFrameDuration;
     public Room currentRoom;
     protected static final int SPRITE_FRAME_DURATION = 200;
     protected long lastSpriteUpdate = 0;
@@ -27,7 +28,7 @@ public abstract class Entity extends GameObject {
         return clientId;
     }
 
-    public char getIdentifier(){
+    public String getIdentifier(){
         return identifier;
     }
 
@@ -79,26 +80,8 @@ public abstract class Entity extends GameObject {
 
     public void runAttackFrames(){
         //TEMPORARY
-        Thread attackFramesthread = new Thread(){
-            @Override
-            public void run(){
-                int frameCount = 0;
-                while(frameCount < 3){
-                    long now = System.currentTimeMillis();
-                
-                    if (now - lastSpriteUpdate > SPRITE_FRAME_DURATION) {
-                        setIsAttacking(true);
-                        currSprite++;
-                        if (currSprite < 6 || currSprite > 8) currSprite = 6;
-                        lastSpriteUpdate = now;
-                        frameCount++;
-                    }
-                    
-                }
-                setIsAttacking(false);
-            }
-        };
-        attackFramesthread.start();
+        
+        
     }
 
     /**
