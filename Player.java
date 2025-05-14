@@ -293,4 +293,22 @@ public abstract class Player extends Entity{
             ts.triggerRegenSystem();
         }
     }
+
+    @Override
+    public void runAttackFrames(){
+        int frameCount = 0;
+        while(frameCount < 4){
+            long now = System.currentTimeMillis();
+        
+            if (now - lastSpriteUpdate > attackFrameDuration) {
+                setIsAttacking(true);
+                currSprite++;
+                if (currSprite < 6) currSprite = 6;
+                if (currSprite > 8) currSprite = 3;
+                lastSpriteUpdate = now;
+                frameCount++;
+            }
+        }
+        setIsAttacking(false);
+    }
 }

@@ -100,6 +100,9 @@ public class ServerMaster {
 
     private void handleDownsAndRevives(Player player) {
         //DOWNING AND REVIVAL MECHANICS
+            //Set death sprite
+            player.setCurrSprite(9);
+
             //If the player has not yet been recorded as being downed, set them as such
             if (!player.getIsDown()){
                 player.setIsDown(true);
@@ -137,7 +140,10 @@ public class ServerMaster {
             if(player.getIsReviving() && player.getIsRevived()){
                 player.setHitPoints(1);
                 player.setIsDown(false);
-                //Insert revival animation
+
+                //Remove death sprite
+                player.setCurrSprite(3);
+                
             }
         }
     

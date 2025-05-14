@@ -42,7 +42,8 @@ public class HeavyCat extends Player{
             BufferedImage attack0 = ImageIO.read(HeavyCat.class.getResourceAsStream("resources/Sprites/HeavyCat/attack0.png"));
             BufferedImage attack1 = ImageIO.read(HeavyCat.class.getResourceAsStream("resources/Sprites/HeavyCat/attack1.png"));
             BufferedImage attack2 = ImageIO.read(HeavyCat.class.getResourceAsStream("resources/Sprites/HeavyCat/attack2.png"));
-            sprites = new BufferedImage[] {left0, left1, left2, right0, right1, right2, attack0, attack1, attack2};
+            BufferedImage death = ImageIO.read(HeavyCat.class.getResourceAsStream("resources/Sprites/HeavyCat/death.png"));
+            sprites = new BufferedImage[] {left0, left1, left2, right0, right1, right2, attack0, attack1, attack2, death};
 
         } catch (IOException e) {
             System.out.println("Exception in Rat setSprites()" + e);
@@ -75,21 +76,5 @@ public class HeavyCat extends Player{
         hitBoxBounds[3] = worldX + width;
     }
 
-    @Override
-    public void runAttackFrames(){
-        int frameCount = 0;
-        while(frameCount < 4){
-            long now = System.currentTimeMillis();
-        
-            if (now - lastSpriteUpdate > attackFrameDuration) {
-                setIsAttacking(true);
-                currSprite++;
-                if (currSprite < 6) currSprite = 6;
-                if (currSprite > 8) currSprite = 3;
-                lastSpriteUpdate = now;
-                frameCount++;
-            }
-        }
-        setIsAttacking(false);
-    }
+
 }

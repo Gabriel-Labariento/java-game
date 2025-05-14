@@ -26,7 +26,7 @@ public class GunCat extends Player{
         damage = 5;
         isDown = false;
         coolDownDuration = 800;
-        attackFrameDuration = 200;
+        attackFrameDuration = 75;
         matchHitBoxBounds();
     }
 
@@ -51,7 +51,8 @@ public class GunCat extends Player{
             BufferedImage attack0 = ImageIO.read(GunCat.class.getResourceAsStream("resources/Sprites/GunCat/attack0.png"));
             BufferedImage attack1 = ImageIO.read(GunCat.class.getResourceAsStream("resources/Sprites/GunCat/attack1.png"));
             BufferedImage attack2 = ImageIO.read(GunCat.class.getResourceAsStream("resources/Sprites/GunCat/attack2.png"));
-            sprites = new BufferedImage[] {left0, left1, left2, right0, right1, right2, attack0, attack1, attack2};
+            BufferedImage death = ImageIO.read(GunCat.class.getResourceAsStream("resources/Sprites/GunCat/death.png"));
+            sprites = new BufferedImage[] {left0, left1, left2, right0, right1, right2, attack0, attack1, attack2, death};
 
         } catch (IOException e) {
             System.out.println("Exception in Rat setSprites()" + e);
