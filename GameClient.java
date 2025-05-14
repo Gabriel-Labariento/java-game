@@ -155,7 +155,7 @@ public class GameClient {
      */
     private void parseEntitiesData(String message){
 
-        // System.out.println(message);
+        System.out.println(message);
         String[] messageParts = message.split("\\" + NetworkProtocol.DELIMITER); // Have to use \\ to escape. Turns out "|" is special for java
         this.clientId = Integer.parseInt(messageParts[0]);
         clientMaster.setXPBarPercent(Integer.parseInt(messageParts[1]));
@@ -202,7 +202,7 @@ public class GameClient {
                 int x = Integer.parseInt(otherPlayerData[2]);
                 int y = Integer.parseInt(otherPlayerData[3]);
                 int hp = Integer.parseInt(otherPlayerData[4]);
-                int currsprite = Integer.parseInt(otherPlayerData[5]);
+                int currsprite = Integer.parseInt(otherPlayerData[6]);
                 
                 
                 // Only load the player if it is not the user player and it is in the same room
