@@ -4,7 +4,6 @@ import java.io.IOException;
 import javax.imageio.ImageIO;
 
 public class Snakelet extends Enemy{
-    public static int snakeletCount = 0;
     private int id;
     private static final int SPRITE_FRAME_DURATION = 200;
     private long lastSpriteUpdate = 0;
@@ -15,8 +14,8 @@ public class Snakelet extends Enemy{
     }
 
     public Snakelet(int x, int y) {
-        id = snakeletCount++;
-        identifier = NetworkProtocol.SNAKELET.toCharArray()[0];
+        id = enemyCount++;
+        identifier = NetworkProtocol.SNAKELET;
         speed = 2;
         height = 16;
         width = 16;

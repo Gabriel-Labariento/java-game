@@ -2,6 +2,7 @@
 import java.util.ArrayList;
 
 public abstract class Enemy extends Entity {
+    protected static int enemyCount = Integer.MIN_VALUE;
     public ArrayList<Integer> attacksTakenById;
     public int rewardXP;
     public boolean isBoss;

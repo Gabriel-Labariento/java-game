@@ -5,7 +5,7 @@ import java.awt.geom.*;
 public class FastCat extends Player{
     public FastCat(int cid, int x, int y){
         this.clientId = cid;
-        identifier = NetworkProtocol.FASTCAT.toCharArray()[0];
+        identifier = NetworkProtocol.FASTCAT;
         speed = 4;
         height = 16;
         width = 16;

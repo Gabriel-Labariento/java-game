@@ -4,7 +4,6 @@ import java.io.IOException;
 import javax.imageio.ImageIO;
 
 public class SmallDog extends Enemy{
-    public static int dogCount = 0;
     private static final int SPRITE_FRAME_DURATION = 200;
     private static final int ATTACK_COOLDOWN = 1500;
     private long lastSpriteUpdate = 0;
@@ -16,8 +15,8 @@ public class SmallDog extends Enemy{
     }
 
     public SmallDog(int x, int y) {
-        id = dogCount++;
-        identifier = NetworkProtocol.SMALLDOG.toCharArray()[0];
+        id = enemyCount++;
+        identifier = NetworkProtocol.SMALLDOG;
         speed = 1;
         height = 16;
         width = 20;

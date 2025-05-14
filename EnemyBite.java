@@ -20,7 +20,7 @@ public class EnemyBite extends Attack{
     public EnemyBite(Entity owner, int x, int y){
         attackNum++;
         id = attackNum;
-        identifier = NetworkProtocol.ENEMYBITE.toCharArray()[0];
+        identifier = NetworkProtocol.ENEMYBITE;
         this.owner = owner;
         isFriendly = false;
         damage = 1;

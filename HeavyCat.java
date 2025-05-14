@@ -5,7 +5,7 @@ import java.awt.geom.*;
 public class HeavyCat extends Player{
     public HeavyCat(int cid, int x, int y){
         this.clientId = cid;
-        identifier = NetworkProtocol.HEAVYCAT.toCharArray()[0];
+        identifier = NetworkProtocol.HEAVYCAT;
         speed = 2;
         height = 16;
         width = 16;

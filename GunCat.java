@@ -5,7 +5,7 @@ import java.awt.geom.*;
 public class GunCat extends Player{
     public GunCat(int cid, int x, int y){
         this.clientId = cid;
-        identifier = NetworkProtocol.GUNCAT.toCharArray()[0];
+        identifier = NetworkProtocol.GUNCAT;
         speed = 3;
         height = 16;
         width = 16;

@@ -20,7 +20,7 @@ public class EnemyBark extends Attack{
     public EnemyBark(Entity owner, int x, int y){
         attackNum++;
         id = attackNum;
-        identifier = NetworkProtocol.ENEMYBARK.toCharArray()[0];
+        identifier = NetworkProtocol.ENEMYBARK;
         this.owner = owner;
         isFriendly = false;
         damage = 1;

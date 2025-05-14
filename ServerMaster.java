@@ -603,19 +603,19 @@ public class ServerMaster {
         Attack playerAttack = null;
         int attackHeight;
         int attackWidth;
-        if (originPlayer.getIdentifier() == NetworkProtocol.FASTCAT.toCharArray()[0]){
+        if (originPlayer.getIdentifier().equals(NetworkProtocol.FASTCAT)){
             attackWidth = 40;
             attackHeight = 40;
             playerAttack = new PlayerSlash(cid, originPlayer, worldX-attackWidth/2, worldY - attackHeight/2, 
             attackDamage, true);
         } 
-        else if (originPlayer.getIdentifier() == NetworkProtocol.HEAVYCAT.toCharArray()[0]){
+        else if (originPlayer.getIdentifier().equals(NetworkProtocol.HEAVYCAT)){
             attackWidth = 80;
             attackHeight = 80;
             playerAttack = new PlayerSmash(cid, originPlayer, worldX-attackWidth/2, worldY - attackHeight/2, 
             attackDamage, true);
         }
-        else if (originPlayer.getIdentifier() == NetworkProtocol.GUNCAT.toCharArray()[0]){
+        else if (originPlayer.getIdentifier().equals(NetworkProtocol.GUNCAT)){
             attackWidth = 16;
             attackHeight = 16;
             playerAttack = new PlayerBullet(originPlayer, worldX-attackWidth/2, worldY - attackHeight/2, 
@@ -703,7 +703,7 @@ public class ServerMaster {
 
         //UI elements
         Item heldItem = userPlayer.getHeldItem();
-        char heldItemIdentifier = '0';
+        String heldItemIdentifier = "0";
         if (heldItem != null) heldItemIdentifier = heldItem.getIdentifier();
 
         sb.append(userPlayer.getXPBarPercent()).append(NetworkProtocol.DELIMITER)

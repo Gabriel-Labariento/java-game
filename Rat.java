@@ -4,7 +4,6 @@ import java.io.IOException;
 import javax.imageio.ImageIO;
 
 public class Rat extends Enemy{
-    public static int ratCount = 0;
     private static final int SPRITE_FRAME_DURATION = 200;
     private static final int BITE_COOLDOWN = 1500;
     private long lastSpriteUpdate = 0;
@@ -16,8 +15,8 @@ public class Rat extends Enemy{
     }
 
     public Rat(int x, int y) {
-        id = ratCount++;
-        identifier = NetworkProtocol.RAT.toCharArray()[0];
+        id = enemyCount++;
+        identifier = NetworkProtocol.RAT;
         speed = 1;
         height = 16;
         width = 16;

@@ -4,7 +4,7 @@ import java.awt.geom.*;
 public class CatTreat extends Item {
     
     public CatTreat(int x, int y){
-        identifier = NetworkProtocol.CATTREAT.charAt(0);
+        identifier = NetworkProtocol.CATTREAT;
         worldX = x;
         worldY = y;
         currentRoom = null;

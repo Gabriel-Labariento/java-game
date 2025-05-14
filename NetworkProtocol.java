@@ -11,17 +11,34 @@ public class NetworkProtocol {
     public static final String PLAYERSMASH = "D";
     public static final String PLAYERSLASH = "E";
     public static final String PLAYERBULLET = "F";
-    public static final String RAT = "G"; // Rat
-    public static final String RATKING = "H";
-    public static final String SNAKELET = "I";
-    public static final String SNAKE = "J";
-    public static final String SPIDER = "K";
-    public static final String SPIDERBULLET = "L";
-    public static final String COCKROACH = "M";
-    public static final String ENEMYBITE = "N";
-    public static final String SMALLDOG = "O";
-    public static final String ENEMYBARK = "P";
-    public static final String BUNNY = "Q";
+    public static final String SPIDER = "G";
+    public static final String COCKROACH = "H";
+    public static final String RAT = "I";
+    public static final String SMALLDOG = "J";
+    public static final String BUNNY = "K";
+    public static final String FROG = "L";
+    public static final String BEE = "M";
+    public static final String SNAKELET = "N";
+    public static final String CLEANINGBOT = "O";
+    public static final String SECURITYBOT = "P";
+    public static final String FERALRAT = "Q";
+    public static final String SCREAMERRAT = "R";
+    public static final String MUTATEDANCHOVY = "S";
+    public static final String MUTATEDARCHERFISH = "T"; // Rat
+    public static final String MUTATEDPUFFERFISH= "U";
+    public static final String RATKING = "V";
+    public static final String FERALDOG = "W";
+    public static final String TURTLE = "X";
+    public static final String SNAKE = "Y";
+    public static final String ADULTCAT = "Z";
+    public static final String CONJOINEDRATS = "AA";
+    public static final String FISHMONSTER = "AB";
+    public static final String SPIDERBULLET = "AC";
+
+    public static final String ENEMYBARK = "ZY";
+    public static final String ENEMYBITE = "ZZ";
+    
+
     public static final String REDFISH = "1"; // Rat
     public static final String CATTREAT = "2"; // Rat
     public static final String MILK = "3"; // Rat
@@ -38,11 +55,10 @@ public class NetworkProtocol {
     public static final String ROOM_CHANGE = "RC:";
     public static final String LEVEL_CHANGE = "LC:";
     public static final String BOSS_KILLED = "BK:";
-    public static final String HP = "@";
+    public static final String HP = "*";
     public static final String ATTACK = "ATK:";
     public static final String KEYS = "K:";
     public static final String CLICK = "CLK:";
     public static final String DELIMITER = "|";
     public static final String SUB_DELIMITER = ",";
-    
 }

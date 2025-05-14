@@ -4,7 +4,7 @@ import java.awt.geom.*;
 public class PremiumCatFood extends Item {
     
     public PremiumCatFood(int x, int y){
-        identifier = NetworkProtocol.PREMIUMCATFOOD.charAt(0);
+        identifier = NetworkProtocol.PREMIUMCATFOOD;
         worldX = x;
         worldY = y;
         currentRoom = null;

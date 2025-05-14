@@ -4,7 +4,6 @@ import java.io.IOException;
 import javax.imageio.ImageIO;
 
 public class Cockroach extends Enemy{
-    public static int cockRoachCount = 0;
     private static final int SPRITE_FRAME_DURATION = 200;
     private static final int IDLE_DURATION = 400;
     private static final int ATTACK_DURATION = 300;
@@ -20,8 +19,8 @@ public class Cockroach extends Enemy{
     }
 
     public Cockroach(int x, int y) {
-        id = cockRoachCount++;
-        identifier = NetworkProtocol.COCKROACH.toCharArray()[0];
+        id = enemyCount++;
+        identifier = NetworkProtocol.COCKROACH;
         speed = 1;
         height = 16;
         width = 16;

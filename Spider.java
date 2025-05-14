@@ -17,7 +17,7 @@ public class Spider extends Enemy{
 
     public Spider(int x, int y) {
         id = spiderCount++;
-        identifier = NetworkProtocol.SPIDER.toCharArray()[0];
+        identifier = NetworkProtocol.SPIDER;
         speed = 1;
         height = 16;
         width = 16;

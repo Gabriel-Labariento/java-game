@@ -160,14 +160,14 @@ public class GameClient {
         this.clientId = Integer.parseInt(messageParts[0]);
         clientMaster.setXPBarPercent(Integer.parseInt(messageParts[1]));
         clientMaster.setUserLvl(Integer.parseInt(messageParts[2]));
-        clientMaster.setHeldItemIdentifier(messageParts[3].charAt(0));
+        clientMaster.setHeldItemIdentifier(messageParts[3]);
 
         for (String part : messageParts) {
             if (part.startsWith(NetworkProtocol.USER_PLAYER)) {
                 // System.out.println("Parsing player");
                 String[] playerData = part.substring(NetworkProtocol.USER_PLAYER.length()).split(NetworkProtocol.SUB_DELIMITER);
                 // System.out.println("User player data: " + part);
-                char identifier = playerData[0].toCharArray()[0];
+                String identifier = playerData[0];
                 int playerId = Integer.parseInt(playerData[1]);
                 int playerX = Integer.parseInt(playerData[2]);
                 int playerY = Integer.parseInt(playerData[3]);
@@ -195,7 +195,7 @@ public class GameClient {
                 int otherRoomId = Integer.parseInt(otherPlayerData[5]);
                 if (otherRoomId != clientMaster.getCurrentRoom().getRoomId()) continue;
 
-                char identifier = otherPlayerData[0].toCharArray()[0];
+                String identifier = otherPlayerData[0];
                 int otherId = Integer.parseInt(otherPlayerData[1]);
                 int x = Integer.parseInt(otherPlayerData[2]);
                 int y = Integer.parseInt(otherPlayerData[3]);
@@ -222,7 +222,7 @@ public class GameClient {
                     int roomId = Integer.parseInt(entityData[4]);
                     if (!(roomId == clientMaster.getCurrentRoom().getRoomId())) continue;
                     
-                    char identifier = entityData[0].toCharArray()[0];
+                    String identifier = entityData[0];
                     int id = Integer.parseInt(entityData[1]);
                     int x = Integer.parseInt(entityData[2]);
                     int y = Integer.parseInt(entityData[3]);
@@ -233,7 +233,7 @@ public class GameClient {
                     int roomId = Integer.parseInt(entityData[4]);
                     if (!(roomId == clientMaster.getCurrentRoom().getRoomId())) continue;
                     
-                    char identifier = entityData[0].toCharArray()[0];
+                    String identifier = entityData[0];
                     int id = Integer.parseInt(entityData[1]);
                     int x = Integer.parseInt(entityData[2]);
                     int y = Integer.parseInt(entityData[3]);

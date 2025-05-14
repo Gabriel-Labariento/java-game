@@ -8,7 +8,7 @@ public class ThickSweater extends Item {
 
     
     public ThickSweater(int x, int y){
-        identifier = NetworkProtocol.THICKSWEATER.charAt(0);
+        identifier = NetworkProtocol.THICKSWEATER;
         worldX = x;
         worldY = y;
         currentRoom = null;

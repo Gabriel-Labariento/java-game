@@ -2,7 +2,7 @@ import java.awt.Graphics2D;
 
 public abstract class Entity extends GameObject {
     protected int id;
-    protected char identifier;
+    protected String identifier;
     // protected BufferedImage[] sprites;
     protected int prevWorldX;
     protected int prevWorldY;
@@ -24,7 +24,7 @@ public abstract class Entity extends GameObject {
         return clientId;
     }
 
-    public char getIdentifier(){
+    public String getIdentifier(){
         return identifier;
     }
 

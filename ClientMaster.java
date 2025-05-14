@@ -8,37 +8,37 @@ public class ClientMaster {
     private CopyOnWriteArrayList<Entity> entities; 
     private int xpBarPercent;
     private int userLvl;
-    private char heldItemIdentifier;
-    private static final HashMap<Character, String> IDENTIFIERTONAME = new HashMap<>();
+    private String heldItemIdentifier;
+    private static final HashMap<String, String> IDENTIFIERTONAME = new HashMap<>();
     static {
         //Initiliaze IDENTIFIERTONAME hashmap using static block
-        IDENTIFIERTONAME.put(NetworkProtocol.REDFISH.charAt(0), "Redfish");
-        IDENTIFIERTONAME.put(NetworkProtocol.CATTREAT.charAt(0), "Cat Treat");
-        IDENTIFIERTONAME.put(NetworkProtocol.MILK.charAt(0), "Milk");
-        IDENTIFIERTONAME.put(NetworkProtocol.PREMIUMCATFOOD.charAt(0), "Premium Cat Food++");
-        IDENTIFIERTONAME.put(NetworkProtocol.GOLDFISH.charAt(0), "Goldfish");
-        IDENTIFIERTONAME.put(NetworkProtocol.LIGHTSCARF.charAt(0), "Light Scarf");
-        IDENTIFIERTONAME.put(NetworkProtocol.THICKSWEATER.charAt(0), "Thick Sweater");
-        IDENTIFIERTONAME.put(NetworkProtocol.BAGOFCATNIP.charAt(0), "Bag of Catnip");
-        IDENTIFIERTONAME.put(NetworkProtocol.LOUDBELL.charAt(0), "Loud Bell");
-        IDENTIFIERTONAME.put(NetworkProtocol.PRINGLESCAN.charAt(0), "Pringles Can");
-        IDENTIFIERTONAME.put(NetworkProtocol.HEAVYCAT.charAt(0), "HeavyCat");
-        IDENTIFIERTONAME.put(NetworkProtocol.FASTCAT.charAt(0), "FastCat");
-        IDENTIFIERTONAME.put(NetworkProtocol.GUNCAT.charAt(0), "GunCat");
-        IDENTIFIERTONAME.put(NetworkProtocol.PLAYERSMASH.charAt(0), "PlayerSmash");
-        IDENTIFIERTONAME.put(NetworkProtocol.PLAYERSLASH.charAt(0), "PlayerSlash");
-        IDENTIFIERTONAME.put(NetworkProtocol.PLAYERBULLET.charAt(0), "PlayerBullet");
-        IDENTIFIERTONAME.put(NetworkProtocol.RAT.charAt(0), "Rat");
-        IDENTIFIERTONAME.put(NetworkProtocol.ENEMYBITE.charAt(0), "EnemyBite");
-        IDENTIFIERTONAME.put(NetworkProtocol.ENEMYBARK.charAt(0), "EnemyBark");
-        IDENTIFIERTONAME.put(NetworkProtocol.RATKING.charAt(0), "RatKing");
-        IDENTIFIERTONAME.put(NetworkProtocol.SNAKE.charAt(0), "Snake");
-        IDENTIFIERTONAME.put(NetworkProtocol.SNAKELET.charAt(0), "Snakelet");
-        IDENTIFIERTONAME.put(NetworkProtocol.SPIDER.charAt(0), "Spider");
-        IDENTIFIERTONAME.put(NetworkProtocol.SPIDERBULLET.charAt(0), "SpiderBullet");
-        IDENTIFIERTONAME.put(NetworkProtocol.COCKROACH.charAt(0), "Cockroach");
-        IDENTIFIERTONAME.put(NetworkProtocol.SMALLDOG.charAt(0), "SmallDog");
-        IDENTIFIERTONAME.put(NetworkProtocol.BUNNY.charAt(0), "Bunny");
+        IDENTIFIERTONAME.put(NetworkProtocol.REDFISH, "Redfish");
+        IDENTIFIERTONAME.put(NetworkProtocol.CATTREAT, "Cat Treat");
+        IDENTIFIERTONAME.put(NetworkProtocol.MILK, "Milk");
+        IDENTIFIERTONAME.put(NetworkProtocol.PREMIUMCATFOOD, "Premium Cat Food++");
+        IDENTIFIERTONAME.put(NetworkProtocol.GOLDFISH, "Goldfish");
+        IDENTIFIERTONAME.put(NetworkProtocol.LIGHTSCARF, "Light Scarf");
+        IDENTIFIERTONAME.put(NetworkProtocol.THICKSWEATER, "Thick Sweater");
+        IDENTIFIERTONAME.put(NetworkProtocol.BAGOFCATNIP, "Bag of Catnip");
+        IDENTIFIERTONAME.put(NetworkProtocol.LOUDBELL, "Loud Bell");
+        IDENTIFIERTONAME.put(NetworkProtocol.PRINGLESCAN, "Pringles Can");
+        IDENTIFIERTONAME.put(NetworkProtocol.HEAVYCAT, "HeavyCat");
+        IDENTIFIERTONAME.put(NetworkProtocol.FASTCAT, "FastCat");
+        IDENTIFIERTONAME.put(NetworkProtocol.GUNCAT, "GunCat");
+        IDENTIFIERTONAME.put(NetworkProtocol.PLAYERSMASH, "PlayerSmash");
+        IDENTIFIERTONAME.put(NetworkProtocol.PLAYERSLASH, "PlayerSlash");
+        IDENTIFIERTONAME.put(NetworkProtocol.PLAYERBULLET, "PlayerBullet");
+        IDENTIFIERTONAME.put(NetworkProtocol.RAT, "Rat");
+        IDENTIFIERTONAME.put(NetworkProtocol.ENEMYBITE, "EnemyBite");
+        IDENTIFIERTONAME.put(NetworkProtocol.ENEMYBARK, "EnemyBark");
+        IDENTIFIERTONAME.put(NetworkProtocol.RATKING, "RatKing");
+        IDENTIFIERTONAME.put(NetworkProtocol.SNAKE, "Snake");
+        IDENTIFIERTONAME.put(NetworkProtocol.SNAKELET, "Snakelet");
+        IDENTIFIERTONAME.put(NetworkProtocol.SPIDER, "Spider");
+        IDENTIFIERTONAME.put(NetworkProtocol.SPIDERBULLET, "SpiderBullet");
+        IDENTIFIERTONAME.put(NetworkProtocol.COCKROACH, "Cockroach");
+        IDENTIFIERTONAME.put(NetworkProtocol.SMALLDOG, "SmallDog");
+        IDENTIFIERTONAME.put(NetworkProtocol.BUNNY, "Bunny");
     }
 
     public ClientMaster(){
@@ -81,7 +81,7 @@ public class ClientMaster {
     }
 
 
-    public Entity getEntity(char identifier, int id, int x, int y){
+    public Entity getEntity(String identifier, int id, int x, int y){
         String name = IDENTIFIERTONAME.get(identifier);
         if (name == null) return null;
         switch (name){
@@ -144,7 +144,7 @@ public class ClientMaster {
         }
     }
 
-    public void loadEntity(char identifier, int id, int x, int y, int roomId, int sprite){
+    public void loadEntity(String identifier, int id, int x, int y, int roomId, int sprite){
         // System.out.println("Loading entity " + identifier + " " + name + "at " + x + ", " + y);
         // if (name == null) System.out.println("Warning: unknown identity identifier " + identifier);
         Entity e = getEntity(identifier, id, x, y);
@@ -157,7 +157,7 @@ public class ClientMaster {
         }    
     }
 
-    public void setHeldItemIdentifier(char identifier){
+    public void setHeldItemIdentifier(String identifier){
         heldItemIdentifier = identifier;
         // System.out.println(heldItemIdentifier);
     }

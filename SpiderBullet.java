@@ -22,7 +22,7 @@ import javax.imageio.ImageIO;
         public SpiderBullet(Entity owner, int x, int y, double nX, double nY){
             attackNum++;
             id = attackNum;
-            identifier = NetworkProtocol.SPIDERBULLET.toCharArray()[0];
+            identifier = NetworkProtocol.SPIDERBULLET;
             this.owner = owner;
             isFriendly = false;
             damage = 1;

@@ -4,7 +4,6 @@ import java.io.IOException;
 import javax.imageio.ImageIO;
 
 public class Bunny extends Enemy{
-    public static int bunnyCount = 0;
     private static final int SPRITE_FRAME_DURATION = 200;
     private static final int BITE_COOLDOWN = 1500;
     private static final int BITE_DISTANCE = GameCanvas.TILESIZE * 2;
@@ -17,8 +16,8 @@ public class Bunny extends Enemy{
     }
 
     public Bunny(int x, int y) {
-        id = bunnyCount++;
-        identifier = NetworkProtocol.BUNNY.toCharArray()[0];
+        id = enemyCount++;
+        identifier = NetworkProtocol.BUNNY;
         speed = 1;
         height = 16;
         width = 20;
