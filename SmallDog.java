@@ -88,7 +88,7 @@ public class SmallDog extends Enemy{
         double distanceSquared = getSquaredDistanceBetween(this, pursued);
         if ( distanceSquared <= BITE_DISTANCE * BITE_DISTANCE) {
             if (now - lastAttackTime > ATTACK_COOLDOWN ) {
-                createBiteAttack(gsm, pursued);
+                createBiteAttack(gsm, pursued, null);
                 lastAttackTime = now;
             }
         } else if (distanceSquared <  BARK_DISTANCE * BARK_DISTANCE) {

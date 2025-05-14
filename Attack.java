@@ -1,3 +1,6 @@
+
+import java.util.ArrayList;
+
 public abstract class Attack extends Entity{
     public static int attackNum = Integer.MIN_VALUE;
     public int duration;
@@ -7,6 +10,11 @@ public abstract class Attack extends Entity{
     public boolean isFriendly;
     public boolean isOffsetInitialized;
     public Entity owner;
+    private ArrayList<StatusEffect> attackEffects;
+
+    public Attack(){
+        attackEffects = new ArrayList<>();
+    }
 
     @Override
     public String getAssetData(boolean isUserPlayer) {
@@ -59,5 +67,13 @@ public abstract class Attack extends Entity{
 
     public boolean getIsFriendly(){
         return isFriendly;
+    }
+
+    public void addAttackEffect(StatusEffect se){
+        attackEffects.add(se);
+    }
+
+    public ArrayList<StatusEffect> getAttackEffects() {
+        return attackEffects;
     }
 }

@@ -61,7 +61,7 @@ public abstract class Enemy extends Entity {
         else if (player.getCenterY() < getCenterY()) worldY -= speed;
     }
 
-    public void createBiteAttack(ServerMaster gsm, Player target){
+    public void createBiteAttack(ServerMaster gsm, Player target, StatusEffect effect){
         int vectorX = target.getCenterX() - getCenterX();
         int vectorY = target.getCenterY() - getCenterY(); 
         double normalizedVector = Math.sqrt((vectorX*vectorX)+(vectorY*vectorY));
@@ -72,12 +72,13 @@ public abstract class Enemy extends Entity {
         double normalizedY = vectorY / normalizedVector;
 
         int biteDistance = GameCanvas.TILESIZE;
-        int biteX = (int) (worldX + normalizedX * biteDistance);
-        int biteY = (int) (worldY + normalizedY * biteDistance);
+        int biteX = (int) (this.getCenterX() + normalizedX * biteDistance);
+        int biteY = (int) (this.getCenterY() + normalizedY * biteDistance);
         biteX -= EnemyBite.WIDTH / 2;
         biteY -= EnemyBite.HEIGHT / 2;
 
         EnemyBite eb = new EnemyBite(this, biteX, biteY);
+        eb.addAttackEffect(effect);
         gsm.addEntity(eb);
     }
     

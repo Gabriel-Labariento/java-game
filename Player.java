@@ -1,4 +1,8 @@
-public abstract class Player extends Entity{
+
+import java.util.ArrayList;
+import java.util.Iterator;
+
+public abstract class Player extends Entity implements Effectable{
     public static final int INVINCIBILITY_DURATION = 1000;
     public static final int REVIVAL_DURATION = 5000;
     public int coolDownDuration;
@@ -14,11 +18,13 @@ public abstract class Player extends Entity{
     public int currentXPCap;
     public int pastXPCap;
     public Item heldItem;
+    private ArrayList<StatusEffect> statusEffects;
 
     public Player(){
         currentLvl = 1;
         currentXPCap = 100;
         heldItem = null;
+        statusEffects = new ArrayList<>();
     }
 
     public void applyXP(int xp){
@@ -147,7 +153,7 @@ public abstract class Player extends Entity{
     }
 
     public boolean getIsInvincible(){
-        return System.currentTimeMillis() >= invincibilityEnd;
+        return System.currentTimeMillis() < invincibilityEnd;
     }
 
     /**
@@ -272,5 +278,32 @@ public abstract class Player extends Entity{
         if(heldItem instanceof ThickSweater ts){
             ts.triggerRegenSystem();
         }
+        updateStatusEffects();
     }
+
+    @Override
+    public void matchHitBoxBounds() {}
+
+    @Override
+        public void updateStatusEffects(){
+            if (statusEffects.isEmpty()) return;
+            Iterator<StatusEffect> iter = statusEffects.iterator();
+            
+            while(iter.hasNext()){
+                StatusEffect currEffect = iter.next();
+                currEffect.tick(this);
+                if (currEffect.isExpired()) {
+                    currEffect.removeStatusEffect(this);
+                    iter.remove();
+                }
+            }
+        }
+
+    @Override
+    public void addStatusffect(StatusEffect se) {
+        statusEffects.add(se);
+    };
+    
+    
+    
 }

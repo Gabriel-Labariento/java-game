@@ -420,7 +420,7 @@ public class ServerMaster {
     //Players generate i-frames when damaged
     private void damagePlayer(Player player, Entity entity){
         //Debouncing condition
-        if(player.getIsInvincible()){
+        if(!player.getIsInvincible()){
             //Calculate damage taken: new health = current health - (damage*(1-(defense/100)))
             double dmgMitigationFactor = (1-(player.getDefense()/100.0));
             if(dmgMitigationFactor < 0) dmgMitigationFactor = 0;
@@ -428,8 +428,18 @@ public class ServerMaster {
             player.setHitPoints(player.getHitPoints()-dmgReceived);
             applyKnockBack(player, entity);
             player.triggerInvincibility();
+            
+            if (entity instanceof Attack attack) {
+                applyAttackEffectsToPlayer(player, attack);
+            } 
         }
+    }
 
+    private void applyAttackEffectsToPlayer(Player player, Attack attack){
+        for (StatusEffect se : attack.getAttackEffects()) {
+            StatusEffect effectCopy = (StatusEffect) se.copy();
+            player.addStatusffect(effectCopy); 
+        }
     }
 
     //Enemy can only take one instance of damage per attack

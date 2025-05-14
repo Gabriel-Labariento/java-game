@@ -3,10 +3,11 @@ import java.awt.image.BufferedImage;
 import java.io.IOException;
 import javax.imageio.ImageIO;
 
-public class Rat extends Enemy{
-    public static int ratCount = 0;
+public class Bunny extends Enemy{
+    public static int bunnyCount = 0;
     private static final int SPRITE_FRAME_DURATION = 200;
     private static final int BITE_COOLDOWN = 1500;
+    private static final int BITE_DISTANCE = GameCanvas.TILESIZE * 2;
     private long lastSpriteUpdate = 0;
     private long lastBiteAttack = 0;
     private static BufferedImage[] sprites;
@@ -15,12 +16,12 @@ public class Rat extends Enemy{
         setSprites();
     }
 
-    public Rat(int x, int y) {
-        id = ratCount++;
-        identifier = NetworkProtocol.RAT.toCharArray()[0];
+    public Bunny(int x, int y) {
+        id = bunnyCount++;
+        identifier = NetworkProtocol.BUNNY.toCharArray()[0];
         speed = 1;
         height = 16;
-        width = 16;
+        width = 20;
         worldX = x;
         worldY = y;
         maxHealth = 10;
@@ -34,16 +35,16 @@ public class Rat extends Enemy{
 
      private static void setSprites() {
         try {
-            BufferedImage left0 = ImageIO.read(Rat.class.getResourceAsStream("resources/Sprites/Rat/rat_left0.png"));
-            BufferedImage left1 = ImageIO.read(Rat.class.getResourceAsStream("resources/Sprites/Rat/rat_left1.png"));
-            BufferedImage left2 = ImageIO.read(Rat.class.getResourceAsStream("resources/Sprites/Rat/rat_left2.png"));
-            BufferedImage right0 = ImageIO.read(Rat.class.getResourceAsStream("resources/Sprites/Rat/rat_right0.png"));
-            BufferedImage right1 = ImageIO.read(Rat.class.getResourceAsStream("resources/Sprites/Rat/rat_right1.png"));
-            BufferedImage right2 = ImageIO.read(Rat.class.getResourceAsStream("resources/Sprites/Rat/rat_right2.png"));
+            BufferedImage left0 = ImageIO.read(Bunny.class.getResourceAsStream("resources/Sprites/Bunny/bunny_left0.png"));
+            BufferedImage left1 = ImageIO.read(Bunny.class.getResourceAsStream("resources/Sprites/Bunny/bunny_left1.png"));
+            BufferedImage left2 = ImageIO.read(Bunny.class.getResourceAsStream("resources/Sprites/Bunny/bunny_left2.png"));
+            BufferedImage right0 = ImageIO.read(Bunny.class.getResourceAsStream("resources/Sprites/Bunny/bunny_right0.png"));
+            BufferedImage right1 = ImageIO.read(Bunny.class.getResourceAsStream("resources/Sprites/Bunny/bunny_right1.png"));
+            BufferedImage right2 = ImageIO.read(Bunny.class.getResourceAsStream("resources/Sprites/Bunny/bunny_right2.png"));
             sprites = new BufferedImage[] {left0, left1, left2, right0, right1, right2};
 
         } catch (IOException e) {
-            System.out.println("Exception in Rat setSprites()" + e);
+            System.out.println("Exception in Bunny setSprites()" + e);
         }
     }
 
@@ -58,7 +59,6 @@ public class Rat extends Enemy{
 
     @Override
     public void draw(Graphics2D g2d, int xOffset, int yOffset){
-        g2d.drawRect(xOffset, yOffset, width, height);
         g2d.drawImage(sprites[currSprite], xOffset, yOffset, width, height, null);
     }
 
@@ -79,14 +79,13 @@ public class Rat extends Enemy{
 
     @Override
     public void updateEntity(ServerMaster gsm){
-        // TODO: ENEMY AI LOGIC
         long now = System.currentTimeMillis();
 
         Player pursued = scanForPlayer(gsm);
         if (pursued == null) return;
-        if (getSquaredDistanceBetween(this, pursued) < GameCanvas.TILESIZE * GameCanvas.TILESIZE) {
+        if (getSquaredDistanceBetween(this, pursued) < BITE_DISTANCE * BITE_DISTANCE) {
             if (now - lastBiteAttack > BITE_COOLDOWN ) {
-                createBiteAttack(gsm, pursued, null);
+                createBiteAttack(gsm, pursued, new PoisonEffect());
                 lastBiteAttack = now;
             }
         }

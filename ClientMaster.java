@@ -38,8 +38,7 @@ public class ClientMaster {
         IDENTIFIERTONAME.put(NetworkProtocol.SPIDERBULLET.charAt(0), "SpiderBullet");
         IDENTIFIERTONAME.put(NetworkProtocol.COCKROACH.charAt(0), "Cockroach");
         IDENTIFIERTONAME.put(NetworkProtocol.SMALLDOG.charAt(0), "SmallDog");
-        
-
+        IDENTIFIERTONAME.put(NetworkProtocol.BUNNY.charAt(0), "Bunny");
     }
 
     public ClientMaster(){
@@ -128,6 +127,8 @@ public class ClientMaster {
                 return new Cockroach(x, y);
             case "SmallDog":
                 return new SmallDog(x, y);
+            case "Bunny":
+                return new Bunny(x, y);
             case "EnemyBark":
                 return new EnemyBark(null, x, y);
             case "PlayerSlash":

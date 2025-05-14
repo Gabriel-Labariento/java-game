@@ -21,6 +21,7 @@ public class NetworkProtocol {
     public static final String ENEMYBITE = "N";
     public static final String SMALLDOG = "O";
     public static final String ENEMYBARK = "P";
+    public static final String BUNNY = "Q";
     public static final String REDFISH = "1"; // Rat
     public static final String CATTREAT = "2"; // Rat
     public static final String MILK = "3"; // Rat
