@@ -37,6 +37,7 @@ public abstract class Enemy extends Entity {
 
         for (Entity e : gsm.getEntities()) {
             if (e instanceof Player player) {
+                if (this.getCurrentRoom() != player.getCurrentRoom()) continue; 
                 // Get the center distance between the player and the entity
                 double distance = 
                 Math.sqrt(

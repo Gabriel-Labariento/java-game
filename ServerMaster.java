@@ -271,8 +271,6 @@ public class ServerMaster {
         mapData.append(NetworkProtocol.LEVEL_CHANGE).append(newDungeonMapData).append(NetworkProtocol.DELIMITER);
         sendMessageToClients(mapData.toString());
 
-        StringBuilder playersData = new StringBuilder();
-
         for (Player player : players) {
             player.setCurrentRoom(currentRoom);
             player.setWorldX(currentRoom.getCenterX());
@@ -339,6 +337,8 @@ public class ServerMaster {
     }
 
     public void resolveCollision(Entity e1, Entity e2, int[] b1, int[] b2){
+
+        if (e1.getCurrentRoom() != e2.getCurrentRoom()) return;
 
         // ATTACK-PLAYER/ENEMY COLLISION HANDLING
         // If entity is an attack and is not friendly and if the second entity is a player, then the player takes damage.
@@ -499,7 +499,7 @@ public class ServerMaster {
 
     }
 
-        private void applyKnockBack(Entity target, Entity attacker) {
+    private void applyKnockBack(Entity target, Entity attacker) {
 
         int[] entityPosition = target.getPositionVector();
         int[] attackPosition = attacker.getPositionVector();
@@ -507,7 +507,13 @@ public class ServerMaster {
         int[] normalVector = getNormalVector(entityPosition, attackPosition);
 
         double normalVectorMagnitude = Math.sqrt((normalVector[0]*normalVector[0]) + (normalVector[1]*normalVector[1]));
-        double[] unitNormal = getUnitNormal(normalVector, normalVectorMagnitude);
+        if (normalVectorMagnitude == 0) normalVectorMagnitude = 1;
+        
+        double[] unitNormal;
+
+        if (normalVectorMagnitude == 0) {
+            unitNormal = new double[] {0, -1};
+        } else unitNormal = getUnitNormal(normalVector, normalVectorMagnitude);
 
         int knockBackStrength = 24;
         int newX = (int) (target. getWorldX() - unitNormal[0] * knockBackStrength);
@@ -829,7 +835,7 @@ public class ServerMaster {
     }
 
     public void addEntity(Entity e) {
-        e.setCurrentRoom(currentRoom);
+        if (e.getCurrentRoom() == null) e.setCurrentRoom(currentRoom);
         if(e instanceof Player) playerNum++;
         entities.add(e);
     }

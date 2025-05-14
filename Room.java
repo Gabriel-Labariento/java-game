@@ -7,6 +7,7 @@ public class Room extends GameObject implements Tileable{
     public static final int WIDTH_TILES = 45;
     public static final int HEIGHT_TILES = 33;
     private int roomId;
+
     private int difficulty; // 0 => 3, easiest to hardest
     private boolean isStartRoom, isEndRoom, isClearedHandled, isCleared;
     private MobSpawner mobSpawner;
