@@ -66,7 +66,6 @@ public class Cockroach extends Enemy{
 
     @Override
     public void updateEntity(ServerMaster gsm){
-        // TODO: ENEMY AI LOGIC
         long now = System.currentTimeMillis();
 
         Player pursued = scanForPlayer(gsm);

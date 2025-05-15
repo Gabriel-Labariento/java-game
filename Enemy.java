@@ -63,6 +63,14 @@ public abstract class Enemy extends Entity {
         else if (player.getCenterY() < getCenterY()) worldY -= speed;
     }
 
+    public void moveAwayFromPlayer(Player player) {
+        if (player.getCenterX() > getCenterX()) worldX -= speed;
+        else if (player.getCenterX() < getCenterX()) worldX += speed;
+
+        if (player.getCenterY() > getCenterY()) worldY -= speed;
+        else if (player.getCenterY() < getCenterY()) worldY += speed;
+    }
+
     public void createBiteAttack(ServerMaster gsm, Player target, StatusEffect effect){
         int vectorX = target.getCenterX() - getCenterX();
         int vectorY = target.getCenterY() - getCenterY(); 

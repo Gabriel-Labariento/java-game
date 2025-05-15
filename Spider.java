@@ -7,6 +7,7 @@ public class Spider extends Enemy{
     public static int spiderCount = 0;
     private static final int SPRITE_FRAME_DURATION = 200;
     private static final int BULLET_COOLDOWN = 5000;
+    private static final int ATTACK_DISTANCE = GameCanvas.TILESIZE * 4;
     private long lastBulletSend = 0;
     private long lastSpriteUpdate = 0;
     private static BufferedImage[] sprites;
@@ -67,7 +68,7 @@ public class Spider extends Enemy{
 
         Player pursued = scanForPlayer(gsm);
         if (pursued == null) return;
-        if (getSquaredDistanceBetween(this, pursued) < (GameCanvas.TILESIZE * 4) * (GameCanvas.TILESIZE * 4)) {
+        if (getSquaredDistanceBetween(this, pursued) < ATTACK_DISTANCE * ATTACK_DISTANCE) {
             if (now - lastBulletSend > BULLET_COOLDOWN) {
                 sendProjectile(gsm, pursued);
                 lastBulletSend = now;

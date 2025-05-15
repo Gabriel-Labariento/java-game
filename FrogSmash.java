@@ -23,7 +23,7 @@ public class FrogSmash extends Attack {
         identifier = NetworkProtocol.FROGSMASH;
         this.owner = owner;
         isFriendly = false;
-        damage = 10;
+        damage = 1;
         width = 2 * SMASH_RADIUS;
         height = 2 * SMASH_RADIUS;
         worldX = x;

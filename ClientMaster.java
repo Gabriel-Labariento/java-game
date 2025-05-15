@@ -36,11 +36,13 @@ public class ClientMaster {
         IDENTIFIERTONAME.put(NetworkProtocol.SNAKELET, "Snakelet");
         IDENTIFIERTONAME.put(NetworkProtocol.SPIDER, "Spider");
         IDENTIFIERTONAME.put(NetworkProtocol.SPIDERBULLET, "SpiderBullet");
+        IDENTIFIERTONAME.put(NetworkProtocol.SNAKEBULLET, "SnakeBullet");
         IDENTIFIERTONAME.put(NetworkProtocol.COCKROACH, "Cockroach");
         IDENTIFIERTONAME.put(NetworkProtocol.SMALLDOG, "SmallDog");
         IDENTIFIERTONAME.put(NetworkProtocol.BUNNY, "Bunny");
         IDENTIFIERTONAME.put(NetworkProtocol.FROG, "Frog");
         IDENTIFIERTONAME.put(NetworkProtocol.FROGSMASH, "FrogSmash");
+        IDENTIFIERTONAME.put(NetworkProtocol.BEE, "Bee");
 
 
     }
@@ -133,6 +135,8 @@ public class ClientMaster {
                 return new SmallDog(x, y);
             case "Bunny":
                 return new Bunny(x, y);
+            case "Bee":
+                return new Bee(x, y);
             case "Frog":
                 return new Frog(x, y);
             case "FrogSmash":
@@ -147,6 +151,8 @@ public class ClientMaster {
                 return new PlayerBullet(null, x, y, 0, 0, 0);
             case "SpiderBullet":
                 return new SpiderBullet(null, x, y, 0, 0);
+            case "SnakeBullet":
+                return new SnakeBullet(null, x, y, 0, 0);
             default:
                 return null;
         }

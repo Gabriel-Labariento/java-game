@@ -1,7 +1,7 @@
 import java.util.*;
 
 public class DungeonMap {
-    private ArrayList<Room> rooms;
+    private final ArrayList<Room> rooms;
     private Room startRoom, endRoom;
     private int gameLevel;
 
@@ -311,8 +311,7 @@ public class DungeonMap {
         // Clear data 
         rooms.clear();
         
-        int roomCount;
-        
+       
         // Helper utils
         HashMap<Integer, Room> mapIdToRoom = new HashMap<>();
         ArrayList<DoorDataHolder> doorDataList = new ArrayList<>();
@@ -426,8 +425,8 @@ public class DungeonMap {
      * DoorDataHolder, a new Door object can be made.
      */
     private class DoorDataHolder{
-        private int id, x, y, roomAId, roomBId;
-        private String direction;
+        private final int id, x, y, roomAId, roomBId;
+        private final String direction;
 
         public DoorDataHolder(int id, int x, int y, String direction, int roomAId, int roomBId) {
             this.id = id;

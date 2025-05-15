@@ -13,7 +13,7 @@ public class EnemyBite extends Attack{
             BufferedImage img = ImageIO.read(EnemyBite.class.getResourceAsStream("resources/Sprites/SharedEnemy/enemyslash.png"));
             sprite = img;
         } catch (IOException e) {
-            System.out.println("Exception in SpiderBullet setSprites()" + e);
+            System.out.println("Exception in EnemyBite setSprites()" + e);
         }
     }
 

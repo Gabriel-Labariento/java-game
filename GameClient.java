@@ -1,7 +1,6 @@
 
 import java.io.*;
 import java.net.*;
-import java.nio.channels.NetworkChannel;
 import java.util.*;
 import java.util.concurrent.*;
 
@@ -242,7 +241,7 @@ public class GameClient {
                     int id = Integer.parseInt(entityData[1]);
                     int x = Integer.parseInt(entityData[2]);
                     int y = Integer.parseInt(entityData[3]);
-                    clientMaster.loadEntity(identifier, id, x, y, roomId, 0, 0); // TODO: TEMPORARY 0 SPRITE   
+                    clientMaster.loadEntity(identifier, id, x, y, roomId, 0, 0);
                 }
             }
         
@@ -323,6 +322,11 @@ public class GameClient {
         return str.toString();
     }
 
+    /**
+     * 
+     * @param input
+     * @param isPressed
+     */
     public void keyInput(String input, Boolean isPressed){
         switch (input) {
             case "Q":
@@ -343,6 +347,11 @@ public class GameClient {
         }
     }
 
+    /**
+     * Sets the x and y coordinate of a clickInput
+     * @param x x-coordinate
+     * @param y y-coordinate
+     */
     public void clickInput(int x, int y){
         clickedX = x;
         clickedY = y;

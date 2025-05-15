@@ -6,7 +6,10 @@ import javax.imageio.ImageIO;
 public class Snakelet extends Enemy{
     private int id;
     private static final int SPRITE_FRAME_DURATION = 200;
+    private static final int BULLET_COOLDOWN = 5000;
+    private static final int ATTACK_DISTANCE = GameCanvas.TILESIZE * 4;
     private long lastSpriteUpdate = 0;
+    private long lastBulletSend = 0;
     private static BufferedImage[] sprites;
 
     static {
@@ -66,8 +69,14 @@ public class Snakelet extends Enemy{
         long now = System.currentTimeMillis();
 
         Player pursued = scanForPlayer(gsm);
-        if (pursued != null) pursuePlayer(pursued);
-        else return;
+        if (pursued == null) return;
+        if (getSquaredDistanceBetween(this, pursued) < ATTACK_DISTANCE * ATTACK_DISTANCE) {
+            if (now - lastBulletSend > BULLET_COOLDOWN) {
+                sendProjectile(gsm, pursued);
+                lastBulletSend = now;
+            }
+        }
+        else pursuePlayer(pursued);
 
         // Sprite walk update
         if (now - lastSpriteUpdate > SPRITE_FRAME_DURATION) {
@@ -82,5 +91,41 @@ public class Snakelet extends Enemy{
         }
 
         matchHitBoxBounds();
+    }
+
+    private void sendProjectile(ServerMaster gsm, Player target){
+        int vectorX = target.getCenterX() - getCenterX();
+        int vectorY = target.getCenterY() - getCenterY(); 
+        double normalizedVector = Math.sqrt((vectorX*vectorX)+(vectorY*vectorY));
+
+        //Avoids 0/0 division edge case
+        if (normalizedVector == 0) normalizedVector = 1; 
+        double normalizedX = vectorX / normalizedVector;
+        double normalizedY = vectorY / normalizedVector;
+
+        double spreadAngle = Math.toRadians(15);
+
+        double x1 = normalizedX * Math.cos(spreadAngle) - normalizedY * Math.sin(spreadAngle);
+        double y1 = normalizedX * Math.sin(spreadAngle) + normalizedY * Math.cos(spreadAngle);
+
+        double x2 = normalizedX * Math.cos(-spreadAngle) - normalizedY * Math.sin(-spreadAngle);
+        double y2 = normalizedX * Math.sin(-spreadAngle) + normalizedY * Math.cos(-spreadAngle);
+
+        // Bullet Spread Rotation Reference: https://stackoverflow.com/questions/31225062/rotating-a-vector-by-angle-and-axis-in-java
+
+        SnakeBullet sb0 = new SnakeBullet(this, this.worldX-SnakeBullet.WIDTH/2, this.worldY-SnakeBullet.HEIGHT/2, normalizedX, normalizedY);
+        SnakeBullet sb1 = new SnakeBullet(this, this.worldX-SnakeBullet.WIDTH/2, this.worldY-SnakeBullet.HEIGHT/2, x1, y1);
+        SnakeBullet sb2 = new SnakeBullet(this, this.worldX-SnakeBullet.WIDTH/2, this.worldY-SnakeBullet.HEIGHT/2, x2, y2);
+
+        sb0.addAttackEffect(new SlowEffect());
+        sb0.addAttackEffect(new PoisonEffect());
+        sb1.addAttackEffect(new SlowEffect());
+        sb1.addAttackEffect(new PoisonEffect());
+        sb2.addAttackEffect(new SlowEffect());
+        sb2.addAttackEffect(new PoisonEffect());
+
+        gsm.addEntity(sb0);
+        gsm.addEntity(sb1);
+        gsm.addEntity(sb2);
     }
 }

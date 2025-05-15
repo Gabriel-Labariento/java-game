@@ -7,7 +7,7 @@ import javax.swing.*;
 public class GameCanvas extends JComponent {
     public static final int TILESIZE = 16;
     private static final int REFRESHINTERVAL = 16;
-    private int width, height;
+    private final int width, height;
     private GameClient gameClient;
     private ClientMaster clientMaster;
     private ScheduledExecutorService renderLoopScheduler;
