@@ -12,6 +12,7 @@ public abstract class Item extends Entity{
     public int initialHitPoints;
     public int initialSpeed;
     public int initialDefense;
+    public int initialAttackFrameDuration;
 
     public Item(){
         triggerDespawnTimer();

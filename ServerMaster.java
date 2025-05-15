@@ -430,7 +430,7 @@ public class ServerMaster {
             //Calculate damage taken: new health = current health - (damage*(1-(defense/100)))
             double dmgMitigationFactor = (1-(player.getDefense()/100.0));
             if(dmgMitigationFactor < 0) dmgMitigationFactor = 0;
-            int dmgReceived = (int) (entity.getDamage()*dmgMitigationFactor);
+            int dmgReceived = (int) (Math.round(entity.getDamage()*dmgMitigationFactor));
             player.setHitPoints(player.getHitPoints()-dmgReceived);
             applyKnockBack(player, entity);
             player.triggerInvincibility();

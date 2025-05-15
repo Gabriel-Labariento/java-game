@@ -6,7 +6,6 @@ import javax.imageio.ImageIO;
 public class CleaningRobot extends Enemy{
     public static int cleaningRobotNum = 0;
     private static final int SPRITE_FRAME_DURATION = 200;
-    private long lastSpriteUpdate = 0;
     private static BufferedImage[] sprites;
 
     static {
@@ -14,11 +13,13 @@ public class CleaningRobot extends Enemy{
     }
 
     public CleaningRobot(int x, int y) {
+        lastSpriteUpdate = 0;
+        lastAttackTime = 0;
         id = cleaningRobotNum++;
-        identifier = NetworkProtocol.RAT;
+        identifier = NetworkProtocol.CLEANINGBOT;
         speed = 1;
-        height = 16;
-        width = 16;
+        height = 32;
+        width = 32;
         worldX = x;
         worldY = y;
         maxHealth = 10;
@@ -27,18 +28,15 @@ public class CleaningRobot extends Enemy{
         rewardXP = 50;
         currentRoom = null;
         currSprite = 0;
+        attackCDDuration = 250;
         
     }
 
      private static void setSprites() {
         try {
             BufferedImage left0 = ImageIO.read(Rat.class.getResourceAsStream("resources/Sprites/Rat/rat_left0.png"));
-            BufferedImage left1 = ImageIO.read(Rat.class.getResourceAsStream("resources/Sprites/Rat/rat_left1.png"));
-            BufferedImage left2 = ImageIO.read(Rat.class.getResourceAsStream("resources/Sprites/Rat/rat_left2.png"));
             BufferedImage right0 = ImageIO.read(Rat.class.getResourceAsStream("resources/Sprites/Rat/rat_right0.png"));
-            BufferedImage right1 = ImageIO.read(Rat.class.getResourceAsStream("resources/Sprites/Rat/rat_right1.png"));
-            BufferedImage right2 = ImageIO.read(Rat.class.getResourceAsStream("resources/Sprites/Rat/rat_right2.png"));
-            sprites = new BufferedImage[] {left0, left1, left2, right0, right1, right2};
+            sprites = new BufferedImage[] {left0, right0};
 
         } catch (IOException e) {
             System.out.println("Exception in Rat setSprites()" + e);
@@ -77,25 +75,34 @@ public class CleaningRobot extends Enemy{
 
     @Override
     public void updateEntity(ServerMaster gsm){
-        // TODO: ENEMY AI LOGIC
-        long now = System.currentTimeMillis();
+        // // TODO: ENEMY AI LOGIC
+        // long now = System.currentTimeMillis();
+        // final double AGGRO_DISTANCE = GameCanvas.TILESIZE;
 
-        Player pursued = scanForPlayer(gsm);
-        if (pursued != null) pursuePlayer(pursued);
-        else return;
+        // Player pursued = scanForPlayer(gsm);
+        // if (pursued == null) return;
+        // double distanceSquared = getSquaredDistanceBetween(this, pursued);
+        // if (distanceSquared <= AGGRO_DISTANCE * AGGRO_DISTANCE) {
+        //     if (now - lastAttackTime > attackCDDuration) {
+        //         createLaserBullet()
+        //         lastAttackTime = now;
+        //     }
+        // } else {
+        //     pursuePlayer(pursued);
+        // }
+        
 
-        // Sprite walk update
-        if (now - lastSpriteUpdate > SPRITE_FRAME_DURATION) {
-            if (worldX > pursued.getWorldX()) {
-                currSprite++;
-                if (currSprite > 2) currSprite = 0;
-            } else {
-                currSprite++;
-                if (currSprite < 3 || currSprite > 5) currSprite = 3;
-            }
-            lastSpriteUpdate = now;
-        }
+        // // Sprite walk update
+        // if (now - lastSpriteUpdate > SPRITE_FRAME_DURATION) {
+        //     if (worldX > pursued.getWorldX()) {
+        //         currSprite = 0;
+        //     } else {
+        //         currSprite = 1;
+        //     }
+        //     lastSpriteUpdate = now;
+        // }
 
-        matchHitBoxBounds();
+        // matchHitBoxBounds();
     }
 }
+

@@ -25,11 +25,10 @@ public class GunCat extends Player{
         hitPoints = maxHealth;
         damage = 5;
         isDown = false;
-        coolDownDuration = 800;
+        attackCDDuration = 800;
         attackFrameDuration = 75;
         matchHitBoxBounds();
     }
-
 
     @Override
     public void draw(Graphics2D g2d, int xOffset, int yOffset){

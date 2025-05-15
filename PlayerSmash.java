@@ -1,8 +1,17 @@
-import java.awt.Color;
 import java.awt.Graphics2D;
-import java.awt.geom.*;
+import java.awt.image.BufferedImage;
+import java.io.IOException;
+import javax.imageio.ImageIO;
 
 public class PlayerSmash extends Attack{
+    public static BufferedImage sprite;
+    static {
+        try {
+            sprite = ImageIO.read(PlayerSmash.class.getResourceAsStream("resources/Sprites/Attacks/playersmash.png"));
+        } catch (IOException e) {
+            System.out.println("Exception in setSprites()" + e);
+        }
+    }
 
     public PlayerSmash(int cid, Entity entity, int x, int y, int d, boolean isFriendly){
         attackNum++;
@@ -30,9 +39,7 @@ public class PlayerSmash extends Attack{
 
     @Override
     public void draw(Graphics2D g2d, int xOffset, int yOffset){
-        Rectangle2D.Double sprite = new Rectangle2D.Double(xOffset, yOffset, width, height);
-        g2d.setColor(Color.PINK);
-        g2d.fill(sprite);
+        g2d.drawImage(sprite, xOffset, yOffset, width, height, null);
     }
 
     @Override

@@ -1,7 +1,6 @@
 public abstract class Player extends Entity{
     public static final int INVINCIBILITY_DURATION = 1000;
     public static final int REVIVAL_DURATION = 5000;
-    public int coolDownDuration;
     public long invincibilityEnd;
     public long coolDownEnd;
     public int screenX;
@@ -55,14 +54,6 @@ public abstract class Player extends Entity{
         return currentXPCap;
     }
 
-    public int getCoolDownDuration(){
-        return coolDownDuration;
-    }
-
-    public void setCoolDownDuration(int duration){
-        coolDownDuration = duration;
-    }
-
     public void setHeldItem(Item item){
         heldItem = item;
     }
@@ -92,7 +83,7 @@ public abstract class Player extends Entity{
     }
 
     public void triggerCoolDown(){
-        coolDownEnd = System.currentTimeMillis() + coolDownDuration;
+        coolDownEnd = System.currentTimeMillis() + attackCDDuration;
     }
 
     public boolean getIsOnCoolDown(){

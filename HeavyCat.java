@@ -24,7 +24,7 @@ public class HeavyCat extends Player{
         hitPoints = maxHealth;
         damage = 5;
         isDown = false;
-        coolDownDuration = 1200;
+        attackCDDuration = 1200;
         currSprite = 0;
         attackFrameDuration = 200;
 
@@ -46,7 +46,7 @@ public class HeavyCat extends Player{
             sprites = new BufferedImage[] {left0, left1, left2, right0, right1, right2, attack0, attack1, attack2, death};
 
         } catch (IOException e) {
-            System.out.println("Exception in Rat setSprites()" + e);
+            System.out.println("Exception in setSprites()" + e);
         }
     }
 

@@ -18,7 +18,9 @@ public abstract class Entity extends GameObject {
     protected int attackFrameDuration;
     public Room currentRoom;
     protected static final int SPRITE_FRAME_DURATION = 200;
-    protected long lastSpriteUpdate = 0;
+    protected long lastSpriteUpdate;
+    protected long lastAttackTime;
+    protected int attackCDDuration;
 
     public void draw(Graphics2D g2d, int xOffset, int yOffset){}
 
@@ -38,6 +40,22 @@ public abstract class Entity extends GameObject {
 
     public void setDefense(int d){
         defense = d;
+    }
+
+    public int getAttackCDDuration(){
+        return attackCDDuration;
+    }
+
+    public void setAttackCDDuration(int duration){
+        attackCDDuration = duration;
+    }
+
+    public int getAttackFrameDuration(){
+        return attackFrameDuration;
+    }
+
+    public void setAttackFrameDuration(int a){
+        attackFrameDuration = a;
     }
 
     public boolean getIsAttacking(){
@@ -172,9 +190,6 @@ public abstract class Entity extends GameObject {
         if(s < 2) s = 2;
         speed = s;
     }
-
-
-
 }
     
     

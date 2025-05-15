@@ -1,8 +1,18 @@
-import java.awt.*;
-import java.awt.geom.*;
+import java.awt.Graphics2D;
+import java.awt.image.BufferedImage;
+import java.io.IOException;
+import javax.imageio.ImageIO;
 
 public class BagOfCatnip extends Item {
-    
+    public static BufferedImage sprite;
+    static {
+        try {
+            sprite = ImageIO.read(BagOfCatnip.class.getResourceAsStream("resources/Sprites/Items/bagofcatnip.png"));
+        } catch (IOException e) {
+            System.out.println("Exception in setSprites()" + e);
+        }
+    }
+
     public BagOfCatnip(int x, int y){
         identifier = NetworkProtocol.BAGOFCATNIP;
         worldX = x;
@@ -14,8 +24,8 @@ public class BagOfCatnip extends Item {
 
     @Override
     public void applyEffects(){
-        initialCDDuration = owner.getCoolDownDuration();
-        owner.setCoolDownDuration((int) Math.round(initialCDDuration*1.5));
+        initialCDDuration = owner.getAttackCDDuration();
+        owner.setAttackCDDuration((int) Math.round(initialCDDuration*1.5));
 
         initialDamage = owner.getDamage();
         owner.setDamage((int) Math.round(initialDamage*2.0));
@@ -23,14 +33,12 @@ public class BagOfCatnip extends Item {
 
     @Override
     public void removeEffects(){
-        owner.setCoolDownDuration(initialCDDuration);
+        owner.setAttackCDDuration(initialCDDuration);
         owner.setDamage(initialDamage);
     }
 
     @Override
     public void draw(Graphics2D g2d, int xOffset, int yOffset){
-        Rectangle2D.Double sprite = new Rectangle2D.Double(xOffset, yOffset, width, height);
-        g2d.setColor(Color.ORANGE);
-        g2d.fill(sprite);
+        g2d.drawImage(sprite, xOffset, yOffset, width, height, null);
     }
 }

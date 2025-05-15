@@ -24,8 +24,8 @@ public class FastCat extends Player{
         hitPoints = maxHealth;
         damage = 5;
         isDown = false;
-        coolDownDuration = 600;
-        attackFrameDuration = 200;
+        attackCDDuration = 600;
+        attackFrameDuration = 125;
 
         matchHitBoxBounds();
     }
@@ -49,7 +49,8 @@ public class FastCat extends Player{
             BufferedImage attack0 = ImageIO.read(FastCat.class.getResourceAsStream("resources/Sprites/FastCat/attack0.png"));
             BufferedImage attack1 = ImageIO.read(FastCat.class.getResourceAsStream("resources/Sprites/FastCat/attack1.png"));
             BufferedImage attack2 = ImageIO.read(FastCat.class.getResourceAsStream("resources/Sprites/FastCat/attack2.png"));
-            sprites = new BufferedImage[] {left0, left1, left2, right0, right1, right2, attack0, attack1, attack2};
+            BufferedImage death = ImageIO.read(FastCat.class.getResourceAsStream("resources/Sprites/FastCat/death.png"));
+            sprites = new BufferedImage[] {left0, left1, left2, right0, right1, right2, attack0, attack1, attack2, death};
 
         } catch (IOException e) {
             System.out.println("Exception in Rat setSprites()" + e);

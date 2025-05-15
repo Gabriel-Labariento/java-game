@@ -1,7 +1,17 @@
-import java.awt.*;
-import java.awt.geom.*;
+import java.awt.Graphics2D;
+import java.awt.image.BufferedImage;
+import java.io.IOException;
+import javax.imageio.ImageIO;
 
 public class Milk extends Item {
+    public static BufferedImage sprite;
+    static {
+        try {
+            sprite = ImageIO.read(Milk.class.getResourceAsStream("resources/Sprites/Items/milk.png"));
+        } catch (IOException e) {
+            System.out.println("Exception in setSprites()" + e);
+        }
+    }
     
     public Milk(int x, int y){
         identifier = NetworkProtocol.MILK;
@@ -26,8 +36,6 @@ public class Milk extends Item {
 
     @Override
     public void draw(Graphics2D g2d, int xOffset, int yOffset){
-        Rectangle2D.Double sprite = new Rectangle2D.Double(xOffset, yOffset, width, height);
-        g2d.setColor(Color.ORANGE);
-        g2d.fill(sprite);
+        g2d.drawImage(sprite, xOffset, yOffset, width, height, null);
     }
 }
