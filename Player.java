@@ -173,7 +173,8 @@ public abstract class Player extends Entity implements Effectable{
         .append(newX).append(NetworkProtocol.SUB_DELIMITER)
         .append(newY).append(NetworkProtocol.SUB_DELIMITER)
         .append(hitPoints).append(NetworkProtocol.SUB_DELIMITER)
-        .append(next.getRoomId());
+        .append(next.getRoomId()).append(NetworkProtocol.SUB_DELIMITER)
+        .append(getZIndex());
 
         return sb.toString();
     }
@@ -260,13 +261,14 @@ public abstract class Player extends Entity implements Effectable{
             }
             else return getRoomTransitionData(d, d.getOtherRoom(currentRoom)); // return a different string upon room change
         } else {
-            // String format: identifier, clientId,x,y,hp,roomId
+            // String format: identifier, clientId,x,y,hp,roomId,zIndex
             sb.append(identifier).append(NetworkProtocol.SUB_DELIMITER)
             .append(clientId).append(NetworkProtocol.SUB_DELIMITER)
             .append(worldX).append(NetworkProtocol.SUB_DELIMITER)
             .append(worldY).append(NetworkProtocol.SUB_DELIMITER)
             .append(hitPoints).append(NetworkProtocol.SUB_DELIMITER)
-            .append(currentRoom.getRoomId()).append(NetworkProtocol.DELIMITER);
+            .append(currentRoom.getRoomId()).append(NetworkProtocol.SUB_DELIMITER)
+            .append(getZIndex()).append(NetworkProtocol.DELIMITER);
         }
 
         return sb.toString();

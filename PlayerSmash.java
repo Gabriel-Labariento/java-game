@@ -16,11 +16,6 @@ public class PlayerSmash extends Attack{
         height = 80;
         worldX = x;
         worldY = y;
-
-        //Temporary hitPoints allocation
-        hitPoints = 100;
-
-
         //For checking attack duration
         duration = 800;
         setExpirationTime(duration);

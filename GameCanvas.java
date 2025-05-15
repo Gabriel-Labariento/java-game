@@ -1,4 +1,6 @@
 import java.awt.*;
+import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.concurrent.*;
 import javax.swing.*;
 
@@ -69,8 +71,12 @@ public class GameCanvas extends JComponent {
             }
 
             // Draw enemies, projectiles, other players
+
             synchronized (clientMaster.getEntities()) {
-                for (Entity entity : clientMaster.getEntities())
+                ArrayList<Entity> sortedEntitiesByZ = new ArrayList<>(clientMaster.getEntities());
+                sortedEntitiesByZ.sort(Comparator.comparingInt(Entity::getZIndex));
+
+                for (Entity entity : sortedEntitiesByZ)    
                     entity.draw(g2d, entity.getWorldX() - userPlayer.getWorldX() + screenX, entity.getWorldY()- userPlayer.getWorldY() + screenY);    
             }
             

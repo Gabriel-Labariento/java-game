@@ -61,21 +61,6 @@ public class SmallDog extends Enemy{
     }
 
     @Override
-    public String getAssetData(boolean isUserPlayer) {
-        StringBuilder sb = new StringBuilder();
-        // System.out.println("In getAssetData of Rat, identifier is " + identifier);
-        // String format: B,id,x,y,currentRoomId,currsprite|
-        sb.append(identifier).append(NetworkProtocol.SUB_DELIMITER)
-        .append(id).append(NetworkProtocol.SUB_DELIMITER)
-        .append(worldX).append(NetworkProtocol.SUB_DELIMITER)
-        .append(worldY).append(NetworkProtocol.SUB_DELIMITER)
-        .append(currentRoom.getRoomId()).append(NetworkProtocol.SUB_DELIMITER)
-        .append(currSprite).append(NetworkProtocol.DELIMITER);
-
-        return sb.toString();
-    }
-
-    @Override
     public void updateEntity(ServerMaster gsm){
         // TODO: ENEMY AI LOGIC
         long now = System.currentTimeMillis();
@@ -84,17 +69,21 @@ public class SmallDog extends Enemy{
 
         Player pursued = scanForPlayer(gsm);
         if (pursued == null) return;
+
         double distanceSquared = getSquaredDistanceBetween(this, pursued);
+        // If within biting distance, create a bite attack
         if ( distanceSquared <= BITE_DISTANCE * BITE_DISTANCE) {
             if (now - lastAttackTime > ATTACK_COOLDOWN ) {
                 createBiteAttack(gsm, pursued, null);
                 lastAttackTime = now;
             }
+        // If farther than biting distance but within barking distance, create bark attack
         } else if (distanceSquared <  BARK_DISTANCE * BARK_DISTANCE) {
             if (now - lastAttackTime > ATTACK_COOLDOWN) {
                 createBarkAttack(gsm, pursued);
                 lastAttackTime = now;
             }
+        // If too far to attack, pursue
         } else {
             pursuePlayer(pursued);
         }

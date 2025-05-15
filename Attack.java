@@ -16,19 +16,7 @@ public abstract class Attack extends Entity{
         attackEffects = new ArrayList<>();
     }
 
-    @Override
-    public String getAssetData(boolean isUserPlayer) {
-        StringBuilder sb = new StringBuilder();
-        // String format: S,id,x,y,currentRoomId|
-        sb.append(identifier).append(NetworkProtocol.SUB_DELIMITER)
-        .append(id).append(NetworkProtocol.SUB_DELIMITER)
-        .append(worldX).append(NetworkProtocol.SUB_DELIMITER)
-        .append(worldY).append(NetworkProtocol.SUB_DELIMITER)
-        .append(currentRoom.getRoomId()).append(NetworkProtocol.DELIMITER);
-
-        return sb.toString();
-    }
-
+    
     public void setExpirationTime(int duration){
         expirationTime = System.currentTimeMillis() + duration;
     }
@@ -76,4 +64,11 @@ public abstract class Attack extends Entity{
     public ArrayList<StatusEffect> getAttackEffects() {
         return attackEffects;
     }
+
+    @Override
+    public int getZIndex(){
+        return 0;
+    }
+
+
 }

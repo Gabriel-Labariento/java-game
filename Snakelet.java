@@ -61,21 +61,6 @@ public class Snakelet extends Enemy{
     }
 
     @Override
-    public String getAssetData(boolean isUserPlayer) {
-        StringBuilder sb = new StringBuilder();
-        // System.out.println("In getAssetData of Rat, identifier is " + identifier);
-        // String format: I,id,x,y,currentRoomId,currsprite|
-        sb.append(identifier).append(NetworkProtocol.SUB_DELIMITER)
-        .append(id).append(NetworkProtocol.SUB_DELIMITER)
-        .append(worldX).append(NetworkProtocol.SUB_DELIMITER)
-        .append(worldY).append(NetworkProtocol.SUB_DELIMITER)
-        .append(currentRoom.getRoomId()).append(NetworkProtocol.SUB_DELIMITER)
-        .append(currSprite).append(NetworkProtocol.DELIMITER);
-
-        return sb.toString();
-    }
-
-    @Override
     public void updateEntity(ServerMaster gsm){
         // TODO: ENEMY AI LOGIC
         long now = System.currentTimeMillis();

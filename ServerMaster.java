@@ -763,12 +763,14 @@ public class ServerMaster {
             int newY = Integer.parseInt(dataParts[3]);
             int hp = Integer.parseInt(dataParts[4]);
             int newRoomId = Integer.parseInt(dataParts[5]);
+            int zIndex = Integer.parseInt(dataParts[6]);
 
             // Use the data to set relevant fields
             Room newRoom = dungeonMap.getRoomFromId(newRoomId);
             userPlayer.setPosition(newX, newY);
             userPlayer.setCurrentRoom(newRoom);
             userPlayer.setHitPoints(hp);
+
             currentRoom = newRoom;
             handleSpawnersOnRoomChange(newRoom);
             if (!currentRoom.isStartRoom() && !currentRoom.isCleared()) newRoom.closeDoors();
@@ -780,7 +782,9 @@ public class ServerMaster {
             .append(newX).append(NetworkProtocol.SUB_DELIMITER)
             .append(newY).append(NetworkProtocol.SUB_DELIMITER)
             .append(hp).append(NetworkProtocol.SUB_DELIMITER)
-            .append(newRoomId).append(NetworkProtocol.DELIMITER);
+            .append(newRoomId).append(NetworkProtocol.SUB_DELIMITER)
+            .append(zIndex).append(NetworkProtocol.DELIMITER);
+
 
             // System.out.println("String returned by handleRoomTransition: " + sb.toString());
 

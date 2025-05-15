@@ -39,6 +39,10 @@ public class ClientMaster {
         IDENTIFIERTONAME.put(NetworkProtocol.COCKROACH, "Cockroach");
         IDENTIFIERTONAME.put(NetworkProtocol.SMALLDOG, "SmallDog");
         IDENTIFIERTONAME.put(NetworkProtocol.BUNNY, "Bunny");
+        IDENTIFIERTONAME.put(NetworkProtocol.FROG, "Frog");
+        IDENTIFIERTONAME.put(NetworkProtocol.FROGSMASH, "FrogSmash");
+
+
     }
 
     public ClientMaster(){
@@ -129,6 +133,10 @@ public class ClientMaster {
                 return new SmallDog(x, y);
             case "Bunny":
                 return new Bunny(x, y);
+            case "Frog":
+                return new Frog(x, y);
+            case "FrogSmash":
+                return new FrogSmash(null, x, y);
             case "EnemyBark":
                 return new EnemyBark(null, x, y);
             case "PlayerSlash":
@@ -144,7 +152,7 @@ public class ClientMaster {
         }
     }
 
-    public void loadEntity(String identifier, int id, int x, int y, int roomId, int sprite){
+    public void loadEntity(String identifier, int id, int x, int y, int roomId, int sprite, int zIndex){
         // System.out.println("Loading entity " + identifier + " " + name + "at " + x + ", " + y);
         // if (name == null) System.out.println("Warning: unknown identity identifier " + identifier);
         Entity e = getEntity(identifier, id, x, y);
@@ -153,6 +161,7 @@ public class ClientMaster {
             e.setCurrSprite(sprite);
             e.matchHitBoxBounds();
             e.setCurrentRoom(getRoomById(roomId));
+            e.setzIndex(zIndex);
             entities.add(e);
         }    
     }

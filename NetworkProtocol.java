@@ -35,6 +35,7 @@ public class NetworkProtocol {
     public static final String FISHMONSTER = "AB";
     public static final String SPIDERBULLET = "AC";
 
+    public static final String FROGSMASH = "ZX";
     public static final String ENEMYBARK = "ZY";
     public static final String ENEMYBITE = "ZZ";
     

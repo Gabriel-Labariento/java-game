@@ -173,6 +173,7 @@ public class GameClient {
                 int playerY = Integer.parseInt(playerData[3]);
                 int playerHealth = Integer.parseInt(playerData[4]);
                 int playerRoomId = Integer.parseInt(playerData[5]);
+                int playerZIndex = Integer.parseInt(playerData[6]);
         
                 // System.out.println(" user Player loaded");
                 try {
@@ -181,6 +182,7 @@ public class GameClient {
                     player.setCurrentRoom(currentRoom);
                     player.setIsMaxHealthSet(true);
                     player.setHitPoints(playerHealth);
+                    player.setzIndex(playerZIndex);
                     clientMaster.setUserPlayer(player);
                     clientMaster.setCurrentRoom(currentRoom);
                         
@@ -200,6 +202,7 @@ public class GameClient {
                 int x = Integer.parseInt(otherPlayerData[2]);
                 int y = Integer.parseInt(otherPlayerData[3]);
                 int hp = Integer.parseInt(otherPlayerData[4]);
+                int zIndex = Integer.parseInt(otherPlayerData[5]);
                 
                 
                 // Only load the player if it is not the user player and it is in the same room
@@ -208,6 +211,7 @@ public class GameClient {
                     other.setCurrentRoom(clientMaster.getRoomById(otherRoomId));
                     other.setIsMaxHealthSet(true);
                     other.setHitPoints(hp);
+                    other.setzIndex(zIndex);
                     clientMaster.addEntity(other);
                 } 
             } else if (part.startsWith(NetworkProtocol.ENTITY)) {
@@ -218,7 +222,7 @@ public class GameClient {
                 //     // System.out.println("Entity string: " + string);
                 // }
 
-                if (entityData.length >= 6) {
+                if (entityData.length >= 7) {
                     int roomId = Integer.parseInt(entityData[4]);
                     if (!(roomId == clientMaster.getCurrentRoom().getRoomId())) continue;
                     
@@ -227,7 +231,8 @@ public class GameClient {
                     int x = Integer.parseInt(entityData[2]);
                     int y = Integer.parseInt(entityData[3]);
                     int sprite = Integer.parseInt(entityData[5]);
-                    clientMaster.loadEntity(identifier, id, x, y, roomId, sprite);
+                    int zIndex = Integer.parseInt(entityData[6]);
+                    clientMaster.loadEntity(identifier, id, x, y, roomId, sprite, zIndex);
                 } else { // SPRITELESS OBJECTS
                     // Don't load if not in the same room as the client.
                     int roomId = Integer.parseInt(entityData[4]);
@@ -237,7 +242,7 @@ public class GameClient {
                     int id = Integer.parseInt(entityData[1]);
                     int x = Integer.parseInt(entityData[2]);
                     int y = Integer.parseInt(entityData[3]);
-                    clientMaster.loadEntity(identifier, id, x, y, roomId, 0); // TODO: TEMPORARY 0 SPRITE   
+                    clientMaster.loadEntity(identifier, id, x, y, roomId, 0, 0); // TODO: TEMPORARY 0 SPRITE   
                 }
             }
         

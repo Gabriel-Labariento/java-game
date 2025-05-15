@@ -1,6 +1,7 @@
 public abstract class GameObject {
     protected int worldX, worldY, height, width;
     protected int HEIGHT_TILES, WIDTH_TILES;
+    protected int zIndex;
     protected Tile[][] tiles;
     protected int[][] tileLayout;
     int[] hitBoxBounds;
@@ -135,6 +136,14 @@ public abstract class GameObject {
         int dx = a.getCenterX() - b.getCenterX();
         int dy = a.getCenterY() - b.getCenterY();
         return dx * dx + dy * dy;
+    }
+
+    public int getZIndex() {
+        return 0;
+    }
+
+    public void setzIndex(int zIndex) {
+        this.zIndex = zIndex;
     }
 
 }

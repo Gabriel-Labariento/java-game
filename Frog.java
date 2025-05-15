@@ -1,150 +1,146 @@
-// import java.awt.Graphics2D;
-// import java.awt.image.BufferedImage;
-// import java.io.IOException;
-// import javax.imageio.ImageIO;
+import java.awt.Graphics2D;
+import java.awt.image.BufferedImage;
+import java.io.IOException;
+import javax.imageio.ImageIO;
 
-// public class Frog extends Enemy{
-//     private static final int SPRITE_FRAME_DURATION = 200;
-//     private static final int IDLE_DURATION = 400;
-//     private static final int ATTACK_DURATION = 300;
-//     private long lastSpriteUpdate = 0;
-//     private long lastStateChangeTime = 0;
-//     private static final int ATTACK_RANGE = GameCanvas.TILESIZE * 2;
-//     private static BufferedImage[] sprites;
-//     private enum State {IDLE, PURSUE, ATTACK}; 
-//     private State currentState;
+public class Frog extends Enemy{
+    private static final int ATTACK_RANGE = GameCanvas.TILESIZE * 3;
+    private static final int IDLE_DURATION = 400;
+    private static final int ATTACK_DURATION = 300;
+    private boolean smashPerformed;
+    private long lastStateChangeTime = 0;
+    private static BufferedImage[] sprites;
+    private enum State {IDLE, PURSUE, ATTACK, SMASH}; 
+    private State currentState;
     
-//     static {
-//         setSprites();
-//     }
+    static {
+        setSprites();
+    }
 
-//     public FROG(int x, int y) {
-//         id = enemyCount++;
-//         identifier = NetworkProtocol.FROG;
-//         speed = 1;
-//         height = 16;
-//         width = 16;
-//         worldX = x;
-//         worldY = y;
-//         maxHealth = 10;
-//         hitPoints = maxHealth;
-//         damage = 1;
-//         rewardXP = 50;
-//         currentRoom = null;
-//         currSprite = 0;
-//         currentState = State.IDLE;
-//     }
+    public Frog(int x, int y) {
+        id = enemyCount++;
+        identifier = NetworkProtocol.FROG;
+        speed = 5;
+        height = 16;
+        width = 16;
+        worldX = x;
+        worldY = y;
+        maxHealth = 20;
+        hitPoints = maxHealth;
+        damage = 1;
+        rewardXP = 50;
+        currentRoom = null;
+        currSprite = 0;
+        currentState = State.IDLE;
+        smashPerformed = false;
+    }
 
-//      private static void setSprites() {
-//         try {
-//             BufferedImage up0 = ImageIO.read(Cockroach.class.getResourceAsStream("resources/Sprites/Cockroach/cockroach_up0.png"));
-//             BufferedImage up1 = ImageIO.read(Cockroach.class.getResourceAsStream("resources/Sprites/Cockroach/cockroach_up1.png"));
-//             BufferedImage down0 = ImageIO.read(Cockroach.class.getResourceAsStream("resources/Sprites/Cockroach/cockroach_down0.png"));
-//             BufferedImage down1 = ImageIO.read(Cockroach.class.getResourceAsStream("resources/Sprites/Cockroach/cockroach_down1.png"));
+     private static void setSprites() {
+        try {
+            BufferedImage down0 = ImageIO.read(Frog.class.getResourceAsStream("resources/Sprites/Frog/frog_down0.png"));
+            BufferedImage down1 = ImageIO.read(Frog.class.getResourceAsStream("resources/Sprites/Frog/frog_down1.png"));
 
-//             sprites = new BufferedImage[] {up0, up1, down0, down1};
+            sprites = new BufferedImage[] {down0, down1};
 
-//         } catch (IOException e) {
-//             System.out.println("Exception in Cockroach setSprites()" + e);
-//         }
-//     }
+        } catch (IOException e) {
+            System.out.println("Exception in Frog setSprites()" + e);
+        }
+    }
 
-//     @Override
-//     public void matchHitBoxBounds() {
-//         hitBoxBounds = new int[4];
-//         hitBoxBounds[0]= worldY;
-//         hitBoxBounds[1] = worldY + height;
-//         hitBoxBounds[2]= worldX;
-//         hitBoxBounds[3] = worldX + width;
-//     }
+    @Override
+    public void matchHitBoxBounds() {
+        hitBoxBounds = new int[4];
+        hitBoxBounds[0]= worldY;
+        hitBoxBounds[1] = worldY + height;
+        hitBoxBounds[2]= worldX;
+        hitBoxBounds[3] = worldX + width;
+    }
 
-//     @Override
-//     public void draw(Graphics2D g2d, int xOffset, int yOffset){
-//         g2d.drawRect(xOffset, yOffset, width, height);
-//         g2d.drawImage(sprites[currSprite], xOffset, yOffset, width, height, null);
-//     }
+    @Override
+    public void draw(Graphics2D g2d, int xOffset, int yOffset){
+        g2d.drawImage(sprites[currSprite], xOffset, yOffset, width, height, null);
+    }
 
-//     @Override
-//     public String getAssetData(boolean isUserPlayer) {
-//         StringBuilder sb = new StringBuilder();
-//         // System.out.println("In getAssetData of Rat, identifier is " + identifier);
-//         // String format: B,id,x,y,currentRoomId,currsprite|
-//         sb.append(identifier).append(NetworkProtocol.SUB_DELIMITER)
-//         .append(id).append(NetworkProtocol.SUB_DELIMITER)
-//         .append(worldX).append(NetworkProtocol.SUB_DELIMITER)
-//         .append(worldY).append(NetworkProtocol.SUB_DELIMITER)
-//         .append(currentRoom.getRoomId()).append(NetworkProtocol.SUB_DELIMITER)
-//         .append(currSprite).append(NetworkProtocol.DELIMITER);
+    
+    @Override
+    public void updateEntity(ServerMaster gsm){
+        // TODO: ENEMY AI LOGIC
+        long now = System.currentTimeMillis();
 
-//         return sb.toString();
-//     }
+        Player pursued = scanForPlayer(gsm);
+        if (pursued == null) return;
 
-//     @Override
-//     public void updateEntity(ServerMaster gsm){
-//         // TODO: ENEMY AI LOGIC
-//         long now = System.currentTimeMillis();
+        double distanceSquared = getSquaredDistanceBetween(this, pursued);
 
-//         Player pursued = scanForPlayer(gsm);
-//         if (pursued == null) return;
+        switch (currentState) {
+            case IDLE:
+                if (now - lastStateChangeTime > IDLE_DURATION) {
+                    currSprite = 0;
+                    currentState = (distanceSquared <= ATTACK_RANGE * ATTACK_RANGE) ? State.ATTACK : State.PURSUE;
+                    lastStateChangeTime = now;
+                }
+                break;
 
-//         // Sprite walk update
-//         if (now - lastSpriteUpdate > SPRITE_FRAME_DURATION) {
-//             if (worldY > pursued.getWorldY()) {
-//                 currSprite = (currSprite == 1) ? 0 : 1;
-//             } else if (worldY < pursued.getWorldY()) {
-//                 currSprite = (currSprite == 2) ? 3 : 2;
-//             }
-//             lastSpriteUpdate = now;
-//         }
+            case PURSUE:
+                currSprite = 1;
+                initiateJump(pursued);
+                currentState = State.IDLE;
+                lastStateChangeTime = now;
+                break;
 
-//         double distanceSquared = getSquaredDistanceBetween(this, pursued);
+            case ATTACK:
+                if (!smashPerformed) {
+                    currentState = State.SMASH;
+                    smashPerformed = true;
+                    lastStateChangeTime = now;
+                    performSmashAttack(gsm);
+                }
+                if (now - lastStateChangeTime > ATTACK_DURATION) { 
+                    initiateJump(pursued);
+                    currentState = State.IDLE;
+                    lastStateChangeTime = now;
+                    smashPerformed = false;
+                } 
+                break;
 
-//         switch (currentState) {
-//             case IDLE:
-//                 if (now - lastStateChangeTime > IDLE_DURATION) {
-//                     currentState = State.PURSUE;
-//                     lastStateChangeTime = now;
-//                 }
-//                 break;
+            case SMASH:
+                if (now - lastStateChangeTime > ATTACK_DURATION) {
+                    currentState = State.IDLE;
+                    lastStateChangeTime = now;
+                }
+                break;
 
-//             case PURSUE:
-//                 pursuePlayer(pursued);
-//                 if (distanceSquared <= ATTACK_RANGE * ATTACK_RANGE) {
-//                     currentState = State.ATTACK;
-//                     lastStateChangeTime = now;
-//                 }
-//                 break;
+            default:
+                throw new AssertionError();
+        }
 
-//             case ATTACK:
-//                 if (now - lastStateChangeTime > ATTACK_DURATION) { 
-//                     initiateJump(pursued);
-//                     currentState = State.IDLE;
-//                     lastStateChangeTime = now;
-//                 } 
-//                 break;
+        matchHitBoxBounds();
+    }
 
-//             default:
-//                 throw new AssertionError();
-//         }
+    private void initiateJump(Player target){
+        int vectorX = target.getCenterX() - getCenterX();
+        int vectorY = target.getCenterY() - getCenterY(); 
+        double normalizedVector = Math.sqrt((vectorX*vectorX)+(vectorY*vectorY));
 
-//         matchHitBoxBounds();
-//     }
+        //Avoids 0/0 division edge case
+        if (normalizedVector == 0) normalizedVector = 1; 
+        double normalizedX = vectorX / normalizedVector;
+        double normalizedY = vectorY / normalizedVector;
 
-//     private void initiateJump(Player target){
-//         int vectorX = target.getCenterX() - getCenterX();
-//         int vectorY = target.getCenterY() - getCenterY(); 
-//         double normalizedVector = Math.sqrt((vectorX*vectorX)+(vectorY*vectorY));
+        int jumpDistance = GameCanvas.TILESIZE * 3;
 
-//         //Avoids 0/0 division edge case
-//         if (normalizedVector == 0) normalizedVector = 1; 
-//         double normalizedX = vectorX / normalizedVector;
-//         double normalizedY = vectorY / normalizedVector;
+        int newX = (int) (worldX + normalizedX * jumpDistance);
+        int newY = (int) (worldY + normalizedY * jumpDistance);
 
-//         int jumpDistance = GameCanvas.TILESIZE * 3;
+        setPosition(newX, newY);
+    }
 
-//         int newX = (int) (worldX + normalizedX * jumpDistance);
-//         int newY = (int) (worldY + normalizedY * jumpDistance);
+    private void performSmashAttack(ServerMaster gsm){
+        int smashX = worldX - FrogSmash.SMASH_RADIUS;
+        int smashY = worldY - FrogSmash.SMASH_RADIUS;
 
-//         setPosition(newX, newY);
-//     }
-// }
+        FrogSmash fs = new FrogSmash(this, smashX, smashY);
+        fs.addAttackEffect(new SlowEffect());
+        gsm.addEntity(fs);
+    }
+}
