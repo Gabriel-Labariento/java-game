@@ -4,6 +4,9 @@ import java.io.IOException;
 import javax.imageio.ImageIO;
 
 public class PlayerSmash extends Attack{
+    public static final int WIDTH = 80;
+    public static final int HEIGHT = 80;
+
     public static BufferedImage sprite;
     static {
         try {
@@ -21,8 +24,8 @@ public class PlayerSmash extends Attack{
         owner = entity;
         this.isFriendly = isFriendly;
         damage = d;
-        width = 80;
-        height = 80;
+        width = WIDTH;
+        height = HEIGHT;
         worldX = x;
         worldY = y;
 

@@ -156,7 +156,7 @@ public abstract class Player extends Entity{
     }
 
     public boolean getIsInvincible(){
-        return System.currentTimeMillis() >= invincibilityEnd;
+        return System.currentTimeMillis() < invincibilityEnd;
     }
 
     /**
@@ -280,7 +280,7 @@ public abstract class Player extends Entity{
     @Override
     public void updateEntity(ServerMaster gsm) {
         //Do regen mechanics if player is holding a thick sweater
-        if(heldItem instanceof ThickSweater ts){
+        if(heldItem instanceof ThickSweater ts && !isDown){
             ts.triggerRegenSystem();
         }
     }

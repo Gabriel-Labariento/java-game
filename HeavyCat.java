@@ -13,7 +13,7 @@ public class HeavyCat extends Player{
     public HeavyCat(int cid, int x, int y){
         this.clientId = cid;
         identifier = NetworkProtocol.HEAVYCAT;
-        speed = 2;
+        speed = 1;
         height = 16;
         width = 16;
         screenX = 800/2 - width/2;

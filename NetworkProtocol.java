@@ -34,7 +34,9 @@ public class NetworkProtocol {
     public static final String CONJOINEDRATS = "AA";
     public static final String FISHMONSTER = "AB";
     public static final String SPIDERBULLET = "AC";
-
+    public static final String LASERBULLET = "AD";
+    public static final String ENEMYBITE = "AE";
+    
     public static final String REDFISH = "1"; // Rat
     public static final String CATTREAT = "2"; // Rat
     public static final String MILK = "3"; // Rat

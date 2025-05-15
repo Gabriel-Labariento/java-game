@@ -16,8 +16,8 @@ public class SecurityBot extends Enemy{
     public SecurityBot(int x, int y) {
         identifier = NetworkProtocol.SECURITYBOT;
         speed = 1;
-        height = 16;
-        width = 16;
+        height = 24;
+        width = 24;
         worldX = x;
         worldY = y;
         maxHealth = 10;
@@ -26,7 +26,7 @@ public class SecurityBot extends Enemy{
         rewardXP = 50;
         currentRoom = null;
         currSprite = 0;
-        
+        attackCDDuration = 2000;
     }
 
      private static void setSprites() {
@@ -60,32 +60,28 @@ public class SecurityBot extends Enemy{
     }
 
     @Override
-    public String getAssetData(boolean isUserPlayer) {
-        StringBuilder sb = new StringBuilder();
-        // System.out.println("In getAssetData of Rat, identifier is " + identifier);
-        // String format: B,id,x,y,currentRoomId,currsprite|
-        sb.append(identifier).append(NetworkProtocol.SUB_DELIMITER)
-        .append(id).append(NetworkProtocol.SUB_DELIMITER)
-        .append(worldX).append(NetworkProtocol.SUB_DELIMITER)
-        .append(worldY).append(NetworkProtocol.SUB_DELIMITER)
-        .append(currentRoom.getRoomId()).append(NetworkProtocol.SUB_DELIMITER)
-        .append(currSprite).append(NetworkProtocol.DELIMITER);
-
-        return sb.toString();
-    }
-
-    @Override
     public void updateEntity(ServerMaster gsm){
 
         // TODO: ENEMY AI LOGIC
         long now = System.currentTimeMillis();
+        final double ACTION_DISTANCE = (GameCanvas.TILESIZE * 8) *(GameCanvas.TILESIZE * 8);
 
         Player pursued = scanForPlayer(gsm);
         if (pursued == null) return;
-        if (!(getSquaredDistanceBetween(this, pursued) < (GameCanvas.TILESIZE * 4) * (GameCanvas.TILESIZE * 4))) 
+        if (getSquaredDistanceBetween(this, pursued) > ACTION_DISTANCE)
             pursuePlayer(pursued);
-        else
-            runFromPlayer(pursued);
+        else {
+            //If in aggro range trigger attacks, and run if chased
+            if (getSquaredDistanceBetween(this, pursued) < ACTION_DISTANCE){
+                runFromPlayer(pursued);
+            }
+            
+            if (now - lastAttackTime > attackCDDuration) {
+                sendProjectile(gsm, pursued);
+                lastAttackTime = now;
+            }
+        }
+            
         
         // Sprite walk update
         if (now - lastSpriteUpdate > SPRITE_FRAME_DURATION) {
@@ -98,10 +94,20 @@ public class SecurityBot extends Enemy{
             }
             lastSpriteUpdate = now;
         }
-
-        
-
-
         matchHitBoxBounds();
+    }
+
+    private void sendProjectile(ServerMaster gsm, Player target){
+        int vectorX = target.getCenterX() - getCenterX();
+        int vectorY = target.getCenterY() - getCenterY(); 
+        double normalizedVector = Math.sqrt((vectorX*vectorX)+(vectorY*vectorY));
+
+        //Avoids 0/0 division edge case
+        if (normalizedVector == 0) normalizedVector = 1; 
+        double normalizedX = vectorX / normalizedVector;
+        double normalizedY = vectorY / normalizedVector;
+
+        LaserBullet bullet = new LaserBullet(this, this.worldX-LaserBullet.WIDTH/2, this.worldY-LaserBullet.HEIGHT/2, normalizedX, normalizedY);
+        gsm.addEntity(bullet);
     }
 }

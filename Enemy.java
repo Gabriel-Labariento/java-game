@@ -3,7 +3,10 @@ import java.util.ArrayList;
 
 public abstract class Enemy extends Entity {
     public ArrayList<Integer> attacksTakenById;
+    public static int enemyCount = Integer.MIN_VALUE;
     public int rewardXP;
+    public long lastAttackTime;
+
 
     public Enemy(){
         attacksTakenById = new ArrayList<>();
@@ -11,6 +14,10 @@ public abstract class Enemy extends Entity {
 
     public int getRewardXP(){
         return rewardXP;
+    }
+
+    public void setRewardXP(int i){
+        rewardXP = i;
     }
     
     public void loadAttack(int id){
@@ -58,7 +65,7 @@ public abstract class Enemy extends Entity {
     // Right now, simple logic that scans if the distance between the player and the entity is <= scanRadius.
     // Pursues if yes. Does not yet consider obstacles.
     public Player scanForPlayer(ServerMaster gsm){
-        final int scanRadius = 96;
+        final int scanRadius = GameCanvas.TILESIZE * 12;
         Player closestPlayer = null;
         double minDistance = 10000; // Random large number
 
@@ -94,7 +101,26 @@ public abstract class Enemy extends Entity {
 
         if (player.getCenterY() > getCenterY() && isMoveInbound(0, -speed)) worldY -= speed;
         else if (player.getCenterY() < getCenterY() && isMoveInbound(0, speed)) worldY += speed;
-    }
+    }    
 
-    
+    public void createBiteAttack(ServerMaster gsm, Player target, StatusEffect effect){
+        int vectorX = target.getCenterX() - getCenterX();
+        int vectorY = target.getCenterY() - getCenterY(); 
+        double normalizedVector = Math.sqrt((vectorX*vectorX)+(vectorY*vectorY));
+
+        //Avoids 0/0 division edge case
+        if (normalizedVector == 0) normalizedVector = 1; 
+        double normalizedX = vectorX / normalizedVector;
+        double normalizedY = vectorY / normalizedVector;
+
+        int biteDistance = GameCanvas.TILESIZE;
+        int biteX = (int) (this.getCenterX() + normalizedX * biteDistance);
+        int biteY = (int) (this.getCenterY() + normalizedY * biteDistance);
+        biteX -= EnemyBite.WIDTH / 2;
+        biteY -= EnemyBite.HEIGHT / 2;
+
+        EnemyBite eb = new EnemyBite(this, biteX, biteY);
+        eb.addAttackEffect(effect);
+        gsm.addEntity(eb);
+    }
 }

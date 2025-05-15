@@ -78,22 +78,22 @@ public class ClientMaster {
         else if (identifier.equals( NetworkProtocol.FROG)) return new PringlesCan(x,y);
         else if (identifier.equals( NetworkProtocol.BEE)) return new RatKing(x, y);
         else if (identifier.equals( NetworkProtocol.SNAKELET)) return new Snakelet(x, y);
-        else if (identifier.equals( NetworkProtocol.CLEANINGBOT)) return new BagOfCatnip(x, y);
+        else if (identifier.equals( NetworkProtocol.CLEANINGBOT)) return new CleaningRobot(x, y);
         else if (identifier.equals( NetworkProtocol.SECURITYBOT)) return new SecurityBot(x, y);
-        else if (identifier.equals( NetworkProtocol.FERALRAT)) return new PringlesCan(x,y);
-        else if (identifier.equals( NetworkProtocol.SCREAMERRAT)) return new RatKing(x, y);
-        else if (identifier.equals( NetworkProtocol.MUTATEDANCHOVY)) return new Snakelet(x, y);
-        else if (identifier.equals( NetworkProtocol.MUTATEDARCHERFISH)) return new BagOfCatnip(x, y);
-        else if (identifier.equals( NetworkProtocol.MUTATEDPUFFERFISH)) return new LoudBell(x, y);
+        else if (identifier.equals( NetworkProtocol.FERALRAT)) return new FeralRat(x,y);
+        else if (identifier.equals( NetworkProtocol.SCREAMERRAT)) return new ScreamerRat(x, y);
+        else if (identifier.equals( NetworkProtocol.MUTATEDANCHOVY)) return new MutatedAnchovy(x, y);
+        else if (identifier.equals( NetworkProtocol.MUTATEDARCHERFISH)) return new MutatedArcherfish(x, y);
+        else if (identifier.equals( NetworkProtocol.MUTATEDPUFFERFISH)) return new MutatedPufferfish(x, y);
 
         //Bosses
         else if (identifier.equals( NetworkProtocol.RATKING)) return new RatKing(x,y);
         else if (identifier.equals( NetworkProtocol.FERALDOG)) return new RatKing(x, y);
         else if (identifier.equals( NetworkProtocol.TURTLE)) return new BagOfCatnip(x, y);
         else if (identifier.equals( NetworkProtocol.SNAKE)) return new LoudBell(x, y);
-        else if (identifier.equals( NetworkProtocol.ADULTCAT)) return new PringlesCan(x,y);
-        else if (identifier.equals( NetworkProtocol.CONJOINEDRATS)) return new RatKing(x, y);
-        else if (identifier.equals( NetworkProtocol.FISHMONSTER)) return new Snakelet(x, y);
+        else if (identifier.equals( NetworkProtocol.ADULTCAT)) return new AdultCat(x,y);
+        else if (identifier.equals( NetworkProtocol.CONJOINEDRATS)) return new ConjoinedRats(x, y);
+        else if (identifier.equals( NetworkProtocol.FISHMONSTER)) return new FishMonster(x, y);
 
         //Attack entities
         else if (identifier.equals( NetworkProtocol.PLAYERSMASH)) 
@@ -102,6 +102,14 @@ public class ClientMaster {
             return new PlayerSlash(id, null, x, y, 0, false);
         else if (identifier.equals( NetworkProtocol.PLAYERBULLET)) 
             return new PlayerBullet(id, null, x, y, 0, 0, 0, false);
+        else if (identifier.equals(NetworkProtocol.SPIDERBULLET))
+            return new SpiderBullet(null, x, y, 0, 0);
+        else if (identifier.equals(NetworkProtocol.LASERBULLET))
+            return new LaserBullet(null, x, y, 0, 0);
+        else if (identifier.equals(NetworkProtocol.ENEMYBITE))
+            return new EnemyBite(null, x, y);
+        else if (identifier.equals(NetworkProtocol.ENEMYBITE))
+            return new EnemyBite(null, x, y);
         else return null;
     }
 

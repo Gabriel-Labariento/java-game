@@ -6,6 +6,8 @@ import javax.imageio.ImageIO;
 public class PlayerBullet extends Attack{
     private double normalizedX;
     private double normalizedY;
+    public static final int WIDTH = 16;
+    public static final int HEIGHT = 16;
     public static BufferedImage sprite;
     static {
         try {
@@ -25,8 +27,8 @@ public class PlayerBullet extends Attack{
         this.isFriendly = isFriendly;
         damage = d;
         //Temporary hitPoints allocation
-        width = 16;
-        height = 16;
+        width = WIDTH;
+        height = HEIGHT;
         worldX = x;
         worldY = y;
         speed = 3;

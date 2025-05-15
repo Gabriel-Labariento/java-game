@@ -4,6 +4,7 @@ public abstract class GameObject {
     protected Tile[][] tiles;
     protected int[][] tileLayout;
     int[] hitBoxBounds;
+    protected int zIndex;
 
     public abstract void matchHitBoxBounds();
 
@@ -28,7 +29,7 @@ public abstract class GameObject {
      * @return integer value of the object's center x coordinate
      */
     public int getCenterX() {
-        return ( (int) ((worldX + width) / 2));
+        return ( (int) (worldX + (width / 2)));
     }
 
     /**
@@ -36,7 +37,7 @@ public abstract class GameObject {
      * @return integer value of the object's center y coordinate
      */
     public int getCenterY() {
-        return ( (int) ((worldY + height) / 2));
+        return ( (int) (worldY + (height / 2)));
     }
 
     /**
@@ -135,6 +136,14 @@ public abstract class GameObject {
         int dx = a.getCenterX() - b.getCenterX();
         int dy = a.getCenterY() - b.getCenterY();
         return dx * dx + dy * dy;
+    }
+
+    public int getZIndex() {
+        return 0;
+    }
+
+    public void setzIndex(int zIndex) {
+        this.zIndex = zIndex;
     }
 
 }

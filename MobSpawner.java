@@ -21,12 +21,12 @@ public class MobSpawner {
     private static final int INITIALSPAWNDELAY = 1;
     
     private static final String[][] spawnableEnemiesAtLevel = {
-        {"SecurityBot"}, // TODO: ADD OTHER ENEMIES
+        {"Rat"}, // TODO: ADD OTHER ENEMIES
         {"Rat", "Snakelet"}
     };
 
     private static final String[] bosses = {
-        "RatKing", // TODO: ADD OTHER BOSSES
+        "ConjoinedRats", // TODO: ADD OTHER BOSSES
         "Snake"
     };
 
@@ -108,16 +108,29 @@ public class MobSpawner {
     
     private Enemy createEnemy(String name, int x, int y) {
         switch (name) {
+            case "CleaningBot":
+                return new CleaningRobot(x, y);
+            case "ConjoinedRats":
+                return new ConjoinedRats(x, y);
+            case "FeralRat":
+                return new FeralRat(x, y);
+            case "MutatedAnchovy":
+                return new MutatedAnchovy(x, y);
+            case "MutatedArcherfish":
+                return new MutatedArcherfish(x, y);
+            case "MutatedPufferfish":
+                return new MutatedPufferfish(x, y);
             case "Rat":
                 return new Rat(x, y);
             case "RatKing":
                 return new RatKing(x, y);
+            case "ScreamerRat":
+                return new ScreamerRat(x, y);
             case "Snakelet":
                 return new Snakelet(x, y);
             case "Snake":
                 return new Snake(x, y);
             case "SecurityBot":
-                System.out.println("a");
                 return new SecurityBot(x, y);
             default:
                 System.out.println("Undetected enemy " + name );

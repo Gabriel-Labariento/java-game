@@ -155,7 +155,7 @@ public class GameClient {
      */
     private void parseEntitiesData(String message){
 
-        System.out.println(message);
+        // System.out.println(message);
         String[] messageParts = message.split("\\" + NetworkProtocol.DELIMITER); // Have to use \\ to escape. Turns out "|" is special for java
         this.clientId = Integer.parseInt(messageParts[0]);
         clientMaster.setXPBarPercent(Integer.parseInt(messageParts[1]));

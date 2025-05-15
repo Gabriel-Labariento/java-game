@@ -3,30 +3,27 @@ import java.awt.image.BufferedImage;
 import java.io.IOException;
 import javax.imageio.ImageIO;
 
-public class PlayerSlash extends Attack{
-    public static final int WIDTH = 40;
-    public static final int HEIGHT = 40;
+public class EnemyBite extends Attack{
+    public static final int HEIGHT = 16;
+    public static final int WIDTH = 16;
+    private static BufferedImage sprite;
 
-    public static BufferedImage sprite;
     static {
         try {
-            sprite = ImageIO.read(PlayerSlash.class.getResourceAsStream("resources/Sprites/Attacks/playerslash.png"));
+            BufferedImage img = ImageIO.read(EnemyBite.class.getResourceAsStream("resources/Sprites/SharedEnemy/enemyslash.png"));
+            sprite = img;
         } catch (IOException e) {
-            System.out.println("Exception in setSprites()" + e);
+            System.out.println("Exception in SpiderBullet setSprites()" + e);
         }
     }
 
-    public PlayerSlash(int cid, Entity entity, int x, int y, int d, boolean isFriendly){
+    public EnemyBite(Entity owner, int x, int y){
         attackNum++;
         id = attackNum;
-        clientId = cid;
-        identifier = NetworkProtocol.PLAYERSLASH;
-        owner = entity;
-        this.isFriendly = isFriendly;
-        damage = d;
-        //Temporary hitPoints allocation
-        hitPoints = 100;
-        
+        identifier = NetworkProtocol.ENEMYBITE;
+        this.owner = owner;
+        isFriendly = false;
+        damage = 1;
         width = WIDTH;
         height = HEIGHT;
         worldX = x;
@@ -57,6 +54,5 @@ public class PlayerSlash extends Attack{
     @Override
     public void updateEntity(ServerMaster gsm) {
         attachToOwner();
-
     }
 }
