@@ -12,7 +12,7 @@ public class PoisonEffect extends StatusEffect{
 
     @Override
     public void applyStatusEffect(Player player) {
-        player.setHitPoints(player.getHitPoints() - DPS);
+        if (!player.getStatusEffects().contains(this)) player.setHitPoints(player.getHitPoints() - DPS);
     }
 
     @Override

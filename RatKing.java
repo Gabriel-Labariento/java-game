@@ -8,7 +8,6 @@ public class RatKing extends Enemy {
     private static final int SPAWN_COOLDOWN = 4000;
     private static final int ATTACK_COOLDOWN = 5000;
     private static final int SMASH_COOLDOWN = 3000;
-    // private static final int SMASH_RANGE = GameCanvas.TILESIZE * 3;
     private static final int ATTACK_RANGE = GameCanvas.TILESIZE * 3;
     private long lastAttackTime = 0;
     private long lastSpawnTime = 0;

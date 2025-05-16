@@ -17,6 +17,7 @@ public abstract class Player extends Entity implements Effectable{
     public int currentLvl;
     public int currentXPCap;
     public int pastXPCap;
+    protected int baseSpeed;
     public Item heldItem;
     private ArrayList<StatusEffect> statusEffects;
 
@@ -305,6 +306,14 @@ public abstract class Player extends Entity implements Effectable{
     public void addStatusffect(StatusEffect se) {
         statusEffects.add(se);
     };
+
+    public int getBaseSpeed() {
+        return baseSpeed;
+    }
+
+    public ArrayList<StatusEffect> getStatusEffects() {
+        return statusEffects;
+    }
     
     
     

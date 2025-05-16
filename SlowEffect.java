@@ -9,20 +9,23 @@ public class SlowEffect extends StatusEffect{
 
     @Override
     public void applyStatusEffect(Player player) {
-        initialPlayerSpeed = player.getSpeed();
-        player.setSpeed(initialPlayerSpeed - 2);
+        initialPlayerSpeed = player.getBaseSpeed();
+        player.setSpeed(player.getBaseSpeed() - 2);        
     }
 
     @Override
     public void tick(Player player){
         if (isExpired()) {
             removeStatusEffect(player);
-        }
+        } else applyStatusEffect(player);
     }
 
     @Override
     public void removeStatusEffect(Player player) {
         player.setSpeed(initialPlayerSpeed);
+        System.out.println("Removed slow");
+        System.out.println("Initial Player Speed: " + initialPlayerSpeed);
+        System.out.println("Player speed: " + player.getSpeed());
     }
 
     @Override
