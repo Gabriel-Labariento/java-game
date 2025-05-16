@@ -21,7 +21,7 @@ public class MobSpawner {
     private static final int INITIALSPAWNDELAY = 1;
     
     private static final String[][] spawnableEnemiesAtLevel = {
-        {"Snakelet"}, // TODO: ADD OTHER ENEMIES
+        {"Spider", "Bunny", "Bee", "Snakelet"}, // TODO: ADD OTHER ENEMIES
         {"Rat", "SmallDog"}
     };
 
@@ -41,6 +41,7 @@ public class MobSpawner {
         
         spawnRate = Math.max(2, 5 - (level / 2 - difficulty));
         maxSpawned = (difficulty == 3) ? 1 : (3 + level + difficulty);
+        maxSpawned = 1;
         spawnedEnemies = new ArrayList<>();
         // spawnedCount = 0;
         isSpawning = false;
@@ -58,16 +59,11 @@ public class MobSpawner {
                     Enemy enemy = null;
                     if (inBossRoom && spawnedCount == 0) {
                         enemy = createBoss(level);
+                        spawnEnemy(enemy);
                         for (int i = 0; i < 0; i++) {
                             enemy = createNormalEnemy(level);
                             spawnEnemy(enemy);
                         }
-                        // if (enemy instanceof  RatKing && !enemy.isDead()) {
-                        //     // TODO: RATKING IMPLEMENTATION
-                        // }
-                        spawnEnemy(enemy);
-
-                        
                     } else {
                         // Pick a random enemy to spawn out of the available in the list for the level
                         enemy = createNormalEnemy(level);
@@ -162,7 +158,7 @@ public class MobSpawner {
         return createEnemy(bossType, spawnX, spawnY);
     }
 
-    private Enemy createNormalEnemy(int level){
+    public Enemy createNormalEnemy(int level){
         int[] spawnCoors = getRandomTileCoordinates();
         spawnX = spawnCoors[0];
         spawnY = spawnCoors[1];
@@ -171,7 +167,7 @@ public class MobSpawner {
         return createEnemy(toSpawn, spawnX, spawnY);
     }
 
-    private void spawnEnemy(Enemy enemy) {
+    public void spawnEnemy(Enemy enemy) {
         spawnedCount++;   
         isSpawning = true;
         enemy.setCurrentRoom(parentRoom);

@@ -29,26 +29,26 @@ public abstract class Enemy extends Entity {
     }
 
 
-      // Right now, simple logic that scans if the distance between the player and the entity is <= scanRadius.
-    // Pursues if yes. Does not yet consider obstacles.
+    /**
+     * Scans for and returns the closest player to the enemy.
+     * @param gsm servermaster instance
+     * @return the player closest to the enemy
+     */ 
     public Player scanForPlayer(ServerMaster gsm){
         final int scanRadius = GameCanvas.TILESIZE * 6;
         Player closestPlayer = null;
-        double minDistance = 10000; // Random large number
+        double minDistance = Integer.MAX_VALUE;
 
         for (Entity e : gsm.getEntities()) {
             if (e instanceof Player player) {
                 if (this.getCurrentRoom() != player.getCurrentRoom()) continue; 
                 // Get the center distance between the player and the entity
-                double distance = 
-                Math.sqrt(
-                    (Math.pow(getCenterX() - e.getCenterX(), 2) + 
-                    Math.pow(getCenterY() - e.getCenterY(), 2))
-                );
+                double distanceSquared = 
+                    (Math.pow(getCenterX() - e.getCenterX(), 2) + Math.pow(getCenterY() - e.getCenterY(), 2));
                 
-                if ( (distance <= scanRadius) && (distance < minDistance)) {
+                if ( (distanceSquared <= scanRadius * scanRadius) && (distanceSquared < minDistance)) {
                     closestPlayer = player;
-                    minDistance = distance;
+                    minDistance = distanceSquared;
                 }
             }
         }
@@ -56,19 +56,30 @@ public abstract class Enemy extends Entity {
     }
 
     public void pursuePlayer(Player player) {
-        if (player.getCenterX() > getCenterX()) worldX += speed;
-        else if (player.getCenterX() < getCenterX()) worldX -= speed;
 
-        if (player.getCenterY() > getCenterY()) worldY += speed;
-        else if (player.getCenterY() < getCenterY()) worldY -= speed;
+        int newX = worldX;
+        int newY = worldY;
+
+        if (player.getCenterX() > getCenterX()) newX += speed;
+        else if (player.getCenterX() < getCenterX()) newX -= speed;
+
+        if (player.getCenterY() > getCenterY()) newY += speed;
+        else if (player.getCenterY() < getCenterY()) newY -= speed;
+
+        setPosition(newX, newY);
     }
 
-    public void moveAwayFromPlayer(Player player) {
-        if (player.getCenterX() > getCenterX()) worldX -= speed;
-        else if (player.getCenterX() < getCenterX()) worldX += speed;
+    public void moveAwayFromPlayer(Player player) {       
+        int newX = worldX;
+        int newY = worldY;
+        
+        if (player.getCenterX() > getCenterX()) newX -= speed;
+        else if (player.getCenterX() < getCenterX()) newX += speed;
 
-        if (player.getCenterY() > getCenterY()) worldY -= speed;
-        else if (player.getCenterY() < getCenterY()) worldY += speed;
+        if (player.getCenterY() > getCenterY()) newY -= speed;
+        else if (player.getCenterY() < getCenterY()) newY += speed;
+
+        setPosition(newX, newY);
     }
 
     public void createBiteAttack(ServerMaster gsm, Player target, StatusEffect effect){
@@ -88,11 +99,11 @@ public abstract class Enemy extends Entity {
         biteY -= EnemyBite.HEIGHT / 2;
 
         EnemyBite eb = new EnemyBite(this, biteX, biteY);
-        eb.addAttackEffect(effect);
+        if (effect != null) eb.addAttackEffect(effect);
         gsm.addEntity(eb);
     }
     
-    public void createBarkAttack(ServerMaster gsm, Player target){
+    public void createBarkAttack(ServerMaster gsm, Player target, StatusEffect effect){
         int vectorX = target.getCenterX() - getCenterX();
         int vectorY = target.getCenterY() - getCenterY(); 
         double normalizedVector = Math.sqrt((vectorX*vectorX)+(vectorY*vectorY));
@@ -110,6 +121,35 @@ public abstract class Enemy extends Entity {
         barkY -= EnemyBark.HEIGHT / 2;
 
         EnemyBark eb = new EnemyBark(this, barkX, barkY);
+        if (effect != null) eb.addAttackEffect(effect);
         gsm.addEntity(eb);
+        System.out.println("Created bark attack");
+    }
+
+    public void performSmashAttack(ServerMaster gsm){
+        int smashX = worldX - EnemySmash.SMASH_RADIUS;
+        int smashY = worldY - EnemySmash.SMASH_RADIUS;
+
+        EnemySmash fs = new EnemySmash(this, smashX, smashY);
+        fs.addAttackEffect(new SlowEffect());
+        gsm.addEntity(fs);
+    }
+
+    public void initiateJump(Player target){
+        int vectorX = target.getCenterX() - getCenterX();
+        int vectorY = target.getCenterY() - getCenterY(); 
+        double normalizedVector = Math.sqrt((vectorX*vectorX)+(vectorY*vectorY));
+
+        //Avoids 0/0 division edge case
+        if (normalizedVector == 0) normalizedVector = 1; 
+        double normalizedX = vectorX / normalizedVector;
+        double normalizedY = vectorY / normalizedVector;
+
+        int jumpDistance = GameCanvas.TILESIZE * 3;
+
+        int newX = (int) (worldX + normalizedX * jumpDistance);
+        int newY = (int) (worldY + normalizedY * jumpDistance);
+
+        setPosition(newX, newY);
     }
 }

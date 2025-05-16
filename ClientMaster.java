@@ -41,7 +41,7 @@ public class ClientMaster {
         IDENTIFIERTONAME.put(NetworkProtocol.SMALLDOG, "SmallDog");
         IDENTIFIERTONAME.put(NetworkProtocol.BUNNY, "Bunny");
         IDENTIFIERTONAME.put(NetworkProtocol.FROG, "Frog");
-        IDENTIFIERTONAME.put(NetworkProtocol.FROGSMASH, "FrogSmash");
+        IDENTIFIERTONAME.put(NetworkProtocol.ENEMYSMASH, "EnemySmash");
         IDENTIFIERTONAME.put(NetworkProtocol.BEE, "Bee");
 
 
@@ -139,8 +139,8 @@ public class ClientMaster {
                 return new Bee(x, y);
             case "Frog":
                 return new Frog(x, y);
-            case "FrogSmash":
-                return new FrogSmash(null, x, y);
+            case "EnemySmash":
+                return new EnemySmash(null, x, y);
             case "EnemyBark":
                 return new EnemyBark(null, x, y);
             case "PlayerSlash":

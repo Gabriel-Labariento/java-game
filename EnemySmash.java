@@ -3,24 +3,24 @@ import java.awt.image.BufferedImage;
 import java.io.IOException;
 import javax.imageio.ImageIO;
 
-public class FrogSmash extends Attack {
+public class EnemySmash extends Attack {
     public static final int SMASH_RADIUS = GameCanvas.TILESIZE * 2;
     private static BufferedImage sprite;
 
     static {
         try {
-            BufferedImage img = ImageIO.read(FrogSmash.class.getResourceAsStream("resources/Sprites/Frog/frog_smash.png"));
+            BufferedImage img = ImageIO.read(EnemySmash.class.getResourceAsStream("resources/Sprites/SharedEnemy/enemysmash.png"));
             sprite = img;
         } catch (IOException e) {
-            System.out.println("Exception in FrogSmash setSprite()" + e);
+            System.out.println("Exception in EnemySmash setSprite()" + e);
         }
     }
 
 
-    public FrogSmash(Entity owner, int x, int y){
+    public EnemySmash(Entity owner, int x, int y){
         attackNum++;
         id = attackNum;
-        identifier = NetworkProtocol.FROGSMASH;
+        identifier = NetworkProtocol.ENEMYSMASH;
         this.owner = owner;
         isFriendly = false;
         damage = 1;

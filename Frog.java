@@ -116,30 +116,7 @@ public class Frog extends Enemy{
         matchHitBoxBounds();
     }
 
-    private void initiateJump(Player target){
-        int vectorX = target.getCenterX() - getCenterX();
-        int vectorY = target.getCenterY() - getCenterY(); 
-        double normalizedVector = Math.sqrt((vectorX*vectorX)+(vectorY*vectorY));
+    
 
-        //Avoids 0/0 division edge case
-        if (normalizedVector == 0) normalizedVector = 1; 
-        double normalizedX = vectorX / normalizedVector;
-        double normalizedY = vectorY / normalizedVector;
-
-        int jumpDistance = GameCanvas.TILESIZE * 3;
-
-        int newX = (int) (worldX + normalizedX * jumpDistance);
-        int newY = (int) (worldY + normalizedY * jumpDistance);
-
-        setPosition(newX, newY);
-    }
-
-    private void performSmashAttack(ServerMaster gsm){
-        int smashX = worldX - FrogSmash.SMASH_RADIUS;
-        int smashY = worldY - FrogSmash.SMASH_RADIUS;
-
-        FrogSmash fs = new FrogSmash(this, smashX, smashY);
-        fs.addAttackEffect(new SlowEffect());
-        gsm.addEntity(fs);
-    }
+    
 }

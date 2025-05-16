@@ -446,5 +446,9 @@ public class Room extends GameObject implements Tileable{
     public void setCleared(boolean isCleared) {
         this.isCleared = isCleared;
     }
+
+    public int getGameLevel() {
+        return gameLevel;
+    }
     
 }

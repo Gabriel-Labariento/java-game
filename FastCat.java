@@ -13,7 +13,7 @@ public class FastCat extends Player{
         screenY = 600/2 - height/2;
         worldX = x;
         worldY = y;
-        maxHealth = 4;
+        maxHealth = 500;
         hitPoints = maxHealth;
         damage = 5;
         isDown = false;

@@ -80,7 +80,7 @@ public class SmallDog extends Enemy{
         // If farther than biting distance but within barking distance, create bark attack
         } else if (distanceSquared <  BARK_DISTANCE * BARK_DISTANCE) {
             if (now - lastAttackTime > ATTACK_COOLDOWN) {
-                createBarkAttack(gsm, pursued);
+                createBarkAttack(gsm, pursued, null);
                 lastAttackTime = now;
             }
         // If too far to attack, pursue
