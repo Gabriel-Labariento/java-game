@@ -143,7 +143,9 @@ public class ServerMaster {
     
     private boolean checkRoomCleared(){
         if (currentRoom.isStartRoom() || currentRoom.isCleared()) return true;
-        // System.out.println("Current room is end room: " + currentRoom.isEndRoom());
+        
+        if (currentRoom.isEndRoom()) return (currentRoom.getMobSpawner().isBossKilled());
+
         if (currentRoom.getMobSpawner().isAllKilled()) {
             currentRoom.setCleared(true);
             return true;

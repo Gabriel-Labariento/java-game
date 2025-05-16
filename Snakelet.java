@@ -4,7 +4,6 @@ import java.io.IOException;
 import javax.imageio.ImageIO;
 
 public class Snakelet extends Enemy{
-    private int id;
     private static final int SPRITE_FRAME_DURATION = 200;
     private static final int BULLET_COOLDOWN = 5000;
     private static final int ATTACK_DISTANCE = GameCanvas.TILESIZE * 4;
@@ -113,9 +112,9 @@ public class Snakelet extends Enemy{
 
         // Bullet Spread Rotation Reference: https://stackoverflow.com/questions/31225062/rotating-a-vector-by-angle-and-axis-in-java
 
-        SnakeBullet sb0 = new SnakeBullet(this, this.worldX-SnakeBullet.WIDTH/2, this.worldY-SnakeBullet.HEIGHT/2, normalizedX, normalizedY);
-        SnakeBullet sb1 = new SnakeBullet(this, this.worldX-SnakeBullet.WIDTH/2, this.worldY-SnakeBullet.HEIGHT/2, x1, y1);
-        SnakeBullet sb2 = new SnakeBullet(this, this.worldX-SnakeBullet.WIDTH/2, this.worldY-SnakeBullet.HEIGHT/2, x2, y2);
+        SnakeBullet sb0 = new SnakeBullet(this, getCenterX()-SnakeBullet.WIDTH/2, getCenterY()-SnakeBullet.HEIGHT/2, normalizedX, normalizedY);
+        SnakeBullet sb1 = new SnakeBullet(this, getCenterX()-SnakeBullet.WIDTH/2, getCenterY()-SnakeBullet.HEIGHT/2, x1, y1);
+        SnakeBullet sb2 = new SnakeBullet(this, getCenterX()-SnakeBullet.WIDTH/2, getCenterY()-SnakeBullet.HEIGHT/2, x2, y2);
 
         sb0.addAttackEffect(new SlowEffect());
         sb0.addAttackEffect(new PoisonEffect());

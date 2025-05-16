@@ -13,6 +13,7 @@ public class MobSpawner {
     private Room parentRoom;
     private ArrayList<Enemy> spawnedEnemies; 
     private boolean isSpawning;
+    private Enemy boss;
 
     private static final int HIGHESTX = 40;
     private static final int LOWESTX = 5;
@@ -26,7 +27,7 @@ public class MobSpawner {
     };
 
     private static final String[] bosses = {
-        "Turtle", // TODO: ADD OTHER BOSSES
+        "Snake", // TODO: ADD OTHER BOSSES
         "Snake"
     };
 
@@ -59,6 +60,7 @@ public class MobSpawner {
                     Enemy enemy = null;
                     if (inBossRoom && spawnedCount == 0) {
                         enemy = createBoss(level);
+                        boss = enemy;
                         spawnEnemy(enemy);
                         for (int i = 0; i < 0; i++) {
                             enemy = createNormalEnemy(level);
@@ -187,4 +189,10 @@ public class MobSpawner {
     public void setParentRoom(Room parentRoom) {
         this.parentRoom = parentRoom;
     }
+
+    public boolean isBossKilled(){
+        if (boss == null) return false;
+        return boss.getHitPoints() <= 0;
+    }
+
 }
