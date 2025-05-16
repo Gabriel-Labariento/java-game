@@ -26,7 +26,7 @@ public class MobSpawner {
     };
 
     private static final String[] bosses = {
-        "RatKing", // TODO: ADD OTHER BOSSES
+        "FeralDog", // TODO: ADD OTHER BOSSES
         "Snake"
     };
 
@@ -123,6 +123,8 @@ public class MobSpawner {
                 return new Cockroach(x, y);
             case "SmallDog":
                 return new SmallDog(x, y);
+            case "FeralDog":
+                return new FeralDog(x, y);
             case "Bunny":
                 return new Bunny(x, y);
             case "Bee":

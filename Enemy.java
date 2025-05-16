@@ -6,10 +6,12 @@ public abstract class Enemy extends Entity {
     public ArrayList<Integer> attacksTakenById;
     public int rewardXP;
     public boolean isBoss;
+    protected boolean isBuffed;
 
     public Enemy(){
         attacksTakenById = new ArrayList<>();
         isBoss = false;
+        isBuffed = false;
     }
 
     public int getRewardXP(){
@@ -151,5 +153,20 @@ public abstract class Enemy extends Entity {
         int newY = (int) (worldY + normalizedY * jumpDistance);
 
         setPosition(newX, newY);
+    }
+
+    public void spawnMinions(){
+        if (currentRoom != null && currentRoom.getMobSpawner() != null) {
+        Enemy newSpawn = currentRoom.getMobSpawner().createNormalEnemy(currentRoom.getGameLevel());
+        currentRoom.getMobSpawner().spawnEnemy(newSpawn);
+        }
+    }
+
+    public void applyBuff(){
+        if (!isBuffed){
+            speed += 1;
+            damage += 1;
+        }
+        isBuffed = true;
     }
 }
