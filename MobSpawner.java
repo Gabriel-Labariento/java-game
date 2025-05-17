@@ -26,7 +26,7 @@ public class MobSpawner {
     };
 
     private static final String[] bosses = {
-        "AdultCat", // TODO: ADD OTHER BOSSES
+        "FishMonster", // TODO: ADD OTHER BOSSES
         "Snake"
     };
 

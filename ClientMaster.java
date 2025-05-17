@@ -10,6 +10,7 @@ public class ClientMaster {
     private int userLvl;
     private String heldItemIdentifier;
     private boolean isGameOver;
+    private int bossHPPercent;
 
     public ClientMaster(){
         userPlayer = null;
@@ -24,6 +25,14 @@ public class ClientMaster {
 
     public int getXPBarPercent(){
         return xpBarPercent;
+    }
+
+    public int getBossHPPercent(){
+        return bossHPPercent;
+    }
+
+    public void setBossHPBarPercemt(int i){
+        bossHPPercent = i;
     }
 
     public void setUserLvl(int lvl){

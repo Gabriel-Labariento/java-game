@@ -167,6 +167,7 @@ public class GameClient {
         clientMaster.setXPBarPercent(Integer.parseInt(messageParts[1]));
         clientMaster.setUserLvl(Integer.parseInt(messageParts[2]));
         clientMaster.setHeldItemIdentifier(messageParts[3]);
+        clientMaster.setBossHPBarPercemt(Integer.parseInt(messageParts[4]));
 
         for (String part : messageParts) {
             if (part.startsWith(NetworkProtocol.USER_PLAYER)) {

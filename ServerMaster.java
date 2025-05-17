@@ -729,7 +729,8 @@ public class ServerMaster {
 
         sb.append(userPlayer.getXPBarPercent()).append(NetworkProtocol.DELIMITER)
         .append(userPlayer.getCurrentLvl()).append(NetworkProtocol.DELIMITER).
-        append(heldItemIdentifier).append(NetworkProtocol.DELIMITER);
+        append(heldItemIdentifier).append(NetworkProtocol.DELIMITER)
+        .append(bossHPPercent).append(NetworkProtocol.DELIMITER);
 
 
         if (userPlayerData.startsWith(NetworkProtocol.ROOM_CHANGE)) {

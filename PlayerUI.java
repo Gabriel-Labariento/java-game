@@ -75,9 +75,13 @@ public class PlayerUI extends GameObject{
         g2d.setFont(gameFont);  
         g2d.drawString("LVL " + userLvl, 142/sf, 95/sf);
 
-        Rectangle2D.Double barBorder = new Rectangle2D.Double(143.7/sf, 98.1/sf, 195.5/sf, 10/sf);
+        Rectangle2D.Double xpBarBorder = new Rectangle2D.Double(143.7/sf, 98.1/sf, 195.5/sf, 10/sf);
         g2d.setColor(Color.WHITE);
-        g2d.fill(barBorder);
+        g2d.fill(xpBarBorder);
+
+        Rectangle2D.Double xpBarBG = new Rectangle2D.Double(147.5/sf, 101.1/sf, 188.9/sf, 4.5/sf);
+        g2d.setColor(Color.decode("#808080"));
+        g2d.fill(xpBarBG);
 
         double xpBarWidth = Math.floor(188.9*(xpBarPercent/100));
         Rectangle2D.Double xpBar = new Rectangle2D.Double(147.5/sf, 101.1/sf, xpBarWidth/sf, 4.5/sf);
@@ -98,6 +102,24 @@ public class PlayerUI extends GameObject{
         if (hasHalfHeart) {
             g2d.drawImage(sprites[1], (int)xOffset, (int)yOffset, 36 / sf, 36 / sf, null); 
         }
+
+        //BOSS HP BAR
+        double bossHPBarPercent = clientMaster.getBossHPPercent();
+        if (bossHPBarPercent > 0){
+            Rectangle2D.Double bossBarBorder = new Rectangle2D.Double(88.1/sf, 521/sf, 623.7/sf, 19/sf);
+            g2d.setColor(Color.WHITE);
+            g2d.fill(bossBarBorder);
+
+            Rectangle2D.Double bossBarBG = new Rectangle2D.Double(95.5/sf, 524.4/sf, 609/sf, 11/sf);
+            g2d.setColor(Color.decode("#808080"));
+            g2d.fill(bossBarBG);
+
+            double bossHPBarWidth = Math.floor(609*(bossHPBarPercent/100));
+            Rectangle2D.Double bossHPBar = new Rectangle2D.Double(95.5/sf, 524.4/sf, bossHPBarWidth/sf, 11/sf);
+            g2d.setColor(Color.decode("#e63d3d"));
+            g2d.fill(bossHPBar);
+        }
+        
     }
 
 
