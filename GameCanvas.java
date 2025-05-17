@@ -12,7 +12,6 @@ public class GameCanvas extends JComponent {
     private ClientMaster clientMaster;
     private ScheduledExecutorService renderLoopScheduler;
     private ScheduledExecutorService sendInputsScheduler;
-    private TileManager tileManager;
     public PlayerUI playerUI;
 
     public GameCanvas(int width, int height){
@@ -23,7 +22,6 @@ public class GameCanvas extends JComponent {
         clientMaster = new ClientMaster();
         gameClient = new GameClient(clientMaster);
         setPreferredSize(new Dimension(width, height));
-        tileManager = new TileManager();
         playerUI = new PlayerUI();
     }
 
@@ -61,13 +59,11 @@ public class GameCanvas extends JComponent {
             int cameraY = userPlayer.getWorldY() - screenY;
 
             Room currentRoom = clientMaster.getCurrentRoom();
-            tileManager.drawTiledObject(g2d, currentRoom, cameraX, cameraY);
             currentRoom.draw(g2d, cameraX, cameraY);
             
             // Draw room doors
             for (Door door : currentRoom.getDoorsArrayList()) {
                 door.draw(g2d, cameraX, cameraY);
-                // tileManager.drawTiledObject(g2d, door, cameraX, cameraY);
             }
 
             // Draw enemies, projectiles, other players

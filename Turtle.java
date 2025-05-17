@@ -5,7 +5,7 @@ import javax.imageio.ImageIO;
 
 public class Turtle extends Enemy {
     private static final int SPRITE_FRAME_DURATION = 300;
-    private int SPAWN_COOLDOWN = 4000;
+    private static final int SPAWN_COOLDOWN = 4000;
     private static final int IDLE_DURATION = 2000;
     private static final int ATTACK_COOLDOWN = 6000;
     private static final int SHELL_DURATION = 6000;

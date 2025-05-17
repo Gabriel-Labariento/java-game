@@ -1,6 +1,6 @@
 import java.awt.Graphics2D;
 
-public class Door extends GameObject implements Tileable {
+public class Door extends GameObject {
     private int id;
     public static final int HEIGHT_TILES = 2;
     public static final int WIDTH_TILES = 2;
@@ -8,21 +8,14 @@ public class Door extends GameObject implements Tileable {
     private Room roomA, roomB; // The door only appears on roomA, but is connected to another door in roomB 
     private boolean isOpen, isExitToNewDungeon;
     
-    
-
     private static int doorCount = 0;
-    private static final int[][] CLOSED_DOOR_LAYOUT = {{16,17}, {18,19}};
-    private static final int[][] OPEN_DOOR_LAYOUT = {{20,21}, {22,23}};
-    
-
+   
     public Door(int x, int y, String direction, Room roomA, Room roomB){
         this.id = doorCount++;
         worldX = x;
         worldY = y;
         height = GameCanvas.TILESIZE * HEIGHT_TILES;
         width = GameCanvas.TILESIZE * WIDTH_TILES;
-        tiles = new Tile[HEIGHT_TILES][WIDTH_TILES];
-        populateTiles();
         isOpen = true;
         isExitToNewDungeon = false;
         this.direction = direction;
@@ -71,12 +64,6 @@ public class Door extends GameObject implements Tileable {
         return sb.toString();
     }
 
-    @Override
-    public int[][] loadLayout(){
-        return (isOpen) ? OPEN_DOOR_LAYOUT : CLOSED_DOOR_LAYOUT;
-    }
-
-    
     public String getDirection() {
         return direction;
     }

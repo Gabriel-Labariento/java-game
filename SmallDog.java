@@ -62,7 +62,6 @@ public class SmallDog extends Enemy{
 
     @Override
     public void updateEntity(ServerMaster gsm){
-        // TODO: ENEMY AI LOGIC
         long now = System.currentTimeMillis();
         final double BITE_DISTANCE = GameCanvas.TILESIZE * 2.5;
         final double BARK_DISTANCE = GameCanvas.TILESIZE * 3.5;
